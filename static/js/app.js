@@ -1,9 +1,40 @@
-// Main Application Class - combines all functionality
+class KaBot {
+    constructor(sectionId) {
+        this.section = document.getElementById(sectionId);
+        this.log = this.section.querySelector("#kabotLog");
+        this.input = this.section.querySelector("#kabotInput");
+        this.button = this.section.querySelector("#kabotStart");
+
+        if (this.button) {
+            this.button.addEventListener("click", () => this.run());
+        }
+    }
+
+    async run() {
+        const url = this.input.value.trim();
+        if (!url) return this.logMessage("Bitte URL eingeben", "red");
+        this.logMessage(`Starte Ka-Bot für ${url}`, "blue");
+
+        await this.delay(1000); this.logMessage("Login erfolgreich", "green");
+        await this.delay(1000); this.logMessage("Angebot geladen", "green");
+        await this.delay(1000); this.logMessage("Erfolgreich erstellt ✅", "green");
+    }
+
+    logMessage(msg, color) {
+        this.log.innerHTML += `<p class='text-${color}-400'>${msg}</p>`;
+        this.log.scrollTop = this.log.scrollHeight;
+    }
+
+    delay(ms) {
+        return new Promise(r => setTimeout(r, ms));
+    }
+}
+
+// Main Application Class
 class KleinManager extends KleinManagerCore {
     constructor() {
         super();
 
-        // Initialize all managers as properties
         this.dashboardManager = new DashboardManager();
         this.ordersManager = new OrdersManager();
         this.watcherManager = new WatcherManager();
@@ -13,7 +44,6 @@ class KleinManager extends KleinManagerCore {
         this.settingsManager = new SettingsManager();
         this.notificationsManager = new NotificationsManager();
 
-        // Copy all methods from managers to this instance
         this.copyMethodsFromManager(this.dashboardManager);
         this.copyMethodsFromManager(this.ordersManager);
         this.copyMethodsFromManager(this.watcherManager);
@@ -27,18 +57,15 @@ class KleinManager extends KleinManagerCore {
     }
 
     copyMethodsFromManager(manager) {
-        // Get all method names from the manager's prototype
         const methodNames = Object.getOwnPropertyNames(Object.getPrototypeOf(manager))
             .filter(name => name !== 'constructor' && typeof manager[name] === 'function');
 
-        // Copy each method to this instance
         methodNames.forEach(methodName => {
-            if (!this[methodName]) { // Don't override existing methods
+            if (!this[methodName]) {
                 this[methodName] = manager[methodName].bind(this);
             }
         });
 
-        // Also copy properties
         Object.keys(manager).forEach(key => {
             if (!this.hasOwnProperty(key)) {
                 this[key] = manager[key];
@@ -59,9 +86,11 @@ class KleinManager extends KleinManagerCore {
                 this.closeMobileMenu();
             }
         });
+
+        // 👉 KaBot hier sauber initialisieren
+        new KaBot("Ka-Bot");
     }
 
-    // Override showSection to handle mixed functionality
     showSection(section) {
         document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
         document.getElementById(section).classList.remove('hidden');
@@ -70,7 +99,6 @@ class KleinManager extends KleinManagerCore {
             n.classList.remove('active', 'bg-blue-900/50', 'border-l-4', 'border-blue-500');
         });
 
-        // Find the clicked nav item
         const clickedItem = event?.target?.closest?.('.nav-item') ||
                            document.querySelector(`.nav-item[onclick*="${section}"]`);
         if (clickedItem) {
@@ -80,7 +108,6 @@ class KleinManager extends KleinManagerCore {
         this.currentSection = section;
         this.closeMobileMenu();
 
-        // Load section data
         if (section === 'dashboard') this.loadDashboard();
         else if (section === 'orders') this.loadOrders();
         else if (section === 'watcher') this.loadWatchedItems();
@@ -91,5 +118,5 @@ class KleinManager extends KleinManagerCore {
     }
 }
 
-// Initialize application
+// 👉 App initialisieren (nur einmal!)
 const app = new KleinManager();

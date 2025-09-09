@@ -18,6 +18,7 @@ class KleinManagerCore {
             en: {
                 'nav.dashboard': 'Dashboard',
                 'nav.orders': 'Orders',
+                'nav.kabot': 'Ka-Bot-En',
                 'nav.watcher': 'Price Watcher',
                 'nav.tracking': 'Package Tracking',
                 'nav.listings': 'My Listings',
@@ -73,6 +74,7 @@ class KleinManagerCore {
             de: {
                 'nav.dashboard': 'Übersicht',
                 'nav.orders': 'Bestellungen',
+                'nav.kabot': 'Ka-Bot-Dt',
                 'nav.watcher': 'Preis-Watcher',
                 'nav.tracking': 'Sendungsverfolgung',
                 'nav.listings': 'Meine Anzeigen',
