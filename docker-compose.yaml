@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  kleinmanager:
+    build: .
+    container_name: kleinmanager
+    ports:
+      - "8080:8000"
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - kleinbot
+
+  kleinbot:
+    build: ./kleinanzeigen-bot
+    container_name: kleinbot
+    volumes:
+      - ./data:/app/data
+    stdin_open: true
+    tty: true
+    command: tail -f /dev/null   # Bot läuft nicht automatisch, sondern wartet

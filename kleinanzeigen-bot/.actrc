@@ -1,0 +1,9 @@
+# config file for https://github.com/nektos/act
+
+# https://github.com/nektos/act#skipping-jobs
+-e .act-event.json
+
+-W .github/workflows/build.yml
+-j build
+--matrix os:ubuntu-latest
+--matrix PYTHON_VERSION:3.13.5
