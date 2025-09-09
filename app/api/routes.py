@@ -2,6 +2,10 @@
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from fastapi import APIRouter, Request
+from fastapi.responses import HTMLResponse  # <- dieser Import fehlt
+from fastapi.templating import Jinja2Templates
+
 import json
 import time
 import asyncio
@@ -31,6 +35,8 @@ notification_service = NotificationService()
 background_tasks = BackgroundTaskManager()
 
 #pl custom
+templates = Jinja2Templates(directory="templates")  # Pfad zu deinen HTML-Templates
+
 @router.get("/bot-ui", response_class=HTMLResponse)
 def bot_ui(request: Request):
     return templates.TemplateResponse("bot.html", {"request": request})

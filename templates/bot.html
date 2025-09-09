@@ -37,12 +37,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("start-btn").addEventListener("click", async () => {
         await fetch("/bot/start", { method: "POST" });
-        updateStatus();
+        setTimeout(updateStatus, 500);
     });
 
     document.getElementById("stop-btn").addEventListener("click", async () => {
         await fetch("/bot/stop", { method: "POST" });
-        updateStatus();
+        setTimeout(updateStatus, 500);
     });
 
     document.getElementById("status-btn").addEventListener("click", updateStatus);
