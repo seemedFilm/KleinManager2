@@ -6,9 +6,16 @@ WORKDIR /app
 
 # Copy project files
 COPY . .
+#COPY . /app
 
+
+RUN mkdir -p /ads
+RUN chmod 777 /ads
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Install debugging tools
+#RUN pip install debugpy
 
 # Expose FastAPI port
 EXPOSE 8000

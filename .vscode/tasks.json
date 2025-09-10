@@ -6,8 +6,21 @@
         {
       "label": "Docker Compose Up",
       "type": "shell",
-      "command": "docker-compose up --build",
+      "command": "docker-compose up -d --build",
       "group": "build"
-    }
+        },
+        {
+      "label": "Docker Compose Down",
+      "type": "shell",
+      "command": "docker-compose down --volumes --rmi all",
+      "group": "build"
+        },
+        {
+          "label": "Docker system prune",
+          "type": "shell",
+          "command": "docker system prune -f",
+          "group": "build",
+        },
+        
   ]
 }

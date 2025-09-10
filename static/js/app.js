@@ -4,10 +4,26 @@ class KaBot {
         this.log = this.section.querySelector("#kabotLog");
         this.input = this.section.querySelector("#kabotInput");
         this.button = this.section.querySelector("#kabotStart");
+        this.jobIdInput = this.section.querySelector("#kabotJobId");
 
-        if (this.button) {
-            this.button.addEventListener("click", () => this.run());
-        }
+        // Container für die Ads-Liste
+        this.adsFileContainer = document.getElementById("adsFileContainer");
+
+        // Buttons
+        this.startButton = this.section.querySelector("#kabotStart");
+        this.saveButton = this.section.querySelector("#kabotSave");
+        this.loadButton = this.section.querySelector("#kabotLoad");
+        this.listButton = this.section.querySelector("#kabotList");
+
+        // Events
+        this.startButton.addEventListener("click", () => this.run());
+        this.saveButton.addEventListener("click", () => this.saveJob());
+        this.loadButton.addEventListener("click", () => this.loadJob());
+        this.listButton.addEventListener("click", () => this.listJobs());
+    
+        // Datei-Liste laden
+        this.loadAdsFiles();
+
     }
 
     async run() {
@@ -19,7 +35,70 @@ class KaBot {
         await this.delay(1000); this.logMessage("Angebot geladen", "green");
         await this.delay(1000); this.logMessage("Erfolgreich erstellt ✅", "green");
     }
+    async saveJob() {
+        const jobId = this.jobIdInput.value.trim();
+        const url = this.input.value.trim();
+        if (!jobId || !url) return this.logMessage("Job-ID und URL erforderlich", "red");
 
+        try {
+            const res = await fetch(`/bot/save?job_id=${encodeURIComponent(jobId)}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ url })
+            });
+            const data = await res.json();
+            this.logMessage(`Job gespeichert: ${JSON.stringify(data)}`, "green");
+        } catch (e) {
+            this.logMessage("Fehler beim Speichern", "red");
+        }
+    }
+    async loadJob() {
+        const jobId = this.jobIdInput.value.trim();
+        if (!jobId) return this.logMessage("Job-ID erforderlich", "red");
+
+        try {
+            const res = await fetch(`/bot/load/${encodeURIComponent(jobId)}`);
+            const data = await res.json();
+            this.logMessage(`Job geladen: ${JSON.stringify(data)}`, "yellow");
+        } catch (e) {
+            this.logMessage("Fehler beim Laden", "red");
+        }
+    }
+    async listJobs() {
+        try {
+            const res = await fetch(`/bot/jobs`);
+            const data = await res.json();
+            this.logMessage(`Jobs: ${data.join(", ")}`, "blue");
+        } catch (e) {
+            this.logMessage("Fehler beim Abrufen der Jobliste", "red");
+        }
+    }
+    // Lade die Liste der Ads-Dateien vom Server
+    async loadAdsFiles() {
+        try {
+            const res = await fetch("/ads");  // neuer API-Endpoint
+            const files = await res.json();
+
+            if (!files.length) {
+                this.adsFileContainer.innerHTML = "<p class='text-gray-400'>Keine Dateien gefunden.</p>";
+                return;
+            }
+
+            this.adsFileContainer.innerHTML = files.map(file => `
+                <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-700 p-2 rounded">
+                    <input type="radio" name="adsFile" value="${file}" class="form-radio text-blue-500">
+                    <span>${file}</span>
+                </label>
+            `).join("");
+        } catch (err) {
+            this.adsFileContainer.innerHTML = "<p class='text-red-400'>Fehler beim Laden der Dateien.</p>";
+        }
+    }
+
+    getSelectedFile() {
+        const selected = this.adsFileContainer.querySelector("input[name='adsFile']:checked");
+        return selected ? selected.value : null;
+    }
     logMessage(msg, color) {
         this.log.innerHTML += `<p class='text-${color}-400'>${msg}</p>`;
         this.log.scrollTop = this.log.scrollHeight;
@@ -87,7 +166,6 @@ class KleinManager extends KleinManagerCore {
             }
         });
 
-        // 👉 KaBot hier sauber initialisieren
         new KaBot("Ka-Bot");
     }
 

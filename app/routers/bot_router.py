@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 import subprocess
+from app.services.ka_bot_ads import save_job, load_job, list_jobs
 
 router = APIRouter(
     prefix="/bot",
@@ -57,3 +58,16 @@ def status_bot():
             return {"status": "stopped"}
     except subprocess.CalledProcessError as e:
         return {"error": f"Fehler bei Statusprüfung: {e}"}
+
+@router.post("/bot/save")
+def save_bot_job(job_id: str, data: dict):
+    save_job(job_id, data)
+    return {"message": f"Job {job_id} gespeichert"}
+
+@router.get("/bot/load/{job_id}")
+def load_bot_job(job_id: str):
+    return load_job(job_id)
+
+@router.get("/bot/jobs")
+def get_all_jobs():
+    return list_jobs()

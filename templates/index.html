@@ -453,6 +453,7 @@
                     <div id="stats-content"></div>
                 </div>
 
+                <!-- Ka-Bot Section -->
                 <div id="Ka-Bot" class="section hidden p-4">
                     <h2 class="text-2xl font-bold text-white mb-4">Ka-Bot Automation</h2>
 
@@ -463,6 +464,20 @@
                         <button id="kabotStart" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                             Starte Ka-Bot
                         </button>
+                    </div>
+                    <!-- Dateiliste aus /app/ads-->
+                    <div id="adsFileList" class="mb-6 bg-gray-800 rounded-xl p-4 border border-gray-700">
+                        <h3 class="text-lg font-semibold mb-2">Vorlagen auswählen</h3>
+                        <div id="adsFileContainer" class="space-y-2 text-white">
+                            <!-- Dateien werden hier dynamisch eingefügt -->
+                        </div>
+                    </div>
+                    <!-- neue Buttons -->
+                    <div class="mb-3 flex gap-2">
+                        <input id="kabotJobId" type="text" placeholder="Job-ID" class="border rounded p-2 flex-grow">
+                        <button id="kabotSave" class="btn btn-green">Job speichern</button>
+                        <button id="kabotLoad" class="btn btn-yellow">Job laden</button>
+                        <button id="kabotList" class="btn btn-gray">Alle Jobs</button>
                     </div>
 
                     <!-- Log-Ausgabe -->

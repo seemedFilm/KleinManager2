@@ -15,6 +15,8 @@ from app.services.background_tasks import background_task_manager
 #pl custom
 from routers import bot_router
 from routers import ui_router
+# from app.services.load_ads import 
+from app.services.load_ads import router as load_ads_router
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -49,6 +51,8 @@ app.mount("/static", StaticFiles(directory=static_dir), name="static")
 # pl custom
 app.include_router(bot_router.router)
 app.include_router(ui_router.router)
+app.include_router(router)
+app.include_router(load_ads_router)
 
 templates = Jinja2Templates(directory=os.path.join(base_path, "templates"))
 

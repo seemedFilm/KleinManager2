@@ -7,6 +7,8 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends procps \
  && rm -rf /var/lib/apt/lists/*
 
+ # Install debugging tools
+RUN pip install debugpy
 
 COPY . /app
 
