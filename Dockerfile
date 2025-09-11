@@ -2,20 +2,21 @@
 FROM python:3.11-slim
 
 # Set working directory
-WORKDIR /app
+#WORKDIR /app
 
 # Copy project files
-COPY . .
-#COPY . /app
+#COPY . .
+COPY . /app
 
 
-RUN mkdir -p /ads
-RUN chmod 777 /ads
+#RUN mkdir -p /ads
+#RUN chmod 777 /ads
 # Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
+WORKDIR /app
 
 # Install debugging tools
-#RUN pip install debugpy
+RUN pip install debugpy
 
 # Expose FastAPI port
 EXPOSE 8000

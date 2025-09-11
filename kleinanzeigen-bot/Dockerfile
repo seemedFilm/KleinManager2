@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-WORKDIR /app
+
 
 # pkill/pgrep braucht procps (für stop/status)
 RUN apt-get update \
@@ -8,9 +8,11 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
  # Install debugging tools
-RUN pip install debugpy
+# RUN pip install debugpy
 
 COPY . /app
 
+
+WORKDIR /app
 # Default CMD: falls container direkt starten soll; in compose wir benutzen `tail -f /dev/null`
 CMD ["python", "main.py"]

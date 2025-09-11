@@ -76,9 +76,9 @@ class KaBot {
     // Lade die Liste der Ads-Dateien vom Server
     async loadAdsFiles() {
         try {
-            const res = await fetch("/ads");  // neuer API-Endpoint
+            const res = await fetch("/api/v1/ads/files");  // neuer API-Endpoint
             const files = await res.json();
-
+            
             if (!files.length) {
                 this.adsFileContainer.innerHTML = "<p class='text-gray-400'>Keine Dateien gefunden.</p>";
                 return;

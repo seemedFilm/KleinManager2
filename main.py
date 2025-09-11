@@ -16,7 +16,7 @@ from app.services.background_tasks import background_task_manager
 from routers import bot_router
 from routers import ui_router
 # from app.services.load_ads import 
-from app.services.load_ads import router as load_ads_router
+from app.api.load_ads import router as load_ads
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -52,11 +52,12 @@ app.mount("/static", StaticFiles(directory=static_dir), name="static")
 app.include_router(bot_router.router)
 app.include_router(ui_router.router)
 app.include_router(router)
-app.include_router(load_ads_router)
+app.include_router(load_ads, prefix="/api/v1", tags=["ads"])
+
 
 templates = Jinja2Templates(directory=os.path.join(base_path, "templates"))
 
-app.include_router(router)
+#app.include_router(router)
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
