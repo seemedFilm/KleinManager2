@@ -12,11 +12,10 @@ from app.api.routes import router
 from app.services.notification_service import Notification
 from app.services.background_tasks import background_task_manager
 
-#pl custom
+# pl custom
 from routers import bot_router
 from routers import ui_router
-# from app.services.load_ads import 
-from app.api.load_ads import router as load_ads
+from app.api.load_ads import router as load_ads_router
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -45,19 +44,18 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Static files
 static_dir = os.path.join(base_path, "static")
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
-# pl custom
+# Templates
+templates = Jinja2Templates(directory=os.path.join(base_path, "templates"))
+
+# Router einbinden (nur 1x!)
 app.include_router(bot_router.router)
 app.include_router(ui_router.router)
 app.include_router(router)
-app.include_router(load_ads, prefix="/api/v1", tags=["ads"])
-
-
-templates = Jinja2Templates(directory=os.path.join(base_path, "templates"))
-
-#app.include_router(router)
+app.include_router(load_ads_router, prefix="/api/v1", tags=["ads"])
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
