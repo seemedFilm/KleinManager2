@@ -9,5 +9,6 @@ build/
 dist/
 .vscode
 .gitignore
-
-
+app/routers
+dist/static
+templates/bot.html

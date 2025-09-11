@@ -6,18 +6,17 @@ services:
       - "8080:8000"   # Webinterface port
       - "5678:5678"   # Debugging port
     volumes:
-      - /docker/kleinmanager/data:/app/data
-      - /docker/kleinmanager/ads:/app/ads  # 👈 Mount für JSON-Daten
-    depends_on:
-      - kleinbot
+      - /docker/kleinmanager/kleinmanager/data:/app/data
+      - /docker/kleinmanager/kleinmanager/ads:/app/ads  # 👈 Mount für JSON-Daten
+    # depends_on:
+    #   - kleinbot
     # Debug aktivieren
     # command: python -m debugpy --listen 0.0.0.0:5678 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
-  kleinbot:
-   build: ./kleinanzeigen-bot
-   container_name: kleinbot
-   volumes:
-     - /docker/kleinbot/data:/app/data
-   stdin_open: true
-   tty: true
-   command: tail -f /dev/null   # Bot läuft nicht automatisch, sondern wartet
+  # kleinbot:
+  #   image: ghcr.io/second-hand-friends/kleinanzeigen-bot:latest
+  #   shm_size: "256m"
+  #   environment:
+  #     - DISPLAY=${X11_DISPLAY}
+  #   volumes:
+  #     - /docker/kleinmanager/kleinbot/data:/mnt/data
