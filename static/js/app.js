@@ -74,26 +74,27 @@ class KaBot {
         }
     }
     // Lade die Liste der Ads-Dateien vom Server
-    async loadAdsFiles() {
-        try {
-            const res = await fetch("/api/v1/ads/files");  // neuer API-Endpoint
-            const files = await res.json();
-            
-            if (!files.length) {
-                this.adsFileContainer.innerHTML = "<p class='text-gray-400'>Keine Dateien gefunden.</p>";
-                return;
-            }
+async loadAdsFiles() {
+    try {
+        const res = await fetch("/api/v1/ads/files");
+        const data = await res.json();
+        const files = data.files || [];  // Array extrahieren
 
-            this.adsFileContainer.innerHTML = files.map(file => `
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-700 p-2 rounded">
-                    <input type="radio" name="adsFile" value="${file}" class="form-radio text-blue-500">
-                    <span>${file}</span>
-                </label>
-            `).join("");
-        } catch (err) {
-            this.adsFileContainer.innerHTML = "<p class='text-red-400'>Fehler beim Laden der Dateien.</p>";
+        if (!files.length) {
+            this.adsFileContainer.innerHTML = "<p class='text-gray-400'>Keine Dateien gefunden.</p>";
+            return;
         }
+
+        this.adsFileContainer.innerHTML = files.map(file => `
+            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-700 p-2 rounded">
+                <input type="radio" name="adsFile" value="${file}" class="form-radio text-blue-500">
+                <span>${file}</span>
+            </label>
+        `).join("");
+    } catch (err) {
+        this.adsFileContainer.innerHTML = "<p class='text-red-400'>Fehler beim Laden der Dateien.</p>";
     }
+}
 
     getSelectedFile() {
         const selected = this.adsFileContainer.querySelector("input[name='adsFile']:checked");
