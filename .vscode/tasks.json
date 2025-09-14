@@ -16,9 +16,15 @@
       "group": "build"
         },
         {
-      "label": "Docker Compose Down",
+      "label": "Docker Compose Down  --volumes --rmi all",
       "type": "shell",
       "command": "docker-compose down --volumes --rmi all",
+      "group": "build"
+        },
+         {
+      "label": "Docker Compose Down",
+      "type": "shell",
+      "command": "docker-compose down",
       "group": "build"
         },
         {

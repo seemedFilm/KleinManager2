@@ -6,7 +6,7 @@ router = APIRouter()
 
 ADS_DIR = Path("/app/ads")
 
-# Logging konfigurieren
+# Logging konfigurieren (falls noch nicht geschehen)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("ads_loader")
 logger.info(f"in ads verzeichnis!")
