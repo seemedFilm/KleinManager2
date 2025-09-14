@@ -1,23 +1,32 @@
 services:
   kleinmanager:
-    build: .
-    container_name: kleinmanager
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:               
+        GIT_COMMIT: ${GIT_COMMIT}
+        GIT_DATE: ${GIT_DATE}
+    container_name: kleinmanager    
     ports:
       - "8080:8000"   # Webinterface port
-      - "5678:5678"   # Debugging port
+      #- "5678:5678"   # Debugging port
     volumes:
       - /docker/klein/manager/data:/app/data
-      - /docker/klein/manager/ads:/app/ads  # 👈 Mount für JSON-Daten
-    depends_on:
-      - kleinbot
+      - /docker/klein/manager/ads:/app/ads  
+    environment:
+      - GIT_COMMIT=${GIT_COMMIT}
+      - GIT_DATE=${GIT_DATE}
+      - BUILD_DATE=${BUILD_DATE}
+    # depends_on:
+    #   - kleinbot
     # Debug aktivieren
     # command: python -m debugpy --listen 0.0.0.0:5678 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
-  kleinbot:
-   build: ./kleinanzeigen-bot
-   container_name: kleinbot
-   volumes:
-     - /docker/klein/bot/data:/app/data
-   stdin_open: true
-   tty: true
-   command: tail -f /dev/null   # Bot läuft nicht automatisch, sondern wartet
+  # kleinbot:
+  #  build: ./kleinanzeigen-bot
+  #  container_name: kleinbot
+  #  volumes:
+  #    - /docker/klein/bot/data:/app/data
+  #  stdin_open: true
+  #  tty: true
+  #  command: tail -f /dev/null   # Bot läuft nicht automatisch, sondern wartet
