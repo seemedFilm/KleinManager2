@@ -118,6 +118,7 @@ if __name__ == "__main__":
 @app.get("/version")
 def version():
     return {
-        "commit": os.getenv("GIT_COMMIT", "unknown"),
-        "date": os.getenv("GIT_DATE", "unknown")
+        "gitCommit": os.getenv("GIT_COMMIT", "unknown"),
+        "gitDate": os.getenv("GIT_DATE", "unknown"),
+        "buildDate": os.getenv("BUILD_DATE", "unknown")
     }
