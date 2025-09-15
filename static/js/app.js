@@ -2,99 +2,44 @@ class KaBot {
     constructor(sectionId) {
         this.section = document.getElementById(sectionId);
         this.log = this.section.querySelector("#kabotLog");
-        this.input = this.section.querySelector("#kabotInput");
-        this.button = this.section.querySelector("#kabotStart");
-        this.jobIdInput = this.section.querySelector("#kabotJobId");
-
+        
         // Container für die Ads-Liste
         this.adsFileContainer = document.getElementById("adsFileContainer");
 
-        // Buttons
-        this.startButton = this.section.querySelector("#kabotStart");
-        this.saveButton = this.section.querySelector("#kabotSave");
-        this.loadButton = this.section.querySelector("#kabotLoad");
-        this.listButton = this.section.querySelector("#kabotList");
-
         // Events
         this.startButton.addEventListener("click", () => this.run());
-        this.saveButton.addEventListener("click", () => this.saveJob());
-        this.loadButton.addEventListener("click", () => this.loadJob());
-        this.listButton.addEventListener("click", () => this.listJobs());
     
         // Datei-Liste laden
         this.loadAdsFiles();
 
     }
 
-    async run() {
-        const url = this.input.value.trim();
-        if (!url) return this.logMessage("Bitte URL eingeben", "red");
-        this.logMessage(`Starte Ka-Bot für ${url}`, "blue");
-
-        await this.delay(1000); this.logMessage("Login erfolgreich", "green");
-        await this.delay(1000); this.logMessage("Angebot geladen", "green");
-        await this.delay(1000); this.logMessage("Erfolgreich erstellt ✅", "green");
-    }
-    async saveJob() {
-        const jobId = this.jobIdInput.value.trim();
-        const url = this.input.value.trim();
-        if (!jobId || !url) return this.logMessage("Job-ID und URL erforderlich", "red");
-
-        try {
-            const res = await fetch(`/bot/save?job_id=${encodeURIComponent(jobId)}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ url })
-            });
-            const data = await res.json();
-            this.logMessage(`Job gespeichert: ${JSON.stringify(data)}`, "green");
-        } catch (e) {
-            this.logMessage("Fehler beim Speichern", "red");
-        }
-    }
-    async loadJob() {
-        const jobId = this.jobIdInput.value.trim();
-        if (!jobId) return this.logMessage("Job-ID erforderlich", "red");
-
-        try {
-            const res = await fetch(`/bot/load/${encodeURIComponent(jobId)}`);
-            const data = await res.json();
-            this.logMessage(`Job geladen: ${JSON.stringify(data)}`, "yellow");
-        } catch (e) {
-            this.logMessage("Fehler beim Laden", "red");
-        }
-    }
-    async listJobs() {
-        try {
-            const res = await fetch(`/bot/jobs`);
-            const data = await res.json();
-            this.logMessage(`Jobs: ${data.join(", ")}`, "blue");
-        } catch (e) {
-            this.logMessage("Fehler beim Abrufen der Jobliste", "red");
-        }
-    }
     // Lade die Liste der Ads-Dateien vom Server
     async loadAdsFiles() {
-        try {
-            const res = await fetch("/api/v1/ads/files");
-            const data = await res.json();
-            const files = data.files || [];  // Array extrahieren
+    try {
+        const res = await fetch("/api/v1/ads/files");
+        const data = await res.json();
 
-            if (!files.length) {
-                this.adsFileContainer.innerHTML = "<p class='text-gray-400'>Keine Dateien gefunden.</p>";
-                return;
-            }
+        const container = document.getElementById("adsFileContainer");
+        container.innerHTML = ""; // leeren
 
-            this.adsFileContainer.innerHTML = files.map(file => `
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-700 p-2 rounded">
-                    <input type="radio" name="adsFile" value="${file}" class="form-radio text-blue-500">
-                    <span>${file}</span>
-                </label>
-            `).join("");
-        } catch (err) {
-            this.adsFileContainer.innerHTML = "<p class='text-red-400'>Fehler beim Laden der Dateien.</p>";
+        if (!data.files || data.files.length === 0) {
+            container.innerHTML = "<p class='text-gray-400'>Keine Dateien gefunden.</p>";
+            return;
         }
+
+        data.files.forEach(file => {
+            const item = document.createElement("div");
+            item.className = "p-2 bg-gray-700 rounded cursor-pointer hover:bg-gray-600";
+            item.textContent = file;
+            container.appendChild(item);
+        });
+    } catch (err) {
+        console.error("Fehler beim Laden der Dateien:", err);
+        document.getElementById("adsFileContainer").innerHTML =
+            "<p class='text-red-400'>Fehler beim Laden der Dateien.</p>";
     }
+}
     
     getSelectedFile() {
         const selected = this.adsFileContainer.querySelector("input[name='adsFile']:checked");
@@ -110,6 +55,7 @@ class KaBot {
     }
 }
 
+
 async function loadVersion() {
     try {
       const res = await fetch("/version");
@@ -117,12 +63,12 @@ async function loadVersion() {
       const data = await res.json();
 
       // Falls dein Endpoint z. B. { "commit": "abc123", "date": "2025-09-14" } zurückgibt
-      const gitCommit = `Commit: ${data.gitCommit} `;
-      const gitDate = `Date: ${data.gitDate}`;
-      const buildDate = `Build Date: ${data.buildDate}`;
-      document.getElementById("gitCommit").textContent = gitCommit;
-      document.getElementById("gitDate").textContent = gitDate;
-      document.getElementById("buildDate").textContent = buildDate;
+      const gitCommit = `${data.gitCommit} `;
+      const gitDate = `${data.gitDate}`;
+      const buildDate = `${data.buildDate}`;
+      document.getElementById("gitCommit").textContent = `${data.gitCommit} `;
+      document.getElementById("gitDate").textContent = `${data.gitDate}`;
+      document.getElementById("buildDate").textContent = `${data.buildDate}`;
     } catch (err) {
       console.error("Konnte Version nicht laden:", err);
       document.getElementById("gitVersion").textContent = "Version unbekannt";
