@@ -3,6 +3,13 @@
     // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
+      {
+      "label": "Docker Compose restart",
+      "type": "shell",
+      "command": "docker-compose down && docker-compose up -d --build",
+      "dependsOn": ["Update Git Env"],
+      "group": "build"
+        },
         {
       "label": "Docker Compose Up -d build",
       "type": "shell",
@@ -37,7 +44,7 @@
         {
       "label": "Update Git Env",
       "type": "shell",
-      "command": "echo GIT_COMMIT=$(git rev-parse --short HEAD) > .env && echo GIT_DATE=$(git log -1 --format=%cd --date=iso) >> .env && echo BUILD_DATE=$(date '+%Y-%m-%d %H:%M:%S') >> .env",
+      "command": "echo GIT_COMMIT=$(git rev-parse --short HEAD) > .env && echo GIT_DATE=$(git log -1 --format=%cd --date=format:'%Y.%m.%d %H:%M:%S') >> .env && echo BUILD_DATE=$(date '+%Y.%m.%d %H:%M:%S') >> .env",
       "problemMatcher": [],
         } 
   ]

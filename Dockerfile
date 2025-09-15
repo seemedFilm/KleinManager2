@@ -12,22 +12,21 @@ ENV BUILD_DATE=$BUILD_DATE
 
 # Copy project files
 COPY . /app
+RUN mkdir -p /app/ads && mv "/app/ad_Gameboy Spiele Divers.json" "/app/ads/"
 
 #RUN mkdir -p /ads 
 #RUN chmod 777 /ads
 
 # Install dependencies
-RUN pip install --no-cache-dir -r /app/requirements.txt
+RUN pip install -r /app/requirements.txt
+
+#RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # Set working directory
 
 WORKDIR /app
 # Install debugging tools
-<<<<<<< HEAD
-# RUN pip install debugpy
-=======
 #RUN pip install debugpy
->>>>>>> main
 
 # Expose FastAPI port
 EXPOSE 8000

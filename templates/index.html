@@ -69,7 +69,7 @@
                         <i class="fas fa-chart-line mr-3 w-5 text-center"></i>
                         <span data-i18n="nav.kabot">kabot</span>
                     </button>
-
+<!-- 
                     <button onclick="app.showSection('orders')"
                             class="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center text-gray-200 hover:bg-gray-700 transition-colors duration-200">
                         <i class="fas fa-shopping-bag mr-3 w-5 text-center"></i>
@@ -92,7 +92,7 @@
                             class="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center text-gray-200 hover:bg-gray-700 transition-colors duration-200">
                         <i class="fas fa-chart-bar mr-3 w-5 text-center"></i>
                         <span data-i18n="nav.statistics">Statistics</span>
-                    </button>
+                    </button> -->
 
                     <button onclick="app.showSection('settings')"
                             class="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center text-gray-200 hover:bg-gray-700 transition-colors duration-200">
@@ -132,18 +132,37 @@
                     </div>
                 </button>
                 
-                Versioninformations:
-                <span id="gitCommit">Lade Version...</span> <br>
-                <span id="gitDate">Lade Version...</span> <br>
-                <span id="buildDate">Lade Version...</span> <br>
+            <!-- <div class="text-white text-sm">
+                <span data-i18n="verInf">Versioninformations:</span><br>
+                Commit:<span id="gitCommit">Lade Version...</span> <br>
+                Commit Date:<span id="gitDate">Lade Version...</span> <br>
+                Build Date:<span id="buildDate">Lade Version...</span> <br>
+            </div> -->
+            <div class="text-white text-sm">
+                <table>
+                    <tr>
+                        <td>Commit:</td>
+                        <td><span id="gitCommit">empty...</span></td>
+                    </tr>
+                    <tr>
+                        <td>Date:</td>
+                        <td><span id="gitDate">empty...</span></td>
+                    </tr>
+                    <tr>
+                        <td>Build Date:</td>
+                        <td><span id="buildDate">empty...</span></td>
+                    </tr>
+                </table>
             </div>
+        </div>
+
         </div>
                 
         <!-- Main Content -->
         <div class="lg:ml-64 flex-1">
             <div class="p-4 lg:p-6">
                 <!-- Dashboard Section -->
-<div id="dashboard" class="section">
+                <div id="dashboard" class="section">
     <div class="mb-8 mt-12 lg:mt-0">
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
             <h2 class="text-3xl font-bold text-white flex items-center">
@@ -290,9 +309,9 @@
             <div id="recent-activity" class="max-h-96 overflow-y-auto"></div>
         </div>
     </div>
-</div>
+            </div>
 
-                <!-- Orders Section -->
+             <!-- Orders Section -->
                <div id="orders" class="section hidden">
     <div class="mb-6 mt-12 lg:mt-0">
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
@@ -316,7 +335,7 @@
                 </button>
             </div>
         </div>
-
+   
         <!-- Smart Filters -->
         <div class="bg-gray-800 rounded-2xl p-4 shadow-lg border border-gray-700 mb-6">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
@@ -456,20 +475,10 @@
                 <div id="statistics" class="section hidden">
                     <h2 class="text-2xl lg:text-3xl font-bold text-white mb-6 lg:mb-8 mt-12 lg:mt-0" data-i18n="statistics.title">Statistics</h2>
                     <div id="stats-content"></div>
-                </div>
+                </div> 
 
-                <!-- Ka-Bot Section -->
+               <!-- Ka-Bot Section -->
                 <div id="Ka-Bot" class="section hidden p-4">
-                    <h2 class="text-2xl font-bold text-white mb-4">Ka-Bot Automation</h2>
-
-                    <!-- Eingabeformular -->
-                    <div class="mb-6 bg-gray-800 rounded-xl p-4 border border-gray-700">
-                        <input type="text" id="kabotInput" placeholder="Gib hier deine Kleinanzeigen-URL ein"
-                            class="w-full px-3 py-2 rounded-lg bg-gray-900 text-white border border-gray-600 mb-2">
-                        <button id="kabotStart" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                            Starte Ka-Bot
-                        </button>
-                    </div>
                     <!-- Dateiliste aus /app/ads-->
                     <div id="adsFileList" class="mb-6 bg-gray-800 rounded-xl p-4 border border-gray-700">
                         <h3 class="text-lg font-semibold mb-2">Vorlagen auswählen</h3>
@@ -477,21 +486,12 @@
                             <!-- Dateien werden hier dynamisch eingefügt -->
                         </div>
                     </div>
-                    <!-- neue Buttons -->
-                    <div class="mb-3 flex gap-2">
-                        <input id="kabotJobId" type="text" placeholder="Job-ID" class="border rounded p-2 flex-grow">
-                        <button id="kabotSave" class="btn btn-green">Job speichern</button>
-                        <button id="kabotLoad" class="btn btn-yellow">Job laden</button>
-                        <button id="kabotList" class="btn btn-gray">Alle Jobs</button>
-                    </div>
 
                     <!-- Log-Ausgabe -->
                     <div id="kabotLog" class="bg-gray-900 border border-gray-700 rounded-xl p-4 text-gray-300 h-64 overflow-y-auto">
                         Ka-Bot Log...
                     </div>
                 </div>
-
-                
                 <!-- Settings Section -->
                 <div id="settings" class="section hidden">
                     <h2 class="text-2xl lg:text-3xl font-bold text-white mb-6 lg:mb-8 mt-12 lg:mt-0" data-i18n="settings.title">Settings</h2>
