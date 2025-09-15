@@ -4,11 +4,18 @@ __pycache__/
 *.pyd
 *.db
 *.log
-.env
 build/
 dist/
 .vscode
 .gitignore
+<<<<<<< HEAD
 app/routers
 dist/static
 templates/bot.html
+=======
+.gitignore
+Dockerfile
+docker-compose.yaml
+.env
+
+>>>>>>> main

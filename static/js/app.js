@@ -74,28 +74,28 @@ class KaBot {
         }
     }
     // Lade die Liste der Ads-Dateien vom Server
-async loadAdsFiles() {
-    try {
-        const res = await fetch("/api/v1/ads/files");
-        const data = await res.json();
-        const files = data.files || [];  // Array extrahieren
+    async loadAdsFiles() {
+        try {
+            const res = await fetch("/api/v1/ads/files");
+            const data = await res.json();
+            const files = data.files || [];  // Array extrahieren
 
-        if (!files.length) {
-            this.adsFileContainer.innerHTML = "<p class='text-gray-400'>Keine Dateien gefunden.</p>";
-            return;
+            if (!files.length) {
+                this.adsFileContainer.innerHTML = "<p class='text-gray-400'>Keine Dateien gefunden.</p>";
+                return;
+            }
+
+            this.adsFileContainer.innerHTML = files.map(file => `
+                <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-700 p-2 rounded">
+                    <input type="radio" name="adsFile" value="${file}" class="form-radio text-blue-500">
+                    <span>${file}</span>
+                </label>
+            `).join("");
+        } catch (err) {
+            this.adsFileContainer.innerHTML = "<p class='text-red-400'>Fehler beim Laden der Dateien.</p>";
         }
-
-        this.adsFileContainer.innerHTML = files.map(file => `
-            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-700 p-2 rounded">
-                <input type="radio" name="adsFile" value="${file}" class="form-radio text-blue-500">
-                <span>${file}</span>
-            </label>
-        `).join("");
-    } catch (err) {
-        this.adsFileContainer.innerHTML = "<p class='text-red-400'>Fehler beim Laden der Dateien.</p>";
     }
-}
-
+    
     getSelectedFile() {
         const selected = this.adsFileContainer.querySelector("input[name='adsFile']:checked");
         return selected ? selected.value : null;
@@ -109,6 +109,29 @@ async loadAdsFiles() {
         return new Promise(r => setTimeout(r, ms));
     }
 }
+
+async function loadVersion() {
+    try {
+      const res = await fetch("/version");
+      if (!res.ok) throw new Error("Fehler beim Laden");
+      const data = await res.json();
+
+      // Falls dein Endpoint z. B. { "commit": "abc123", "date": "2025-09-14" } zurückgibt
+      const gitCommit = `Commit: ${data.gitCommit} `;
+      const gitDate = `Date: ${data.gitDate}`;
+      const buildDate = `Build Date: ${data.buildDate}`;
+      document.getElementById("gitCommit").textContent = gitCommit;
+      document.getElementById("gitDate").textContent = gitDate;
+      document.getElementById("buildDate").textContent = buildDate;
+    } catch (err) {
+      console.error("Konnte Version nicht laden:", err);
+      document.getElementById("gitVersion").textContent = "Version unbekannt";
+    }
+  }
+
+  // Direkt beim Laden starten
+  document.addEventListener("DOMContentLoaded", loadVersion);
+
 
 // Main Application Class
 class KleinManager extends KleinManagerCore {

@@ -1,6 +1,15 @@
 # Use official Python base image
 FROM python:3.11-slim
 
+# pass git infos as build args
+ARG GIT_COMMIT
+ARG GIT_DATE
+ARG BUILD_DATE
+
+ENV GIT_COMMIT=$GIT_COMMIT
+ENV GIT_DATE=$GIT_DATE
+ENV BUILD_DATE=$BUILD_DATE
+
 # Copy project files
 COPY . /app
 
@@ -14,7 +23,11 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 
 WORKDIR /app
 # Install debugging tools
+<<<<<<< HEAD
 # RUN pip install debugpy
+=======
+#RUN pip install debugpy
+>>>>>>> main
 
 # Expose FastAPI port
 EXPOSE 8000

@@ -1,5 +1,9 @@
 ﻿import os, sys
 import asyncio
+import logging
+import os
+
+
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
@@ -68,7 +72,6 @@ async def get_image(filename: str):
         return FileResponse(file_path)
     return {"error": "Image not found"}
 
-import logging
 
 LOGGING_CONFIG = {
     "version": 1,
@@ -110,3 +113,12 @@ if __name__ == "__main__":
         reload=settings.DEBUG,
         log_config=LOGGING_CONFIG
     )
+
+
+@app.get("/version")
+def version():
+    return {
+        "gitCommit": os.getenv("GIT_COMMIT", "unknown"),
+        "gitDate": os.getenv("GIT_DATE", "unknown"),
+        "buildDate": os.getenv("BUILD_DATE", "unknown")
+    }
