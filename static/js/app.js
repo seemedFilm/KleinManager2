@@ -67,6 +67,17 @@ class KaBot {
         return new Promise(r => setTimeout(r, ms));
     }
 }
+async function sendLog(message, level = "INFO") {
+    try {
+        await fetch("/api/v1/frontend-log", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message, level })
+        });
+    } catch (err) {
+        console.error("Konnte Log nicht senden:", err);
+    }
+}
 
 
 async function loadVersion() {

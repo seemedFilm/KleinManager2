@@ -18,6 +18,7 @@ from app.services.background_tasks import background_task_manager
 
 # pl custom
 from app.api.load_ads import router as load_ads
+from app.api.logging import router as logging_frontend
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -56,6 +57,7 @@ templates = Jinja2Templates(directory=os.path.join(base_path, "templates"))
 # import routers app.include_router(load_ads, prefix="/api/v1", tags=["ads"])
 app.include_router(router)
 app.include_router(load_ads, prefix="/api/v1", tags=["ads"])
+app.include_router(logging_frontend, prefix="/api/v1", tags=["logging_frontend"])
 
 
 @app.get("/", response_class=HTMLResponse)
