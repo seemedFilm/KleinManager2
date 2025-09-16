@@ -12,24 +12,24 @@ class DashboardManager extends KleinManagerCore {
 
             // Load all dashboard data in parallel
             const [stats, detailStats, recentOrders, trends, priceData] = await Promise.all([
-                this.apiRequest('/stats'),
-                this.apiRequest('/stats/detail'),
-                this.apiRequest('/orders?limit=10&sort=created_at&order=desc'),
-                this.apiRequest('/stats/trends'),
-                this.apiRequest('/stats/price-analysis')
+                // this.apiRequest('/stats'),
+                // this.apiRequest('/stats/detail'),
+                // this.apiRequest('/orders?limit=10&sort=created_at&order=desc'),
+               // this.apiRequest('/stats/trends'),
+               // this.apiRequest('/stats/price-analysis')
             ]);
 
             // Update main stats cards
-            this.updateMainStats(stats);
+             // this.updateMainStats(stats);
 
             // Render charts with real data
-            this.renderCharts(detailStats, trends, priceData);
+             // this.renderCharts(detailStats, trends, priceData);
 
             // Show recent activity
-            this.renderRecentActivity(recentOrders);
+             // this.renderRecentActivity(recentOrders);
 
             // Update quick insights
-            this.renderQuickInsights(stats, detailStats, priceData);
+             // this.renderQuickInsights(stats, detailStats, priceData);
 
             this.hideLoading();
         } catch (error) {

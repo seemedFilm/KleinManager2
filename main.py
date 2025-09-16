@@ -17,9 +17,7 @@ from app.services.notification_service import Notification
 from app.services.background_tasks import background_task_manager
 
 # pl custom
-from routers import bot_router
-from routers import ui_router
-from app.api.load_ads import router as load_ads_router
+from app.api.load_ads import router as load_ads
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -55,11 +53,10 @@ app.mount("/static", StaticFiles(directory=static_dir), name="static")
 # Templates
 templates = Jinja2Templates(directory=os.path.join(base_path, "templates"))
 
-# Router einbinden (nur 1x!)
-app.include_router(bot_router.router)
-app.include_router(ui_router.router)
+# import routers app.include_router(load_ads, prefix="/api/v1", tags=["ads"])
 app.include_router(router)
-app.include_router(load_ads_router, prefix="/api/v1", tags=["ads"])
+app.include_router(load_ads, prefix="/api/v1", tags=["ads"])
+
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):

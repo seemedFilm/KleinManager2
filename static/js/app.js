@@ -2,12 +2,7 @@ class KaBot {
     constructor(sectionId) {
         this.section = document.getElementById(sectionId);
         this.log = this.section.querySelector("#kabotLog");
-        
-        // Container für die Ads-Liste
         this.adsFileContainer = document.getElementById("adsFileContainer");
-
-        // Events
-        this.startButton.addEventListener("click", () => this.run());
     
         // Datei-Liste laden
         this.loadAdsFiles();
@@ -20,7 +15,25 @@ class KaBot {
         const res = await fetch("/api/v1/ads/files");
         const data = await res.json();
 
-        const container = document.getElementById("adsFileContainer");
+    //      this.adsFileContainer.innerHTML = "";
+
+    //         if (!data.files || data.files.length === 0) {
+    //             this.adsFileContainer.innerHTML = "<p class='text-gray-400'>Keine Dateien gefunden.</p>";
+    //             return;
+    //         }
+
+    //         data.files.forEach(file => {
+    //             const item = document.createElement("div");
+    //             item.className = "p-2 bg-gray-700 rounded cursor-pointer hover:bg-gray-600";
+    //             item.textContent = file;
+    //             this.adsFileContainer.appendChild(item);
+    //         });
+    //     } catch (err) {
+    //         console.error("Fehler beim Laden der Dateien:", err);
+    //         this.adsFileContainer.innerHTML = "<p class='text-red-400'>Fehler beim Laden der Dateien.</p>";
+    //     }
+    // }
+ const container = document.getElementById("adsFileContainer");
         container.innerHTML = ""; // leeren
 
         if (!data.files || data.files.length === 0) {
@@ -40,7 +53,10 @@ class KaBot {
             "<p class='text-red-400'>Fehler beim Laden der Dateien.</p>";
     }
 }
-    
+    logMessage(msg, color) {
+        this.log.innerHTML += `<p class='text-${color}-400'>${msg}</p>`;
+        this.log.scrollTop = this.log.scrollHeight;
+    }
     getSelectedFile() {
         const selected = this.adsFileContainer.querySelector("input[name='adsFile']:checked");
         return selected ? selected.value : null;
@@ -62,10 +78,6 @@ async function loadVersion() {
       if (!res.ok) throw new Error("Fehler beim Laden");
       const data = await res.json();
 
-      // Falls dein Endpoint z. B. { "commit": "abc123", "date": "2025-09-14" } zurückgibt
-      const gitCommit = `${data.gitCommit} `;
-      const gitDate = `${data.gitDate}`;
-      const buildDate = `${data.buildDate}`;
       document.getElementById("gitCommit").textContent = `${data.gitCommit} `;
       document.getElementById("gitDate").textContent = `${data.gitDate}`;
       document.getElementById("buildDate").textContent = `${data.buildDate}`;
@@ -157,6 +169,7 @@ class KleinManager extends KleinManagerCore {
         this.closeMobileMenu();
 
         if (section === 'dashboard') this.loadDashboard();
+        //else if (section === 'Ka-Bot') this.loadAdsFiles();
         else if (section === 'orders') this.loadOrders();
         else if (section === 'watcher') this.loadWatchedItems();
         else if (section === 'tracking') this.loadTracking();

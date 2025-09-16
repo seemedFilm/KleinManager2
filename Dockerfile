@@ -13,9 +13,7 @@ ENV BUILD_DATE=$BUILD_DATE
 # Copy project files
 COPY . /app
 RUN mkdir -p /app/ads && mv "/app/ad_Gameboy Spiele Divers.json" "/app/ads/"
-
-#RUN mkdir -p /ads 
-#RUN chmod 777 /ads
+RUN cp "/app/ads/ad_Gameboy Spiele Divers.json" "/app/ads/ad_Gameboy_Spiele_Divers2.json"
 
 # Install dependencies
 RUN pip install -r /app/requirements.txt
