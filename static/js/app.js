@@ -12,53 +12,50 @@ class KaBot {
     // Lade die Liste der Ads-Dateien vom Server
     async loadAdsFiles() {
     try {
-        const res = await fetch("/api/v1/ads/files");
+       const res = await fetch("/api/v1/ads/files"); // oder /ads/files, je nach Backend
         const data = await res.json();
 
-    //      this.adsFileContainer.innerHTML = "";
-
-    //         if (!data.files || data.files.length === 0) {
-    //             this.adsFileContainer.innerHTML = "<p class='text-gray-400'>Keine Dateien gefunden.</p>";
-    //             return;
-    //         }
-
-    //         data.files.forEach(file => {
-    //             const item = document.createElement("div");
-    //             item.className = "p-2 bg-gray-700 rounded cursor-pointer hover:bg-gray-600";
-    //             item.textContent = file;
-    //             this.adsFileContainer.appendChild(item);
-    //         });
-    //     } catch (err) {
-    //         console.error("Fehler beim Laden der Dateien:", err);
-    //         this.adsFileContainer.innerHTML = "<p class='text-red-400'>Fehler beim Laden der Dateien.</p>";
-    //     }
-    // }
- const container = document.getElementById("adsFileContainer");
-        container.innerHTML = ""; // leeren
+        this.adsFileContainer.innerHTML = "";
 
         if (!data.files || data.files.length === 0) {
-            container.innerHTML = "<p class='text-gray-400'>Keine Dateien gefunden.</p>";
+            this.adsFileContainer.innerHTML = "<p class='text-gray-400'>Keine Dateien gefunden.</p>";
             return;
         }
 
-        data.files.forEach(file => {
-            const item = document.createElement("div");
-            item.className = "p-2 bg-gray-700 rounded cursor-pointer hover:bg-gray-600";
-            item.textContent = file;
-            container.appendChild(item);
+        data.files.forEach((file, index) => {
+            const label = document.createElement("label");
+            label.className = "flex items-center space-x-2 p-2 bg-gray-700 rounded cursor-pointer hover:bg-gray-600";
+
+            const radio = document.createElement("input");
+            radio.type = "radio";
+            radio.name = "adsFile";  // wichtig, damit nur eine auswählbar ist
+            radio.value = file;
+            if (index === 0) radio.checked = true; // erstes Element vorauswählen
+
+            const span = document.createElement("span");
+            span.textContent = file;
+
+            label.appendChild(radio);
+            label.appendChild(span);
+
+            this.adsFileContainer.appendChild(label);
+        
         });
-    } catch (err) {
+        } 
+        catch (err) {
         console.error("Fehler beim Laden der Dateien:", err);
         document.getElementById("adsFileContainer").innerHTML =
             "<p class='text-red-400'>Fehler beim Laden der Dateien.</p>";
-    }
-}
+            }
+        
+    }   
     logMessage(msg, color) {
         this.log.innerHTML += `<p class='text-${color}-400'>${msg}</p>`;
         this.log.scrollTop = this.log.scrollHeight;
     }
     getSelectedFile() {
         const selected = this.adsFileContainer.querySelector("input[name='adsFile']:checked");
+        this.log.in
         return selected ? selected.value : null;
     }
     logMessage(msg, color) {
