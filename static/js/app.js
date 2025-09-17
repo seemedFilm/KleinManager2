@@ -1,4 +1,4 @@
-import { logFrontend } from "./logger.js";
+import log from "./logger.js";
 
 
 class KaBot {
@@ -7,15 +7,13 @@ class KaBot {
         this.log = this.section.querySelector("#kabotLog");
         this.adsFileContainer = document.getElementById("adsFileContainer");
     
-        // Datei-Liste laden
         this.loadAdsFiles();
-
     }
 
-    // Lade die Liste der Ads-Dateien vom Server
+   
     async loadAdsFiles() {
     try {
-       const res = await fetch("/api/v1/ads/files"); // oder /ads/files, je nach Backend
+        const res = await fetch("/api/v1/ads/files"); 
         const data = await res.json();
 
         this.adsFileContainer.innerHTML = "";
@@ -39,7 +37,7 @@ class KaBot {
             span.textContent = file;
 
             radio.addEventListener("change", () => {
-                logFrontend(`Vorlage ausgewählt: ${file}`, "INFO", "red");
+                log.front(`Vorlage ausgewählt: ${file}`, "INFO", "red");
             });
 
             label.appendChild(radio);
@@ -48,6 +46,7 @@ class KaBot {
         });
         } 
         catch (err) {
+            
         console.error("Fehler beim Laden der Dateien:", err);
         document.getElementById("adsFileContainer").innerHTML =
             "<p class='text-red-400'>Fehler beim Laden der Dateien.</p>";

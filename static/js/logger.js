@@ -1,32 +1,38 @@
 // logger.js
-export async function sendLog(message, level = "INFO") {
-    try {
-        await fetch("/api/v1/logging_frontend", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message, level })
-        });
-    } catch (err) {
-        console.error("Konnte Log nicht senden:", err);
-    }
-}
+const log = {
+   
+    front: (message, level, color, htmlElementId = "kabotLog") => {
+        const el = document.getElementById(htmlElementId);
+        if (el) {
+            el.innerHTML += `<p class='text-${color}-400'>${message}</p>`;
+            el.scrollTop = el.scrollHeight;
+        }
+        log.backend(message, level);
+    },
 
-export function logFrontend(message, level, color, htmlElement) {
-    let elementId;
-    if (htmlElement && htmlElement.length > 0) {
-        elementId = htmlElement;
-    } 
-    else {
-        elementId = "kabotLog"; // Default
-        sendLog(`setting default htmlElement: ${elementId}`, level);
-    }
+    console: (message, level = "ERROR") => {
+        console.log(`[${level}] ${message}`);
+        log.backend(message, level);
+    },
 
-    const el = document.getElementById(elementId);
-    if (el) {
-        el.innerHTML += `<p class='text-${color}-400'>${message}</p>`;
-        el.scrollTop = el.scrollHeight;
-    }
 
-    sendLog(message, level);
-    console.log(`[${level}] ${message}`);
-}
+    both: (message, level = "INFO", color = "gray", htmlElementId = "kabotLog") => {
+        log.front(message, level, color, htmlElementId);
+        log.console(message, level);
+    },
+
+    // Zentral: Backend-Log
+    backend: async (message, level) => {
+        try {
+            await fetch("/api/v1/logging_frontend", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message, level })
+            });
+        } catch (err) {
+            console.error("Konnte Log nicht senden:", err);
+        }
+    }
+};
+
+export default log;
