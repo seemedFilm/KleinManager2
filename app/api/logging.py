@@ -17,5 +17,5 @@ async def frontend_log(message: str = Body(..., embed=True), level: str = Body("
         "CRITICAL": logging.critical,
     }
     log_func = levels.get(level.upper(), logging.info)
-    log_func(f"[Frontend] {message}")
+    log_func(f"{message}")
     return {"status": "ok"}

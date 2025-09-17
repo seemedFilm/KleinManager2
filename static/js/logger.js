@@ -11,13 +11,23 @@ export async function sendLog(message, level = "INFO") {
     }
 }
 
-export function logFrontend(message, level, color) {
-   
-    const kabotLog = document.getElementById("kabotLog");
-    if (kabotLog) {
-        kabotLog.innerHTML += `<p class='text-${color}-400'>${message}</p>`;
-        kabotLog.scrollTop = kabotLog.scrollHeight;    
+export function logFrontend(message, level, color, htmlElement) {
+    // Prüfen, ob htmlElement übergeben wurde und eine Länge > 0 hat
+    let elementId;
+    if (htmlElement && htmlElement.length > 0) {
+        elementId = htmlElement;
+    } 
+    else {
+        elementId = "kabotLog"; // Default
+        sendLog(`setting default htmlElement: ${elementId}`, level);
     }
+
+    const el = document.getElementById(elementId);
+    if (el) {
+        el.innerHTML += `<p class='text-${color}-400'>${message}</p>`;
+        el.scrollTop = el.scrollHeight;
+    }
+
     sendLog(message, level);
     console.log(`[${level}] ${message}`);
 }

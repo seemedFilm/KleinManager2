@@ -40,9 +40,9 @@ class KaBot {
 
             // 👉 Klick-Event hinzufügen
             radio.addEventListener("change", () => {
-                this.logMessage(`Vorlage ausgewählt: ${file}`, "red");
-                //sendLog(`Vorlage ausgewählt: ${file}`, "ERROR");
-                logFrontend(`Vorlage ausgewählt logfrontend: ${file}`, "INFO", "red");
+                //this.logMessage(`logbackend Vorlage ausgewählt: ${file}`, "red");
+               
+                logFrontend(`Vorlage ausgewählt: ${file}`, "INFO", "red", "kabotLog");
             });
 
             label.appendChild(radio);
