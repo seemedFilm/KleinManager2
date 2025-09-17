@@ -4,48 +4,56 @@
     "version": "2.0.0",
     "tasks": [
       {
-      "label": "Docker Compose restart",
-      "type": "shell",
-      "command": "docker-compose down && docker-compose up -d --build && docker logs -f kleinmanager",
-      "dependsOn": ["Update Git Env"],
-      "group": "build"
-        },
-        {
-      "label": "Docker Compose Up -d build",
-      "type": "shell",
-      "command": "docker-compose up -d --build",
-      "dependsOn": ["Update Git Env"],
-      "group": "build"
-        },
-        {
-      "label": "Docker Compose Up -d",
-      "type": "shell",
-      "command": "docker-compose up -d",
-      "group": "build"
-        },
-        {
-      "label": "Docker Compose Down  --volumes --rmi all",
-      "type": "shell",
-      "command": "docker-compose down --volumes --rmi all",
-      "group": "build"
-        },
-        {
-      "label": "Docker Compose Down",
-      "type": "shell",
-      "command": "docker-compose down",
-      "group": "build"
-        },
-        {
-          "label": "Docker system prune",
-          "type": "shell",
-          "command": "docker system prune -f",
-          "group": "build"
-        },
-        {
-      "label": "Update Git Env",
-      "type": "shell",
-      "command": "echo GIT_COMMIT=$(git rev-parse --short HEAD) > .env && echo GIT_DATE=$(git log -1 --format=%cd --date=format:'%Y.%m.%d %H:%M:%S') >> .env && echo BUILD_DATE=$(date '+%Y.%m.%d %H:%M:%S') >> .env",
-      "problemMatcher": [],
-        } 
-  ]
+        "label": "restart",
+        "type": "shell",
+        "command": "docker logs -f kleinmanager",
+        "dependsOrder": "sequence",
+        "dependsOn": [
+          "Docker Compose Down",
+          "Update Git Env",
+          "Docker Compose Up -d build"
+        ],
+        "group": "build",
+        "problemMatcher": []
+      },
+      {
+        "label": "Docker Compose Up -d build",
+        "type": "shell",
+        "command": "docker-compose up -d --build",
+        "dependsOn": [
+          "Update Git Env"
+        ],
+        "group": "build"
+      },
+      {
+        "label": "Docker Compose Up -d",
+        "type": "shell",
+        "command": "docker-compose up -d",
+        "group": "build"
+      },
+      {
+        "label": "Docker Compose Down  --volumes --rmi all",
+        "type": "shell",
+        "command": "docker-compose down --volumes --rmi all",
+        "group": "build"
+      },
+      {
+        "label": "Docker Compose Down",
+        "type": "shell",
+        "command": "docker-compose down",
+        "group": "build"
+      },
+      {
+        "label": "Docker system prune",
+        "type": "shell",
+        "command": "docker system prune -f",
+        "group": "build"
+      },
+      {
+        "label": "Update Git Env",
+        "type": "shell",
+        "command": "echo GIT_COMMIT=$(git rev-parse --short HEAD) > .env && echo GIT_DATE=$(git log -1 --format=%cd --date=format:'%Y.%m.%d %H:%M:%S') >> .env && echo BUILD_DATE=$(date '+%Y.%m.%d %H:%M:%S') >> .env",
+        "problemMatcher": []
+      }
+    ]
 }

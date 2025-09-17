@@ -1,3 +1,6 @@
+import { logFrontend } from "./logger.js";
+
+
 class KaBot {
     constructor(sectionId) {
         this.section = document.getElementById(sectionId);
@@ -28,18 +31,25 @@ class KaBot {
 
             const radio = document.createElement("input");
             radio.type = "radio";
-            radio.name = "adsFile";  // wichtig, damit nur eine auswählbar ist
+            radio.name = "adsFile";  
             radio.value = file;
-            if (index === 0) radio.checked = true; // erstes Element vorauswählen
+            if (index === 0) radio.checked = true; 
 
             const span = document.createElement("span");
             span.textContent = file;
+
+            // 👉 Klick-Event hinzufügen
+            radio.addEventListener("change", () => {
+                this.logMessage(`Vorlage ausgewählt: ${file}`, "red");
+                //sendLog(`Vorlage ausgewählt: ${file}`, "ERROR");
+                logFrontend(`Vorlage ausgewählt logfrontend: ${file}`, "INFO", "red");
+            });
 
             label.appendChild(radio);
             label.appendChild(span);
 
             this.adsFileContainer.appendChild(label);
-        
+           
         });
         } 
         catch (err) {
@@ -58,18 +68,16 @@ class KaBot {
         this.log.in
         return selected ? selected.value : null;
     }
-    logMessage(msg, color) {
-        this.log.innerHTML += `<p class='text-${color}-400'>${msg}</p>`;
-        this.log.scrollTop = this.log.scrollHeight;
-    }
 
     delay(ms) {
         return new Promise(r => setTimeout(r, ms));
     }
 }
+
+
 async function sendLog(message, level = "INFO") {
     try {
-        await fetch("/api/v1/frontend-log", {
+        await fetch("/api/v1/logging_frontend", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message, level })
