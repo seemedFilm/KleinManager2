@@ -12,7 +12,6 @@ export async function sendLog(message, level = "INFO") {
 }
 
 export function logFrontend(message, level, color, htmlElement) {
-    // Prüfen, ob htmlElement übergeben wurde und eine Länge > 0 hat
     let elementId;
     if (htmlElement && htmlElement.length > 0) {
         elementId = htmlElement;

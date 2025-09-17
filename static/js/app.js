@@ -38,31 +38,22 @@ class KaBot {
             const span = document.createElement("span");
             span.textContent = file;
 
-            // 👉 Klick-Event hinzufügen
             radio.addEventListener("change", () => {
-                //this.logMessage(`logbackend Vorlage ausgewählt: ${file}`, "red");
-               
-                logFrontend(`Vorlage ausgewählt: ${file}`, "INFO", "red", "kabotLog");
+                logFrontend(`Vorlage ausgewählt: ${file}`, "INFO", "red");
             });
 
             label.appendChild(radio);
             label.appendChild(span);
-
-            this.adsFileContainer.appendChild(label);
-           
+            this.adsFileContainer.appendChild(label);           
         });
         } 
         catch (err) {
         console.error("Fehler beim Laden der Dateien:", err);
         document.getElementById("adsFileContainer").innerHTML =
             "<p class='text-red-400'>Fehler beim Laden der Dateien.</p>";
-            }
-        
+            }        
     }   
-    logMessage(msg, color) {
-        this.log.innerHTML += `<p class='text-${color}-400'>${msg}</p>`;
-        this.log.scrollTop = this.log.scrollHeight;
-    }
+
     getSelectedFile() {
         const selected = this.adsFileContainer.querySelector("input[name='adsFile']:checked");
         this.log.in
@@ -73,20 +64,6 @@ class KaBot {
         return new Promise(r => setTimeout(r, ms));
     }
 }
-
-
-async function sendLog(message, level = "INFO") {
-    try {
-        await fetch("/api/v1/logging_frontend", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message, level })
-        });
-    } catch (err) {
-        console.error("Konnte Log nicht senden:", err);
-    }
-}
-
 
 async function loadVersion() {
     try {
@@ -102,8 +79,6 @@ async function loadVersion() {
       document.getElementById("gitVersion").textContent = "Version unbekannt";
     }
   }
-
-  // Direkt beim Laden starten
   document.addEventListener("DOMContentLoaded", loadVersion);
 
 
