@@ -320,10 +320,10 @@
                             <!-- AD list will be placed here -->
                         </div>
                     </div>
-                    <button onclick="kleinanzeigen.refreshAdsFileList()" class="relative px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg hover:from-orange-700 hover:to-red-700 transition-all duration-200 shadow-lg group">
+                    <button onclick="app.refreshAdsFileList()" class="relative px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg hover:from-orange-700 hover:to-red-700 transition-all duration-200 shadow-lg group">
                         <div class="flex items-center justify-center text-white">
                             <i class="fas fa-refresh text-lg mr-3"></i>
-                            <span class="font-semibold fa-refresh">Reload files</span>
+                            <span class="font-semibold">Reload files</span>
                         </div>
                         <span id="notificationBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center hidden animate-pulse">0</span>
                     </button>
@@ -621,7 +621,8 @@
         </div>
     </div>
 
-    <!-- JavaScript Files -->
+    <!-- JavaScript Files -->     
+    <script src="/static/js/logger.js"></script>
     <script src="/static/js/core.js"></script>
     <script src="/static/js/dashboard.js"></script>
     <script src="/static/js/orders.js"></script>
@@ -630,8 +631,9 @@
     <script src="/static/js/listings.js"></script>
     <script src="/static/js/statistics.js"></script>
     <script src="/static/js/settings.js"></script>
-    <script src="/static/js/notifications.js"></script>
+    <script src="/static/js/notifications.js"></script>    
     <script src="/static/js/kleinanzeigen.js"></script>
-    <!-- <script src="/static/js/app.js"></script> -->
-     <script type="module" src="/static/js/app.js"></script></body>
+    <script src="/static/js/app.js"></script>
+    <!-- <script type="module" src="/static/js/app.js"></script> -->
+    </body>
 </html>

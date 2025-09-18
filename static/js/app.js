@@ -1,6 +1,3 @@
-import log from "./logger.js";
-
-
 class KaBot {
     constructor(sectionId) {
         this.section = document.getElementById(sectionId);

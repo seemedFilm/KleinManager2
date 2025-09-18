@@ -52,7 +52,7 @@
       {
         "label": "Update Git Env",
         "type": "shell",
-        "command": "echo GIT_COMMIT=$(git rev-parse --short HEAD) > .env && echo GIT_DATE=$(git log -1 --format=%cd --date=format:'%Y.%m.%d %H:%M:%S') >> .env && echo BUILD_DATE=$(date '+%Y.%m.%d %H:%M:%S') >> .env",
+        "command": "echo GIT_COMMIT=$(git rev-parse --short HEAD) > .env && echo GIT_DATE=$(git log -1 --format=%cd --date=format:'%Y.%m.%d %H:%M:%S') >> .env && echo BUILD_DATE=$(date '+%Y.%m.%d %H:%M:%S') >> .env && echo APP_VERSION=v0-$(date '+%S') >> .env",
         "problemMatcher": []
       }
     ]

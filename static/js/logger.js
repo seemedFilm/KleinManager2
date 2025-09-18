@@ -1,6 +1,5 @@
 // logger.js
-const log = {
-   
+window.log = {   
     front: (message, level, color, htmlElementId = "kabotLog") => {
         const el = document.getElementById(htmlElementId);
         if (el) {
@@ -34,5 +33,3 @@ const log = {
         }
     }
 };
-
-export default log;
