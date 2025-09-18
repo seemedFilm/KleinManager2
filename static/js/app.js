@@ -37,7 +37,7 @@ class KaBot {
             span.textContent = file;
 
             radio.addEventListener("change", () => {
-                log.front(`Vorlage ausgewählt: ${file}`, "INFO", "red");
+                log.front(`Vorlage ausgewählt: ${file}`, "INFO", "green");
             });
 
             label.appendChild(radio);
@@ -73,6 +73,7 @@ async function loadVersion() {
       document.getElementById("gitCommit").textContent = `${data.gitCommit} `;
       document.getElementById("gitDate").textContent = `${data.gitDate}`;
       document.getElementById("buildDate").textContent = `${data.buildDate}`;
+      document.getElementById("appVersion").textContent = `${data.appVersion}`;
     } catch (err) {
       console.error("Konnte Version nicht laden:", err);
       document.getElementById("gitVersion").textContent = "Version unbekannt";
@@ -94,6 +95,7 @@ class KleinManager extends KleinManagerCore {
         this.statisticsManager = new StatisticsManager();
         this.settingsManager = new SettingsManager();
         this.notificationsManager = new NotificationsManager();
+        this.kleinanzeigenManager = new KleinanzeigenManager();
 
         this.copyMethodsFromManager(this.dashboardManager);
         this.copyMethodsFromManager(this.ordersManager);
@@ -103,6 +105,7 @@ class KleinManager extends KleinManagerCore {
         this.copyMethodsFromManager(this.statisticsManager);
         this.copyMethodsFromManager(this.settingsManager);
         this.copyMethodsFromManager(this.notificationsManager);
+        this.copyMethodsFromManager(this.kleinanzeigenManager);
 
         this.init();
     }
