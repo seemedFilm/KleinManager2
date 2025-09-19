@@ -1,16 +1,21 @@
+import docker
 from fastapi import APIRouter
 import subprocess
 
-router = APIRouter(prefix="/bot", tags=["bot"])
+router = APIRouter()
+client = docker.from_env()
 
-@router.post("/start")
+@router.post("/bot/publish")
 def start_bot():
     try:
-        subprocess.run(["docker", "exec", "-d", "kleinbot", "python", "main.py"], check=True)
+        container = client.containers.get("kleinbot")
+        if container.status != "running":
+            container.start()
         return {"status": "Bot gestartet"}
     except Exception as e:
         return {"error": str(e)}
-
+    
+    
 @router.post("/stop")
 def stop_bot():
     try:

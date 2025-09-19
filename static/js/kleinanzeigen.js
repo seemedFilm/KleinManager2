@@ -26,7 +26,16 @@ class KleinanzeigenManager extends KleinManagerCore {
                 }
                 let fileName = selectedAdFile.value;
                 log.front(`Ausgewählte Datei: ${fileName}`, "INFO", "blue", htmlElementId);
+                
+                await fetch("/api/v1/bot/publish", { method: "POST" });
 
+        //         const res = await fetch("/api/v1/bot/publish", {
+        //             method: "POST",
+        //             headers: { "Content-Type": "application/json" },
+        //             body: JSON.stringify({})  // kein Dateiname nötig
+        // });
+
+                
             } catch (error) {
             log.all(`ERROR: ${error}`, "ERROR", "red", htmlElementId);
             }

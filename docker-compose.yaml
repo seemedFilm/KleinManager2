@@ -11,7 +11,8 @@ services:
       - "8080:8000"   
     volumes:
       - /docker/klein/manager/data:/app/data
-      - ${ADS}:/app/ads  
+      - ${ADS}:/app/ads
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - GIT_COMMIT=${GIT_COMMIT}
       - GIT_DATE=${GIT_DATE}
@@ -22,7 +23,7 @@ services:
 
   kleinbot:
     image: ghcr.io/second-hand-friends/kleinanzeigen-bot:latest
-    container_name: kleinbot
+    container_name: ${KLEINBOT_NAME}
     shm_size: "256m"
     environment:
       - DISPLAY=${X11_DISPLAY}
