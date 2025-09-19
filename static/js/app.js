@@ -12,23 +12,22 @@ class KaBot {
     try {
         const res = await fetch("/api/v1/ads/files"); 
         const data = await res.json();
-
         this.adsFileContainer.innerHTML = "";
-
         if (!data.files || data.files.length === 0) {
             this.adsFileContainer.innerHTML = "<p class='text-gray-400'>Keine Dateien gefunden.</p>";
             return;
         }
-
         data.files.forEach((file, index) => {
             const label = document.createElement("label");
             label.className = "flex items-center space-x-2 p-2 bg-gray-700 rounded cursor-pointer hover:bg-gray-600";
-
             const radio = document.createElement("input");
             radio.type = "radio";
             radio.name = "adsFile";  
             radio.value = file;
-            if (index === 0) radio.checked = true; 
+            if (index === 0) 
+                { 
+                    radio.checked = true; 
+                }
 
             const span = document.createElement("span");
             span.textContent = file;
