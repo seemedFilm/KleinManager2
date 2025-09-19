@@ -8,11 +8,10 @@ services:
         GIT_DATE: ${GIT_DATE}
     container_name: kleinmanager    
     ports:
-      - "8080:8000"   # Webinterface port
-      #- "5678:5678"   # Debugging port
+      - "8080:8000"   
     volumes:
       - /docker/klein/manager/data:/app/data
-      - /docker/klein/manager/ads:/app/ads  
+      - ${ADS}:/app/ads  
     environment:
       - GIT_COMMIT=${GIT_COMMIT}
       - GIT_DATE=${GIT_DATE}
@@ -20,14 +19,13 @@ services:
       - APP_VERSION=${APP_VERSION}
     # depends_on:
     #   - kleinbot
-    # Debug aktivieren
-    # command: python -m debugpy --listen 0.0.0.0:5678 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
-  # kleinbot:
-  #  build: ./kleinanzeigen-bot
-  #  container_name: kleinbot
-  #  volumes:
-  #    - /docker/klein/bot/data:/app/data
-  #  stdin_open: true
-  #  tty: true
-  #  command: tail -f /dev/null   # Bot läuft nicht automatisch, sondern wartet
+  kleinbot:
+    image: ghcr.io/second-hand-friends/kleinanzeigen-bot:latest
+    container_name: kleinbot
+    shm_size: "256m"
+    environment:
+      - DISPLAY=${X11_DISPLAY}
+    volumes:  
+      - ${KLEINBOT_DATA}:/mnt/data
+      - ${ADS}:/mnt/data/ads

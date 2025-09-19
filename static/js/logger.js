@@ -17,8 +17,15 @@ window.log = {
 
     both: (message, level = "INFO", color = "gray", htmlElementId = "kabotLog") => {
         log.front(message, level, color, htmlElementId);
+        log.backend(message, level);
+    },
+
+    all: (message, level, color, htmlElementId) => {
+        log.front(message, level, color, htmlElementId);
+        log.backend(message, level);
         log.console(message, level);
     },
+
 
     // Zentral: Backend-Log
     backend: async (message, level) => {

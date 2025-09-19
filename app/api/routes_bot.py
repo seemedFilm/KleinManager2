@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 import subprocess
 
-router = APIRouter(prefix="/bot", tags=["Bot"])
+router = APIRouter(prefix="/bot", tags=["bot"])
 
 @router.post("/start")
 def start_bot():

@@ -5,3 +5,5 @@ dist
 .venv
 .idea
 /vs
+./pip-cache/
+__pycache__/
