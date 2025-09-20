@@ -19,7 +19,6 @@ ARG LC_ALL=C
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 
 RUN <<EOF
-
   apt-get update
 
   echo "#################################################"
@@ -40,23 +39,27 @@ RUN <<EOF
     /var/lib/apt/lists/* \
     /var/log/{apt,alternatives.log,bootstrap.log,dpkg.log} \
     /tmp/* /var/tmp/*
-
 EOF
 
 ######################
 # build image
 ######################
-
-# https://hub.docker.com/_/python/tags?name=3-slim
 FROM python:3.13-slim AS build-image
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG LC_ALL=C
 
+# NEW → Commit-Hash und Datum als Build-Args
+ARG GIT_COMMIT=unknown
+ARG GIT_COMMIT_DATE=unknown
+
+# Make them available as ENV for version.py
+ENV GIT_COMMIT=$GIT_COMMIT
+ENV GIT_COMMIT_DATE=$GIT_COMMIT_DATE
+
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 
 RUN <<EOF
-
   apt-get update
 
   # install required libraries
@@ -70,26 +73,20 @@ RUN <<EOF
 
   # install pdm
   pip install pdm
-
 EOF
 
 ENV PATH="/opt/upx:${PATH}"
 
 COPY . /opt/app/
 
-RUN <<EOF
-
+RUN bash <<'EOF'
+  set -eux   # e=stop on error, u=undefined var error, x=debug print
   cd /opt/app
-  ls -la .
   pdm install -v
-  ls -la src/kleinanzeigen_bot
   pdm run compile
-  ls -l dist
-
 EOF
 
 RUN /opt/app/dist/kleinanzeigen-bot --help
-
 
 ######################
 # final image

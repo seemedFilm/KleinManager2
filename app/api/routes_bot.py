@@ -7,15 +7,15 @@ client = docker.from_env()
 
 @router.post("/bot/publish")
 def start_bot():
-    try:
+    try:       
+        print("bot publishing")
         container = client.containers.get("kleinbot")
-        if container.status != "running":
-            container.start()
-        return {"status": "Bot gestartet"}
+        exit_code, output = container.exec_run("python main.py verify")
+        return {"status": "done", "output": output.decode()}
     except Exception as e:
         return {"error": str(e)}
     
-    
+
 @router.post("/stop")
 def stop_bot():
     try:

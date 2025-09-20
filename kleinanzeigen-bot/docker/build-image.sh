@@ -52,12 +52,20 @@ if [[ $OSTYPE == "cygwin" || $OSTYPE == "msys" ]]; then
    docker_file=$(cygpath -w "$docker_file")
 fi
 
-docker build "$project_root" \
-   --file "$docker_file" \
-   --progress=plain \
-   --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
-   --build-arg GIT_COMMIT_DATE="$(date -d @$(git log -1 --format='%at') --utc +'%Y-%m-%d %H:%M:%S UTC')" \
-   --build-arg GIT_COMMIT_HASH="$(git rev-parse --short HEAD)" \
-   --build-arg GIT_REPO_URL="$(git config --get remote.origin.url)" \
-   -t $image_name \
-   "$@"
+# docker build "$project_root" \
+#    --file "$docker_file" \
+#    --progress=plain \
+#    --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+#    --build-arg GIT_COMMIT_DATE="$(date -d @$(git log -1 --format='%at') --utc +'%Y-%m-%d %H:%M:%S UTC')" \
+#    --build-arg GIT_COMMIT_HASH="258d9df" \
+#    --build-arg GIT_REPO_URL="https://github.com/seemedFilm/KleinManager2.git" \
+#    -t $image_name #\
+#    #"$@"
+docker build $project_root \
+  --file "$docker_file" \
+  --progress=plain \
+  --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+  --build-arg GIT_COMMIT=$(git rev-parse --short HEAD) \
+  --build-arg GIT_COMMIT_DATE="$(git log -1 --format=%cd --date=format:'%Y-%m-%d %H:%M:%S')" \
+  --build-arg GIT_REPO_URL=$(git config --get remote.origin.url) \
+  -t kleinanzeigen-bot:latest
