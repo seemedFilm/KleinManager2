@@ -27,7 +27,16 @@ class KleinanzeigenManager extends KleinManagerCore {
             let fileName = selectedAdFile.value;
             log.front(`Ausgewählte Datei: ${fileName}`, "INFO", "blue", htmlElementId);
 
-            await fetch("/api/v1/bot/publish", { method: "POST" });
+            const res = await fetch("/api/v1/bot/publish", {
+                method: "POST"
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                log.front(`Fehler: ${err.detail || JSON.stringify(err)}`, "ERROR", "red", "kabotLog");
+                return;
+            }
+
 
         } catch (error) {
             log.all(`ERROR: ${error}`, "ERROR", "red", htmlElementId);

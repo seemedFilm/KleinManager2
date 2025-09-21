@@ -3,51 +3,50 @@ class KaBot {
         this.section = document.getElementById(sectionId);
         this.log = this.section.querySelector("#kabotLog");
         this.adsFileContainer = document.getElementById("adsFileContainer");
-    
+
         this.loadAdsFiles();
     }
 
-   
+
     async loadAdsFiles() {
-    try {
-        const res = await fetch("/api/v1/ads/files"); 
-        const data = await res.json();
-        this.adsFileContainer.innerHTML = "";
-        if (!data.files || data.files.length === 0) {
-            this.adsFileContainer.innerHTML = "<p class='text-gray-400'>Keine Dateien gefunden.</p>";
-            return;
-        }
-        data.files.forEach((file, index) => {
-            const label = document.createElement("label");
-            label.className = "flex items-center space-x-2 p-2 bg-gray-700 rounded cursor-pointer hover:bg-gray-600";
-            const radio = document.createElement("input");
-            radio.type = "radio";
-            radio.name = "adsFile";  
-            radio.value = file;
-            if (index === 0) 
-                { 
-                    radio.checked = true; 
+        try {
+            const res = await fetch("/api/v1/ads/files");
+            const data = await res.json();
+            this.adsFileContainer.innerHTML = "";
+            if (!data.files || data.files.length === 0) {
+                this.adsFileContainer.innerHTML = "<p class='text-gray-400'>Keine Dateien gefunden.</p>";
+                return;
+            }
+            data.files.forEach((file, index) => {
+                const label = document.createElement("label");
+                label.className = "flex items-center space-x-2 p-2 bg-gray-700 rounded cursor-pointer hover:bg-gray-600";
+                const radio = document.createElement("input");
+                radio.type = "radio";
+                radio.name = "adsFile";
+                radio.value = file;
+                if (index === 0) {
+                    radio.checked = true;
                 }
 
-            const span = document.createElement("span");
-            span.textContent = file;
+                const span = document.createElement("span");
+                span.textContent = file;
 
-            radio.addEventListener("change", () => {
-                log.front(`Vorlage ausgewählt: ${file}`, "INFO", "green");
+                radio.addEventListener("change", () => {
+                    log.front(`Vorlage ausgewählt: ${file}`, "INFO", "green");
+                });
+
+                label.appendChild(radio);
+                label.appendChild(span);
+                this.adsFileContainer.appendChild(label);
             });
-
-            label.appendChild(radio);
-            label.appendChild(span);
-            this.adsFileContainer.appendChild(label);           
-        });
-        } 
+        }
         catch (err) {
-            
-        console.error("Fehler beim Laden der Dateien:", err);
-        document.getElementById("adsFileContainer").innerHTML =
-            "<p class='text-red-400'>Fehler beim Laden der Dateien.</p>";
-            }        
-    }   
+
+            console.error("Fehler beim Laden der Dateien:", err);
+            document.getElementById("adsFileContainer").innerHTML =
+                "<p class='text-red-400'>Fehler beim Laden der Dateien.</p>";
+        }
+    }
 
     getSelectedFile() {
         const selected = this.adsFileContainer.querySelector("input[name='adsFile']:checked");
@@ -60,23 +59,37 @@ class KaBot {
     }
 }
 
+function connectLogs() {
+    const ws = new WebSocket(`ws://${location.host}/api/v1/bot/logs`);
+
+    ws.onmessage = (event) => {
+        log.front(event.data, "INFO", "green", "kabotLog");
+    };
+
+    ws.onopen = () => log.front("Verbunden mit Bot-Logs", "INFO", "blue", "kabotLog");
+    ws.onclose = () => log.front("Bot-Logs Verbindung geschlossen", "WARNING", "orange", "kabotLog");
+}
+
+
 async function loadVersion() {
     try {
-      const res = await fetch("/version");
-      if (!res.ok) throw new Error("Fehler beim Laden");
-      const data = await res.json();
+        const res = await fetch("/version");
+        if (!res.ok) throw new Error("Fehler beim Laden");
+        const data = await res.json();
 
-      document.getElementById("gitCommit").textContent = `${data.gitCommit} `;
-      document.getElementById("gitDate").textContent = `${data.gitDate}`;
-      document.getElementById("buildDate").textContent = `${data.buildDate}`;
-      document.getElementById("appVersion").textContent = `${data.appVersion}`;
+        document.getElementById("gitCommit").textContent = `${data.gitCommit} `;
+        document.getElementById("gitDate").textContent = `${data.gitDate}`;
+        document.getElementById("buildDate").textContent = `${data.buildDate}`;
+        document.getElementById("appVersion").textContent = `${data.appVersion}`;
     } catch (err) {
-      console.error("Konnte Version nicht laden:", err);
-      document.getElementById("gitVersion").textContent = "Version unbekannt";
+        console.error("Konnte Version nicht laden:", err);
+        document.getElementById("gitVersion").textContent = "Version unbekannt";
     }
-  }
-  document.addEventListener("DOMContentLoaded", loadVersion);
-
+}
+document.addEventListener("DOMContentLoaded", loadVersion);
+document.addEventListener("DOMContentLoaded", () => {
+    connectLogs();
+});
 
 // Main Application Class
 class KleinManager extends KleinManagerCore {
@@ -149,7 +162,7 @@ class KleinManager extends KleinManagerCore {
         });
 
         const clickedItem = event?.target?.closest?.('.nav-item') ||
-                           document.querySelector(`.nav-item[onclick*="${section}"]`);
+            document.querySelector(`.nav-item[onclick*="${section}"]`);
         if (clickedItem) {
             clickedItem.classList.add('active', 'bg-blue-900/50', 'border-l-4', 'border-blue-500');
         }
