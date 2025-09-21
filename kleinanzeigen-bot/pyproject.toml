@@ -77,7 +77,6 @@ CI            = "https://github.com/Second-Hand-Friends/kleinanzeigen-bot/action
 #####################
 [tool.pdm.version]  # https://backend.pdm-project.org/metadata/#dynamic-project-version
 source = "call"
-call = "bash scripts/version.sh"
 getter = "version:get_version"  # uses get_version() of <project_root>/version.py
 write_to = "kleinanzeigen_bot/_version.py"
 write_template = "__version__ = '{}'\n"

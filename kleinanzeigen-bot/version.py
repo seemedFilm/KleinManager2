@@ -1,12 +1,13 @@
-import os, subprocess
+"""
+SPDX-FileCopyrightText: © Sebastian Thomschke and contributors
+SPDX-License-Identifier: AGPL-3.0-or-later
+SPDX-ArtifactOfProjectHomePage: https://github.com/Second-Hand-Friends/kleinanzeigen-bot/
+"""
+from datetime import datetime
+import subprocess
 
-def get_version():
-    commit_hash = os.getenv("GIT_COMMIT")
-    if not commit_hash or commit_hash == "unknown":
-        try:
-            commit_hash = subprocess.check_output(
-                ["git", "rev-parse", "--short", "HEAD"]
-            ).decode().strip()
-        except Exception:
-            commit_hash = "unknown"
-    return commit_hash
+
+# used in pyproject.toml [tool.pdm.version]
+def get_version() -> str:
+    commit_hash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode().strip()
+    return f"{datetime.now().year}+{commit_hash}"

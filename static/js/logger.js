@@ -26,7 +26,6 @@ window.log = {
         log.console(message, level);
     },
 
-
     // Zentral: Backend-Log
     backend: async (message, level) => {
         try {
