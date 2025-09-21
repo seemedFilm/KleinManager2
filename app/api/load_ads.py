@@ -10,6 +10,11 @@ ADS_DIR = Path("/app/ads")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("ads_loader")
 logger.info(f"starting in dir: {ADS_DIR}")
+# logger.info(f"start print(logging.root.manager.loggerDict)")
+# logger.info(logging.root.manager.loggerDict)
+# logger.info(f"end print(logging.root.manager.loggerDict)")
+
+
 
 
 @router.get("/ads/files")
@@ -27,4 +32,6 @@ def list_ads_files():
             files.append(f.name)
 
     logger.info(f" Returning files: {files}")
+    
+    
     return {"files": files}

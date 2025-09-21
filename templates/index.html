@@ -372,7 +372,29 @@
             </div>
             <!-- Logs Section -->
             <div id="logOutput" class="bg-black text-green-400 p-4 rounded-lg h-64 overflow-y-auto font-mono"></div>
-            
+
+            <label for="logLevel">Logging-Level:</label>
+            <select id="logLevel" onchange="changeLogLevel(this.value)">
+                <option value="DEBUG">DEBUG</option>
+                <option value="INFO">INFO</option>
+                <option value="WARNING">WARNING</option>
+                <option value="ERROR">ERROR</option>
+                <option value="CRITICAL">CRITICAL</option>
+            </select>
+
+            <script>
+                async function changeLogLevel(level) {
+                    await setLoggingLevel(level);
+                }
+
+                // Beim Laden Dropdown auf aktuellen Level setzen
+                document.addEventListener("DOMContentLoaded", async () => {
+                    const level = await getLoggingLevel();
+                    document.getElementById("logLevel").value = level;
+                });
+            </script>
+
+
             <!-- Settings Section -->
             <div id="settings" class="section hidden">
                 <h2 class="text-2xl lg:text-3xl font-bold text-white mb-6 lg:mb-8 mt-12 lg:mt-0"

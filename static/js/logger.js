@@ -1,5 +1,5 @@
 // logger.js
-window.log = {   
+window.log = {
     front: (message, level, color, htmlElementId = "kabotLog") => {
         const el = document.getElementById(htmlElementId);
         if (el) {
@@ -39,3 +39,17 @@ window.log = {
         }
     }
 };
+async function getLoggingLevel() {
+    const res = await fetch("/api/v1/logging_level");
+    const data = await res.json();
+    return data.level;
+}
+
+async function setLoggingLevel(level) {
+    await fetch("/api/v1/logging_level", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ level }),
+    });
+    console.log("Logging-Level gesetzt auf", level);
+}

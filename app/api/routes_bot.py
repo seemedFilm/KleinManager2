@@ -8,22 +8,10 @@ import asyncio
 
 router = APIRouter()
 client = docker.from_env()
-log = logging.getLogger(" routes_bot ")
+log = logging.getLogger("routes_bot")
 
 active_sockets = set()
 
-
-def stream_logs(container):
-    """Liest Container-Logs und broadcastet an alle WebSockets."""
-    try:
-        log.info(f"[BOT-info] Starte Log-Streaming für Container: {container.name}")
-        log.debug(f"[BOT-debug] Starte Log-Streaming für Container: {container.name}")
-        for line in container.logs(stream=True, follow=True):
-            decoded = line.decode("utf-8").rstrip()
-            log.info(f"[BOT] {decoded}")
-            log.debug(f"Broadcasting to {len(active_sockets)} sockets")
-    except Exception as e:
-        log.error(f"Log-Streaming beendet: {e}")
 
 @router.post("/bot/publish")
 def start_bot():
@@ -32,7 +20,6 @@ def start_bot():
         container = client.containers.get("kleinbot")
         container.start()
 
-        # Logs in separatem Thread streamen
         threading.Thread(
             target=stream_logs,
             args=(container,),
@@ -43,6 +30,20 @@ def start_bot():
     except Exception as e:
         log.error(f"Fehler beim Starten: {e}")
         return {"error": str(e)}
+
+
+def stream_logs(container):
+    try:
+        log.info(f"Starte Log-Streaming für Container: {container.name}")
+        
+        for line in container.logs(stream=True, follow=True):
+            decoded = line.decode("utf-8").rstrip()
+            log.info(f"{decoded}")
+        
+        root = logging.getLogger()
+        root.debug(f"alle root.handlers: {root.handlers}")
+    except Exception as e:
+        log.error(f"Log-Streaming beendet: {e}")
 
 
 @router.websocket("/bot/logs")

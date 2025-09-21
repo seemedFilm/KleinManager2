@@ -29,6 +29,10 @@ async def lifespan(app: FastAPI):
     # Startup
     print("🚀 Starting KleinManager...")
     print("📋 Starting background monitoring tasks...")
+    print(f"All logs:")
+    print(logging.root.manager.loggerDict)
+
+
     await background_task_manager.start_all_tasks()
     yield
     # Shutdown
