@@ -59,16 +59,16 @@ class KaBot {
     }
 }
 
-function connectLogs() {
-    const ws = new WebSocket(`ws://${location.host}/api/v1/bot/logs`);
+// function connectLogs() {
+//     const ws = new WebSocket(`ws://${location.host}/api/v1/bot/logs`);
 
-    ws.onmessage = (event) => {
-        log.front(event.data, "INFO", "green", "kabotLog");
-    };
+//     ws.onmessage = (event) => {
+//         log.front(event.data, "INFO", "green", "kabotLog");
+//     };
 
-    ws.onopen = () => log.front("Verbunden mit Bot-Logs", "INFO", "blue", "kabotLog");
-    ws.onclose = () => log.front("Bot-Logs Verbindung geschlossen", "WARNING", "orange", "kabotLog");
-}
+//     ws.onopen = () => log.front("Verbunden mit Bot-Logs", "INFO", "blue", "kabotLog");
+//     ws.onclose = () => log.front("Bot-Logs Verbindung geschlossen", "WARNING", "orange", "kabotLog");
+// }
 
 
 async function loadVersion() {

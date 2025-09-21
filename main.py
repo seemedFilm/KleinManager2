@@ -29,8 +29,8 @@ async def lifespan(app: FastAPI):
     # Startup
     print("🚀 Starting KleinManager...")
     print("📋 Starting background monitoring tasks...")
-    print(f"All logs:")
-    print(logging.root.manager.loggerDict)
+    #print(f"All logs:")
+    #print(logging.root.manager.loggerDict)
 
 
     await background_task_manager.start_all_tasks()
@@ -116,8 +116,9 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=8000,
         reload=settings.DEBUG,
-        log_config=LOGGING_CONFIG
-    )
+        log_config=None   # ❌ Keine doppelten StreamHandler von uvicorn
+)
+
 
 
 @app.get("/version")
