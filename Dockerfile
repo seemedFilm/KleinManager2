@@ -13,8 +13,8 @@ ENV APP_VERSION=$APP_VERSION
 
 COPY . /app
 RUN mkdir -p /app/ads 
-RUN mv "/app/ad_Gameboy Spiele Divers.json" "/app/ads/"
-RUN cp "/app/ads/ad_Gameboy Spiele Divers.json" "/app/ads/ad_Gameboy_Spiele_Divers2.json"
+#RUN mv "/app/ad_Gameboy Spiele Divers.json" "/app/ads/"
+#RUN cp "/app/ads/ad_Gameboy Spiele Divers.json" "/app/ads/ad_Gameboy_Spiele_Divers2.json"
 RUN pip install -r /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 

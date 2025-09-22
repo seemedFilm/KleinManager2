@@ -32,7 +32,7 @@ class KaBot {
                 span.textContent = file;
 
                 radio.addEventListener("change", () => {
-                    log.front(`Vorlage ausgewählt: ${file}`, "INFO", "green");
+                   
                 });
 
                 label.appendChild(radio);
@@ -59,16 +59,6 @@ class KaBot {
     }
 }
 
-// function connectLogs() {
-//     const ws = new WebSocket(`ws://${location.host}/api/v1/bot/logs`);
-
-//     ws.onmessage = (event) => {
-//         log.front(event.data, "INFO", "green", "kabotLog");
-//     };
-
-//     ws.onopen = () => log.front("Verbunden mit Bot-Logs", "INFO", "blue", "kabotLog");
-//     ws.onclose = () => log.front("Bot-Logs Verbindung geschlossen", "WARNING", "orange", "kabotLog");
-// }
 
 
 async function loadVersion() {
@@ -87,9 +77,7 @@ async function loadVersion() {
     }
 }
 document.addEventListener("DOMContentLoaded", loadVersion);
-document.addEventListener("DOMContentLoaded", () => {
-    connectLogs();
-});
+
 
 // Main Application Class
 class KleinManager extends KleinManagerCore {

@@ -20,23 +20,20 @@ default_logging_config = {
         }
     },
     "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "formatter": "default",
+        "console": {"class": "logging.StreamHandler", "formatter": "default", "level": "DEBUG"},
+        "file": {"class": "logging.FileHandler", "formatter": "default", "filename": "/app/data/app.log", "level": "DEBUG"},
+    },
+    "loggers": {
+        "app": {
+            "handlers": ["console", "file"],
             "level": "DEBUG",
-            "stream": "ext://sys.stdout",
-        },
-        "file": {
-            "class": "logging.FileHandler",
-            "formatter": "default",
-            "level": "DEBUG",
-            "filename": "/app/data/app.log",
-        },
+            "propagate": False,  # ✅ verhindert doppelte Logs
+        }
     },
     "root": {
-        "level": "INFO",
-        "handlers": ["console", "file"],  # Root-Logger schreibt in Console + File
-    },
+        "level": "WARNING",
+        "handlers": []  # keine Handler auf Root, damit keine Doppelungen
+    }
 }
 
 # ----------------------------
@@ -45,32 +42,45 @@ default_logging_config = {
 def load_logging_config():
     logging_config = default_logging_config
 
-    # Root-Logger bereinigen, um doppelte Handler zu vermeiden
+    # settings.json einlesen, falls vorhanden
+    if os.path.exists(SETTINGS_FILE):
+        try:
+            with open(SETTINGS_FILE, "r") as f:
+                settings = json.load(f)
+            logging_config = settings.get("logging", default_logging_config)
+            # Propagation für 'app' Logger sicherstellen
+            if "loggers" in logging_config and "app" in logging_config["loggers"]:
+                logging_config["loggers"]["app"]["propagate"] = False
+        except Exception as e:
+            print(f"Fehler beim Laden von settings.json, fallback auf default logging: {e}")
+
+    # Root-Logger bereinigen
     root_logger = logging.getLogger()
-    print(f"Vorherige Handler: {root_logger.handlers}")
     if root_logger.hasHandlers():
         for h in root_logger.handlers[:]:
             root_logger.removeHandler(h)
-    print(f"Bereinigte Handler: {root_logger.handlers}")
-
-    # Config laden
-    logging.config.dictConfig(logging_config)
-    logging.getLogger("docker").propagate = False
-    logging.getLogger("urllib3").propagate = False
-    logging.getLogger("docker").handlers.clear()
-    logging.getLogger("urllib3").handlers.clear()
+    print(f"Bereinige Root-Logger Handler: {root_logger.handlers}")
+    if not hasattr(logging, "_LOGGING_INITIALIZED"):
+        logging.config.dictConfig(logging_config)
+        logging._LOGGING_INITIALIZED = True
 
 
-    # Docker / urllib3 auf WARNING setzen, keine Propagation
-    # for name in ["docker", "urllib3"]:
-    #     logger = logging.getLogger(name)
-    #     logger.handlers.clear()
-    #     logger.propagate = False
-    #     logger.setLevel(logging.WARNING)
+    # Docker / urllib3 Logger auf WARNING setzen
+    for logger_name in ["docker", "urllib3"]:
+        l = logging.getLogger(logger_name)
+        l.propagate = False
+        l.handlers.clear()
+        l.setLevel(logging.WARNING)
 
-    return logging.getLogger("app")  # Optional: dedizierter App-Logger
+    log = logging.getLogger("app")
+    return log
 
+
+# ----------------------------
+# Globaler Logger
+# ----------------------------
 log = load_logging_config()
+
 
 # ----------------------------
 # API: Frontend Logs
@@ -88,12 +98,14 @@ async def frontend_log(message: str = Body(..., embed=True), level: str = Body("
     log_func(f"[FRONTEND] {message}")
     return {"status": "ok"}
 
+
 # ----------------------------
 # Logging-Level APIs
 # ----------------------------
 @router.get("/logging_level")
 async def get_logging_level():
     return {"level": logging.getLevelName(log.level)}
+
 
 @router.post("/logging_level")
 async def set_logging_level(level: str = Body(..., embed=True)):
@@ -103,7 +115,7 @@ async def set_logging_level(level: str = Body(..., embed=True)):
 
     log.setLevel(numeric_level)
 
-    # Auch in settings.json speichern
+    # In settings.json speichern
     settings = {}
     if os.path.exists(SETTINGS_FILE):
         with open(SETTINGS_FILE, "r") as f:
