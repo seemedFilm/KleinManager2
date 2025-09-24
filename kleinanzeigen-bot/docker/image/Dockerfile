@@ -94,16 +94,20 @@ RUN /opt/app/dist/kleinanzeigen-bot --help
 ######################
 # final image
 ######################
+# Basis-Image laden
 FROM runtime-base-image
+
+# Binärdateien/Artefakte vom Build-Image kopieren
 COPY --from=build-image /opt/app/dist/kleinanzeigen-bot /opt/kleinanzeigen-bot
 
+# ---- Build Args (werden von update_env.sh gesetzt) ----
 ARG BUILD_DATE
 ARG GIT_COMMIT_HASH
 ARG GIT_COMMIT_DATE
 ARG GIT_REPO_URL
 
-LABEL \
-  maintainer="Sebastian Thomschke" \
+# ---- Labels für Metadaten ----
+LABEL maintainer="Sebastian Thomschke" \
   org.label-schema.schema-version="1.0" \
   org.label-schema.build-date=$BUILD_DATE \
   org.label-schema.vcs-ref=$GIT_COMMIT_HASH \
@@ -114,11 +118,28 @@ LABEL \
   org.opencontainers.image.title="kleinanzeigen-bot" \
   org.opencontainers.image.description="CLI application to ease publishing of ads to kleinanzeigen.de"
 
-# https://stackoverflow.com/a/59812588/5116073
+# ---- Runtime ENVs (aus .env) ----
+# Diese Werte werden beim docker run oder via docker-compose überschrieben.
+# => zentrale Steuerung über .env Datei
 ENV PYTHONUNBUFFERED=1
-ENV DISPLAY=0:0
 
+# Hier alle ENV-Variablen, die in .env gepflegt werden
+ENV DISPLAY=":0"
+ENV X11_DISPLAY=":0"
+ENV KLEINBOT_NAME="kleinbot"
+ENV KLEINBOT_LOGS="/klein/bot/data/logs"
+ENV KLEINBOT_CACHE="/klein/bot/cache"
+ENV KLEINBOT_DATA="/klein/bot/data"
+ENV SHARED_ADS="/klein/shared/ads"
+ENV SHARED_PIC="/klein/shared/pics"
+
+# ---- Default Configs ----
+ENV INIT_SH_FILE='' \
+    CONFIG_FILE=/mnt/data/config.yaml
+
+# ---- Entry Point ----
 ENTRYPOINT ["/bin/bash", "/opt/run.sh"]
+
 
 ENV \
   INIT_SH_FILE='' \

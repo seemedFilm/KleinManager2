@@ -71,6 +71,7 @@ async function loadVersion() {
         document.getElementById("gitDate").textContent = `${data.gitDate}`;
         document.getElementById("buildDate").textContent = `${data.buildDate}`;
         document.getElementById("appVersion").textContent = `${data.appVersion}`;
+        document.getElementById("branchName").textContent = `${data.branchName}`;
     } catch (err) {
         console.error("Konnte Version nicht laden:", err);
         document.getElementById("gitVersion").textContent = "Version unbekannt";

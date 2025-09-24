@@ -4,14 +4,14 @@ services:
   kleinbot:
     container_name: ${KLEINBOT_NAME:-kleinbot}
     build:
-      context: ./kleinanzeigen-bot   # ✅ Ordner, in dem das Dockerfile liegt
+      context: ./docker/image   # ✅ Ordner, in dem das Dockerfile liegt
       dockerfile: Dockerfile         # falls dein Dockerfile anders heißt, hier anpassen
     image: second-hand-friends/kleinanzeigen-bot:latest
     environment:
       DISPLAY: ${X11_DISPLAY}        # aus .env Datei oder Umgebung
+      
     shm_size: "256m"
     tty: true
     stdin_open: true
-    volumes:
-      - ./data:/mnt/data             # Beispiel-Volume
+    
     restart: unless-stopped

@@ -98,5 +98,6 @@ def version():
         "gitCommit": os.getenv("GIT_COMMIT", "unknown"),
         "gitDate": os.getenv("GIT_DATE", "unknown"),
         "buildDate": os.getenv("BUILD_DATE", "unknown"),
-        "appVersion": os.getenv("APP_VERSION", "unknown")
+        "appVersion": os.getenv("APP_VERSION", "unknown"),
+        "branchName": os.getenv("BRANCH_NAME", "unknown")
     }

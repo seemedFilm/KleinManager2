@@ -11,7 +11,7 @@
         "dependsOn": [
           "Docker Compose Down",
           "Update_env script",
-          "Update_config script",
+          //"Update_config script",
           "Docker Compose Up -d build"
         ],
         "group": "build",

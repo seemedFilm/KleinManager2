@@ -9,17 +9,19 @@ services:
     container_name: kleinmanager    
     ports:
       - "8080:8000"   
+      - "5678:5678"
     volumes:
-      - /docker/klein/manager/data:/app/data
+      - ${KLEINBOT_DATA}:/app/data
       - ${SHARED_ADS}:/app/ads
+      - ${SHARED_PIC}:/app/ads/pics
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - GIT_COMMIT=${GIT_COMMIT}
       - GIT_DATE=${GIT_DATE}
       - BUILD_DATE=${BUILD_DATE}
       - APP_VERSION=${APP_VERSION}
-    # depends_on:
-    #   - kleinbot
+      - BRANCH_NAME=${BRANCH_NAME}
+    
 
   # kleinbot:
   #   container_name: ${KLEINBOT_NAME:-kleinbot}

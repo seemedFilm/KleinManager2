@@ -2,11 +2,7 @@ from fastapi import APIRouter
 from pathlib import Path
 
 router = APIRouter()
-
 ADS_DIR = Path("/app/ads")
-
-
-
 
 
 @router.get("/ads/files")

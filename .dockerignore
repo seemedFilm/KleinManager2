@@ -8,7 +8,7 @@ build/
 dist/
 .vscode
 .gitignore
+.dockerignore
 Dockerfile
 docker-compose.yaml
-.env
 
