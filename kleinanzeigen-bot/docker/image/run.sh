@@ -20,4 +20,9 @@ fi
 
 cd /mnt/data
 
+echo ""
+ls -la /usr/bin/chromium
+chmod 777 /usr/bin/chromium
+ls -la /usr/bin/chromium
+echo ""
 /opt/kleinanzeigen-bot --config $CONFIG_FILE "$@"

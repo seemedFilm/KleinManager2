@@ -22,16 +22,3 @@ services:
       - APP_VERSION=${APP_VERSION}
       - BRANCH_NAME=${BRANCH_NAME}
     
-
-  # kleinbot:
-  #   container_name: ${KLEINBOT_NAME:-kleinbot}
-  #   build:
-  #     context: ./kleinanzeigen-bot   # ✅ Ordner, in dem das Dockerfile liegt
-  #     dockerfile: Dockerfile         # falls dein Dockerfile anders heißt, hier anpassen
-  #   image: second-hand-friends/kleinanzeigen-bot:latest
-  #   shm_size: "256m"
-  #   environment:
-  #     - DISPLAY=${X11_DISPLAY}
-  #   volumes:  
-  #     - ${KLEINBOT_DATA}:/mnt/data
-  #     - ${SHARED_ADS}:/mnt/data/ads

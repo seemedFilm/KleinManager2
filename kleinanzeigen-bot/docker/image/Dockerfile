@@ -25,7 +25,7 @@ RUN <<EOF
   echo "#################################################"
   echo "Installing root CAs..."
   echo "#################################################"
-  apt-get install --no-install-recommends -y ca-certificates
+  apt-get install --no-install-recommends -y ca-certificates curl
   update-ca-certificates
 
   echo "#################################################"
@@ -40,6 +40,10 @@ RUN <<EOF
     /var/lib/apt/lists/* \
     /var/log/{apt,alternatives.log,bootstrap.log,dpkg.log} \
     /tmp/* /var/tmp/*
+
+  useradd -ms /bin/bash pwuser
+  chown -R pwuser:pwuser /home/pwuser
+  
 
 EOF
 
@@ -126,20 +130,22 @@ ENV PYTHONUNBUFFERED=1
 # Hier alle ENV-Variablen, die in .env gepflegt werden
 ENV DISPLAY=":0"
 ENV X11_DISPLAY=":0"
-ENV KLEINBOT_NAME="kleinbot"
-ENV KLEINBOT_LOGS="/klein/bot/data/logs"
-ENV KLEINBOT_CACHE="/klein/bot/cache"
-ENV KLEINBOT_DATA="/klein/bot/data"
-ENV SHARED_ADS="/klein/shared/ads"
-ENV SHARED_PIC="/klein/shared/pics"
+ENV KLEINBOTNAME="kleinbot"
+ENV KLEINBOTLOGS="/klein/bot/data/logs"
+ENV KLEINBOTCACHE="/klein/bot/cache"
+ENV KLEINBOTDATA="/klein/bot/data"
+ENV SHAREDADS="/klein/shared/ads"
+ENV SHAREDPIC="/klein/shared/pics"
 
 # ---- Default Configs ----
 ENV INIT_SH_FILE='' \
     CONFIG_FILE=/mnt/data/config.yaml
 
 # ---- Entry Point ----
-ENTRYPOINT ["/bin/bash", "/opt/run.sh"]
-
+#ENTRYPOINT ["/bin/bash", "/opt/run.sh"]
+RUN echo 'alias ll="ls -alF"' >> ~/.bashrc
+RUN echo 'alias ll="ls -alF"' >> /home/pwuser/.bashrc
+RUN bash
 
 ENV \
   INIT_SH_FILE='' \
@@ -148,3 +154,5 @@ ENV \
 COPY docker/image/run.sh /opt/run.sh
 
 VOLUME /mnt/data
+
+

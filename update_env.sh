@@ -32,4 +32,10 @@ set_or_update "BUILD_DATE" "$BUILD_DATE"
 set_or_update "APP_VERSION" "$APP_VERSION"
 set_or_update "BRANCH_NAME" "$BRANCH_NAME"
 
-echo "✅ .env aktualisiert: GIT_COMMIT=\"$GIT_COMMIT\", GIT_DATE=\"$GIT_DATE\", BUILD_DATE=\"$BUILD_DATE\", APP_VERSION=\"$APP_VERSION\", BRANCH_NAME=\"$BRANCH_NAME\""
+echo "✅ .env aktualisiert: 
+GIT_COMMIT=\"$GIT_COMMIT\"
+GIT_DATE=\"$GIT_DATE\"
+BUILD_DATE=\"$BUILD_DATE\"
+APP_VERSION=\"$APP_VERSION\"
+BRANCH_NAME=\"$BRANCH_NAME\"
+"

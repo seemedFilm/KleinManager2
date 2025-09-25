@@ -4,6 +4,23 @@
     "version": "2.0.0",
     "tasks": [
       {
+        "label": "build kleinbot",
+        "type": "shell",
+        "command": "bash ~/KleinManager2/kleinanzeigen-bot/docker/build-image.sh",
+        "problemMatcher": []
+      },
+      {
+        "label": "logs",
+        "type": "shell",
+        "command": "docker logs -f kleinmanager",
+        "dependsOrder": "sequence",
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": []
+      },
+      {
         "label": "restart",
         "type": "shell",
         "command": "docker logs -f kleinmanager",
@@ -11,7 +28,6 @@
         "dependsOn": [
           "Docker Compose Down",
           "Update_env script",
-          //"Update_config script",
           "Docker Compose Up -d build"
         ],
         "group": "build",
