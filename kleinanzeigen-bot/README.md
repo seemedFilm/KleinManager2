@@ -1,5 +1,12 @@
 # kleinanzeigen-bot
 
+Export Cookies:
+python -m venv venv
+.\venv\Scripts\activate
+python -m pip install --upgrade pip
+pip install pycryptodome pywin32
+.\venv\Scripts\python.exe export_chrome_cookies.py
+
 [![Build Status](https://github.com/Second-Hand-Friends/kleinanzeigen-bot/actions/workflows/build.yml/badge.svg)](https://github.com/Second-Hand-Friends/kleinanzeigen-bot/actions/workflows/build.yml)
 [![License](https://img.shields.io/github/license/Second-Hand-Friends/kleinanzeigen-bot.svg?color=blue)](LICENSE.txt)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.1%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)

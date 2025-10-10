@@ -39,7 +39,7 @@ cp -f "$project_root/.gitignore" "$project_root/.dockerignore"
 #################################################
 #image_repo=second-hand-friends/kleinanzeigen-bot
 image_repo=kleinbot
-image_name=$image_repo:debug
+image_name=$image_repo:cookie
 
 
 #################################################

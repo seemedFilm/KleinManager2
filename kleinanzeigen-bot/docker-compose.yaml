@@ -1,17 +1,19 @@
-version: "3.9"
-
 services:
   kleinbot:
-    container_name: ${KLEINBOT_NAME:-kleinbot}
-    build:
-      context: ./docker/image   # ✅ Ordner, in dem das Dockerfile liegt
-      dockerfile: Dockerfile         # falls dein Dockerfile anders heißt, hier anpassen
-    image: second-hand-friends/kleinanzeigen-bot:latest
+    image: kleinbot:cookie
+    container_name: kleinbot
+    shm_size: 1g
     environment:
-      DISPLAY: ${X11_DISPLAY}        # aus .env Datei oder Umgebung
-      
-    shm_size: "256m"
-    tty: true
-    stdin_open: true
-    
-    restart: unless-stopped
+      - DISPLAY=:0
+      #- KLEINBOT_NAME=kleinbot
+      - LOGGING_ENABLE=TRUE
+      - CHROMIUM_PROFILE=/mnt/data/cache
+      #- KLEINBOT_COOKIE=/mnt/data/kleinanzeigen_cookies.json
+      #- KLEINBOT_STORAGE=/mnt/data/kleinanzeigen_localstorage.json
+    volumes:
+      - /docker/klein/shared/ads:/mnt/data/ads:rw
+      - /docker/klein/shared/ads/pics:/mnt/data/ads/pics:rw
+      - /docker/klein/bot/data:/mnt/data:rw
+    ports:
+      - "6080:6080"   # Zugriff über Browser (NoVNC)
+      - "5900:5900"   # optional Zugriff per VNC-Client

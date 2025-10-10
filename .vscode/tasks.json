@@ -4,10 +4,10 @@
     "version": "2.0.0",
     "tasks": [
       {
-        "label": "build kleinbot",
+        "label": "Docker Compose Up build",
         "type": "shell",
-        "command": "bash ~/KleinManager2/kleinanzeigen-bot/docker/build-image.sh",
-        "problemMatcher": []
+        "command": "docker compose up -d build",
+        "group": "build"
       },
       {
         "label": "logs",
@@ -28,49 +28,23 @@
         "dependsOn": [
           "Docker Compose Down",
           "Update_env script",
-          "Docker Compose Up -d build"
+          "Docker Compose Up"
         ],
         "group": "build",
         "problemMatcher": []
       },
       {
-        "label": "Docker Compose Up -d build",
+        "label": "Docker Compose Up",
         "type": "shell",
-        "command": "docker-compose up -d --build",
-        "dependsOn": [
-          "Update Git Env"
-        ],
-        "group": "build"
-      },
-      {
-        "label": "Docker Compose Up -d",
-        "type": "shell",
-        "command": "docker-compose up -d",
-        "group": "build"
-      },
-      {
-        "label": "Docker Compose Down  --volumes --rmi all",
-        "type": "shell",
-        "command": "docker-compose down --volumes --rmi all",
+        "command": "docker compose up --build",
         "group": "build"
       },
       {
         "label": "Docker Compose Down",
         "type": "shell",
-        "command": "docker-compose down",
-        "group": "build"
-      },
-      {
-        "label": "Docker system prune",
-        "type": "shell",
-        "command": "docker system prune -f",
-        "group": "build"
-      },
-      {
-        "label": "Update_config script",
-        "type": "shell",
-        "command": "./update_config.sh",
-        "group": "build"
+        "command": "docker compose down",
+        "group": "build",
+        "problemMatcher": []
       },
       {
         "label": "Update_env script",

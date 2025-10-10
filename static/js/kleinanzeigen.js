@@ -30,7 +30,7 @@ class KleinanzeigenManager extends KleinManagerCore {
         console.log("KaBot Parameter", kaparameter);
     }
 
-    async loadAdFile(htmlElementId = "dummy") {
+    async startBot(htmlElementId = "dummy") {
         try {
             let kaparameter = document.getElementById("KaBotParameter").value;
             let selectedAdFile = document.querySelector("input[name='adsFile']:checked");

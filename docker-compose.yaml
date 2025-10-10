@@ -3,12 +3,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:               
+      args:
         GIT_COMMIT: ${GIT_COMMIT}
         GIT_DATE: ${GIT_DATE}
-    container_name: kleinmanager    
+    container_name: kleinmanage
     ports:
-      - "8080:8000"   
+      - "8080:8000" 
       - "5678:5678"
     volumes:
       - ${KLEINBOT_DATA}:/app/data

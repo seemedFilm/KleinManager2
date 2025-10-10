@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../../../docker/klein/shared/ads"
+		},
+		{
+			"path": "../../../../docker/klein/bot/data"
+		}
+	],
+	"settings": {}
+}

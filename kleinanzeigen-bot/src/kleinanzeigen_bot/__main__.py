@@ -1,7 +1,8 @@
 # SPDX-FileCopyrightText: © Sebastian Thomschke and contributors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # SPDX-ArtifactOfProjectHomePage: https://github.com/Second-Hand-Friends/kleinanzeigen-bot/
-import sys, time  # isort: skip
+import sys, time # isort: skip
+from nodriver.cdp.network import CookieParam
 from gettext import gettext as _
 
 import kleinanzeigen_bot

@@ -20,9 +20,8 @@ fi
 
 cd /mnt/data
 
-echo ""
-ls -la /usr/bin/chromium
-chmod 777 /usr/bin/chromium
-ls -la /usr/bin/chromium
-echo ""
+/opt/start_chromium.sh
+
+#changed for debug purpose
+#/opt/kleinanzeigen-bot --config /mnt/data/config.yaml "$@"
 /opt/kleinanzeigen-bot --config $CONFIG_FILE "$@"

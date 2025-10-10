@@ -29,7 +29,7 @@ RUN <<EOF
   update-ca-certificates
 
   echo "#################################################"
-  echo "Installing Chromium..."
+  echo "Installing Chromium... & pwuser for starting chromium as non-root user"
   echo "#################################################"
   apt-get install --no-install-recommends -y chromium
 
@@ -41,11 +41,22 @@ RUN <<EOF
     /var/log/{apt,alternatives.log,bootstrap.log,dpkg.log} \
     /tmp/* /var/tmp/*
 
-  useradd -ms /bin/bash pwuser
-  chown -R pwuser:pwuser /home/pwuser
-  
+  useradd -ms /bin/bash pwuser 
 
 EOF
+
+# install X11
+RUN apt-get update && apt-get install -y \
+    xvfb \
+    x11vnc \
+    fluxbox \
+    novnc \
+    websockify \
+    nano \
+    xterm \
+    xfonts-base \
+ && rm -rf /var/lib/apt/lists/*
+
 
 ######################
 # build image
@@ -109,6 +120,8 @@ ARG BUILD_DATE
 ARG GIT_COMMIT_HASH
 ARG GIT_COMMIT_DATE
 ARG GIT_REPO_URL
+ARG KLEINBOT_COOKIE
+ARG KLEINBOT_STORAGE
 
 # ---- Labels für Metadaten ----
 LABEL maintainer="Sebastian Thomschke" \
@@ -122,37 +135,53 @@ LABEL maintainer="Sebastian Thomschke" \
   org.opencontainers.image.title="kleinanzeigen-bot" \
   org.opencontainers.image.description="CLI application to ease publishing of ads to kleinanzeigen.de"
 
-# ---- Runtime ENVs (aus .env) ----
-# Diese Werte werden beim docker run oder via docker-compose überschrieben.
-# => zentrale Steuerung über .env Datei
 ENV PYTHONUNBUFFERED=1
-
-# Hier alle ENV-Variablen, die in .env gepflegt werden
 ENV DISPLAY=":0"
 ENV X11_DISPLAY=":0"
-ENV KLEINBOTNAME="kleinbot"
-ENV KLEINBOTLOGS="/klein/bot/data/logs"
-ENV KLEINBOTCACHE="/klein/bot/cache"
-ENV KLEINBOTDATA="/klein/bot/data"
-ENV SHAREDADS="/klein/shared/ads"
-ENV SHAREDPIC="/klein/shared/pics"
-
+#ENV KLEINBOT_NAME="kleinbot"
+ENV KLEINBOT_LOGS="./logs"
+ENV KLEINBOT_DATA="/klein/bot/data"
+#ENV KLEINBOT_COOKIE="kleinanzeigen_cookies.json"
+#ENV KLEINBOT_STORAGE="/mnt/data/kleinanzeigen_localstorage.json"
+ENV SHARED_ADS="/klein/shared/ads"
+ENV SHARED_PIC="/klein/shared/pics"
+ENV LOGGING_ENABLE="FALSE"
 # ---- Default Configs ----
 ENV INIT_SH_FILE='' \
     CONFIG_FILE=/mnt/data/config.yaml
 
-# ---- Entry Point ----
-#ENTRYPOINT ["/bin/bash", "/opt/run.sh"]
 RUN echo 'alias ll="ls -alF"' >> ~/.bashrc
 RUN echo 'alias ll="ls -alF"' >> /home/pwuser/.bashrc
+RUN echo 'alias start="./opt/run.sh publish"'>> ~/.bashrc
 RUN bash
 
-ENV \
-  INIT_SH_FILE='' \
-  CONFIG_FILE=/mnt/data/config.yaml
 
 COPY docker/image/run.sh /opt/run.sh
+COPY docker/image/start_chromium.sh /opt/start_chromium.sh
+RUN chmod +x /opt/start_chromium.sh
+#changed for debug purposes
+RUN chmod +x /opt/run.sh 
+
+
 
 VOLUME /mnt/data
+VOLUME /mnt/data/ads
+VOLUME /mnt/data/ads/pics
+VOLUME /mnt/data/cache
+
+ENTRYPOINT ["/bin/bash", "-c"]
+
+CMD ["\
+  Xvfb :0 -screen 0 1280x800x16 & \
+  sleep 2 && \
+  fluxbox & \
+  x11vnc -display :0 -nopw -forever -rfbport 5900 & \
+  ln -sf /usr/share/novnc/vnc.html /usr/share/novnc/index.html && \
+  websockify --web=/usr/share/novnc/ 6080 localhost:5900 & \
+  until xdpyinfo -display :0 >/dev/null 2>&1; do echo 'Warte auf Xvfb...'; sleep 1; done && \
+  xterm -display :0 -geometry 120x40+10+10 -fa Monospace -fs 10 & \
+  tail -f /dev/null \
+"]
+
 
 
