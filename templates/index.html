@@ -357,11 +357,30 @@
                     <span id="notificationBadge"
                         class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center hidden animate-pulse">0</span>
                 </button>
-                <button onclick="app.startBot('kabotLog')"
+                <button onclick="fetch('/bot/publish', {method: 'POST', body: JSON.stringify({kaparameter: 'xyz'}), headers: {'Content-Type': 'application/json'}})">Container Starten</button>
+                <button onclick="app.startContainer('kabotLog')"
                     class="relative px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg hover:from-orange-700 hover:to-red-700 transition-all duration-200 shadow-lg group">
                     <div class="flex items-center justify-center text-white tooltip">
                         <i class="fas fa-bell text-lg mr-3"></i>
                         <span class="font-semibold ">Start Kleinbot</span>
+                    </div>
+                    <span id="notificationBadge"
+                        class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center hidden animate-pulse">0</span>
+                </button>
+                 <button onclick="app.runCom('kabotLog')"
+                    class="relative px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg hover:from-orange-700 hover:to-red-700 transition-all duration-200 shadow-lg group">
+                    <div class="flex items-center justify-center text-white tooltip">
+                        <i class="fas fa-bell text-lg mr-3"></i>
+                        <span class="font-semibold ">run command</span>
+                    </div>
+                    <span id="notificationBadge"
+                        class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center hidden animate-pulse">0</span>
+                </button>
+                <button onclick="app.stopBot('kabotLog')"
+                    class="relative px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg hover:from-orange-700 hover:to-red-700 transition-all duration-200 shadow-lg group">
+                    <div class="flex items-center justify-center text-white tooltip">
+                        <i class="fas fa-bell text-lg mr-3"></i>
+                        <span class="font-semibold ">Stop Bot</span>
                     </div>
                     <span id="notificationBadge"
                         class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center hidden animate-pulse">0</span>
