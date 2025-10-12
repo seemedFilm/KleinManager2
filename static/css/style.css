@@ -41,8 +41,28 @@ button {
     font-size: 16px;
 }
 
+
 button:hover {
     background-color: #357abd;
+}
+select {
+    background-color: #4a90e2;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+#kabotLog {
+    font-family: monospace;
+    white-space: pre-wrap; /* Zeilenumbrüche (\n) anzeigen */
+    background-color: #0a0a0a;
+    color: #00ff8c;
+    border-radius: 8px;
+    padding: 10px;
+    height: 400px;
+    overflow-y: auto;
 }
 
 tooltip {
@@ -82,3 +102,4 @@ tooltip:hover .tooltiptext {
   visibility: visible;
   opacity: 1;
 }
+

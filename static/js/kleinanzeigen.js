@@ -1,4 +1,19 @@
 
+function setStatus(msg) {
+    const logBox = document.getElementById("kabotLog");
+    if (logBox) logBox.textContent = msg;
+    console.log(msg);
+}
+
+function appendLog(msg) {
+    const logBox = document.getElementById("kabotLog");
+    if (logBox) {
+        const time = new Date().toLocaleTimeString();
+        logBox.textContent += `\n[${time}] ${msg}`;
+        logBox.scrollTop = logBox.scrollHeight;
+    }
+    console.log(msg);
+}
 class KleinanzeigenManager extends KleinManagerCore {
     constructor() {
         super();
@@ -9,7 +24,6 @@ class KleinanzeigenManager extends KleinManagerCore {
     refreshAdsFileList(htmlElementId = "dummy") {
         try {
             this.apiRequest('/ads/files');
-
         }
         catch (error) {
         }
@@ -29,154 +43,68 @@ class KleinanzeigenManager extends KleinManagerCore {
         });
         console.log("KaBot Parameter", kaparameter);
     }
-//     async runCom() {
-//         try {
-//              let kaparameter = document.getElementById("KaBotParameter").value;
-           
-//             const res = await fetch("/api/v1/bot/runCommand", {
-//                 method: "POST",
-//                 headers: { "Content-Type": "application/json" },
-//                 body: JSON.stringify({ kaparameter }),                
-//             });
-            
-//         } catch (error) {            
-//         }
-//     }
-//     async stopBot() {
-//         try {
-//             const res = await fetch("/api/v1/bot/stop", {
-//                 method: "POST",
-//                 headers: { "Content-Type": "application/json" },                
-//             });
-            
-//         } catch (error) {            
-//         }
-//     }
-//     // async startBot(htmlElementId = "dummy") {
-//     //     try {
-//     //         console.log("startBot")
-//     //         const res = await fetch("/api/v1/bot/start", {
-//     //             method: "POST",
-//     //             headers: { "Content-Type": "application/json" },
-//     //             body: JSON.stringify({ kaparameter }),
-//     //         });
 
-//     //         if (!res.ok) {
-//     //             const err = await res.json();
-//     //             return;
-//     //         }
-
-
-//     //     } catch (error) {
-//     //     }
-//     // }
-//     async stopContainer() {
-//     setStatus("Stoppe Container ...");
-
-//     try {
-//         const response = await fetch(`/api/v1/bot/stop`, { method: "POST" });
-//         const data = await response.json();
-
-//         if (data.error) {
-//             setStatus(`âŒ Fehler: ${data.error}`);
-//         } else {
-//             setStatus("ðŸ›‘ Container gestoppt.");
-//             appendLog("Container wurde beendet.");
-//         }
-//         } catch (err) {
-//             setStatus(`âŒ Netzwerkfehler: ${err}`);
-//         }
-//     }
-
-
-
-//     async startContainer() {
-//     setStatus("Starte Container ...");
-
-//     try {
-//         const response = await fetch(`/api/v1/bot/publish`, {
-//             method: "POST",
-//             headers: { "Content-Type": "application/json" },
-//             body: JSON.stringify({ kaparameter: "publish" }),
-//         });
-
-//         const data = await response.json();
-//         if (data.error) {
-//             setStatus(`âŒ Fehler: ${data.error}`);
-//         } else {
-//             setStatus(`âœ… Container gestartet (ID: ${data.container_id || "?"})`);
-//             appendLog("Container erfolgreich gestartet.");
-//         }
-//     } catch (err) {
-//         setStatus(`âŒ Netzwerkfehler: ${err}`);
-//     }
-// }
-
-// ðŸŸ¢ Container starten
     async startContainer(htmlElementId = "dummy") {
-        setStatus("Starte Container ...");
+        setStatus("Starting container ...");
 
         try {
             const response = await fetch(`/api/v1/bot/start`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ kaparameter: "publish" }),
+                headers: { "Content-Type": "application/json" },                
             });
 
             const data = await response.json();
             if (data.error) {
-                setStatus(`âŒ Fehler: ${data.error}`);
+                setStatus(`Error: ${data.error}`);
             } else {
-                setStatus(`âœ… Container gestartet (ID: ${data.container_id || "?"})`);
-                appendLog("Container erfolgreich gestartet.");
+                setStatus(`Container started (ID: ${data.container_id || "?"})`);
+                appendLog("Container started.");
             }
         } catch (err) {
-            setStatus(`âŒ Netzwerkfehler: ${err}`);
+            setStatus(`Error: ${err}`);
         }
     }
-
-    // âš™ï¸ Bot-Command im Container ausfÃ¼hren
+    
     async runBotCommand() {
-        setStatus("Starte Kleinanzeigen-Bot ...");
+        setStatus("Starting Kleinanzeigen-Bot ...");
 
         try {
+            let kaparameter = document.getElementById("KaBotParameter").value;
+
             const response = await fetch(`/api/v1/bot/runCommand`, {
-                method: "POST"
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ kaparameter: kaparameter }),
             });
+              const data = await response.json();
 
-            const data = await response.json();
-            if (data.error) {
-                setStatus(`âŒ Fehler: ${data.error}`);
-            } else {
-                setStatus(`âœ… Bot ausgefÃ¼hrt (Exec-ID: ${data.exec_id || "?"})`);
-                appendLog("Bot-Befehl erfolgreich gestartet.");
-            }
-        } catch (err) {
-            setStatus(`âŒ Netzwerkfehler: ${err}`);
+        if (data.error) {
+            setStatus(`Error: ${data.error}`);
+        } else {
+            setStatus(`✅ Bot started.`);
+            appendLog(data.output || "No logs received.");
         }
+    } catch (err) {
+        setStatus(`Error: ${err}`);
     }
-
-    // ðŸ”´ Container stoppen
-    async stopContainer() {
-        setStatus("Stoppe Container ...");
-
+}
+async stopCommand() {
+        setStatus("Stopping container...");
         try {
-            const response = await fetch(`/api/v1/bot/stop`, { method: "POST" });
+            
+            const response = await fetch(`/api/v1/bot/stopCommand`, { 
+                method: "POST" },
+            );
             const data = await response.json();
 
             if (data.error) {
-                setStatus(`âŒ Fehler: ${data.error}`);
+                setStatus(`Error: ${data.error}`);
             } else {
-                setStatus("ðŸ›‘ Container gestoppt.");
-                appendLog("Container wurde beendet.");
+                setStatus("Command stopped.");
+                appendLog("Command stopped.");
             }
         } catch (err) {
-            setStatus(`âŒ Netzwerkfehler: ${err}`);
+            setStatus(`Error: ${err}`);
         }
     }
-
-
-
-
-
 }

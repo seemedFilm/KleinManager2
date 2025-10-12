@@ -357,7 +357,6 @@
                     <span id="notificationBadge"
                         class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center hidden animate-pulse">0</span>
                 </button>
-                <button onclick="fetch('/bot/publish', {method: 'POST', body: JSON.stringify({kaparameter: 'xyz'}), headers: {'Content-Type': 'application/json'}})">Container Starten</button>
                 <button onclick="app.startContainer('kabotLog')"
                     class="relative px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg hover:from-orange-700 hover:to-red-700 transition-all duration-200 shadow-lg group">
                     <div class="flex items-center justify-center text-white tooltip">
@@ -367,7 +366,7 @@
                     <span id="notificationBadge"
                         class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center hidden animate-pulse">0</span>
                 </button>
-                 <button onclick="app.runCom('kabotLog')"
+                <button onclick="app.runBotCommand('kabotLog')"
                     class="relative px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg hover:from-orange-700 hover:to-red-700 transition-all duration-200 shadow-lg group">
                     <div class="flex items-center justify-center text-white tooltip">
                         <i class="fas fa-bell text-lg mr-3"></i>
@@ -376,29 +375,35 @@
                     <span id="notificationBadge"
                         class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center hidden animate-pulse">0</span>
                 </button>
-                <button onclick="app.stopBot('kabotLog')"
+                    <select id="KaBotParameter"
+                            onchange="changeKAParameter(this.value)"
+                            class="px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg text-white
+                                font-semibold shadow-lg hover:from-orange-700 hover:to-red-700 transition-all duration-200
+                                focus:outline-none focus:ring-2 focus:ring-orange-300 cursor-pointer appearance-none pr-10">
+                        <option value="publish">Publish</option>
+                        <option value="verify">Verify</option>
+                        <option value="update">Update</option>
+                        <option value="">---</option>
+                        <option value="--help">Help</option>
+                        <option value="diagnose">Diagnose</option>
+                    </select>
+                    <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-white pointer-events-none"></i>
+                    </div>
+                <button onclick="app.stopCommand('kabotLog')"
                     class="relative px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg hover:from-orange-700 hover:to-red-700 transition-all duration-200 shadow-lg group">
                     <div class="flex items-center justify-center text-white tooltip">
                         <i class="fas fa-bell text-lg mr-3"></i>
-                        <span class="font-semibold ">Stop Bot</span>
+                        <span class="font-semibold ">Stop command</span>
                     </div>
                     <span id="notificationBadge"
                         class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center hidden animate-pulse">0</span>
                 </button>
-                <label for="KaBotParameter">Bot-Parameter:</label>
-                <select id="KaBotParameter" onchange="changeKAParameter(this.value)">
-                    <option value="publish" title="Tooltip text">Publish</option>
-                    <option value="verify" title="Überprüfen der Daten">Verify</option>
-                    <option value="update" title="Aktualisiert die Daten">Update</option>
-                    <option value="" title="Keine Auswahl">---</option>
-                    <option value="--help" title="Zeigt Hilfe an">Help</option>
-                    <option value="diagnose" title="Zeigt Hilfe an">diagnose</option>
-                </select>
+                
 
 
                 <!-- Log-Ausgabe -->
                 <div id="kabotLog"
-                    class="bg-gray-900 border border-gray-700 rounded-xl p-4 text-gray-300 h-64 overflow-y-auto">
+                    class="kabotLog kabotLogbg-gray-900 border border-gray-700 rounded-xl p-4 text-gray-300 h-64 overflow-y-auto">
                     Ka-Bot Log...
                 </div>
             </div>

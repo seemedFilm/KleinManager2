@@ -11,9 +11,6 @@ log_threads = {}
 load_dotenv()
 active_sockets = set()
 
-# default parameter for kleinanzeigen-bot
-kaparameter = ["--help"]
-
 def require_env(key: str) -> str:
     value = os.getenv(key)
     if not value:
@@ -22,87 +19,19 @@ def require_env(key: str) -> str:
 
 router = APIRouter()
 client = docker.from_env()
-
-# @router.post("/bot/publish")
-# def start_container(kaparameter: str = Body(..., embed=True)):
-#     print(f"KA-Parameter: {kaparameter}")
-#     print("Starte Container 'kleinbot'...")
-
-#     # Existierenden Container entfernen
-#     existing = [c for c in client.containers.list(all=True) if c.name == "kleinbot"]
-#     if existing:
-#         print("Vorherigen Container gefunden – entferne ihn...")
-#         existing[0].remove(force=True)
-
-#     # Container starten (Umgebung + VNC)
-#     container = client.containers.run(
-#         image="kleinbot:cookie",
-#         name="kleinbot",
-#         shm_size="1g",
-#         environment={
-#             "DISPLAY": ":0",
-#             "LOGGING_ENABLE": "TRUE",
-#             "CHROMIUM_PROFILE": "/mnt/data/cache",
-#         },
-#         volumes={
-#             "/docker/klein/shared/ads": {"bind": "/mnt/data/ads", "mode": "rw"},
-#             "/docker/klein/shared/ads/pics": {"bind": "/mnt/data/ads/pics", "mode": "rw"},
-#             "/docker/klein/bot/data": {"bind": "/mnt/data", "mode": "rw"},
-#         },
-#         ports={"6080/tcp": 6080, "5900/tcp": 5900},
-#         detach=True,
-#         tty=True,
-#         stdin_open=True
-#     )
-
-#     print(f"Container gestartet: {container.short_id}")
-#     return {"status": "running", "container_id": container.short_id}
-
-
-# @router.post("/bot/runCommand")
-# def run_command():
-#     print("Starte den Kleinanzeigen-Bot-Prozess...")
-
-#     try:
-#         container = client.containers.get("kleinbot")
-#     except docker.errors.NotFound:
-#         return {"error": "Container 'kleinbot' läuft nicht."}
-
-#     exec_result = container.exec_run(
-#         cmd="/opt/kleinanzeigen-bot --config=/mnt/data/config.yaml verify",
-#         user="pwuser",
-#         detach=True
-#     )
-
-#     print(f"Bot gestartet (exec ID: {getattr(exec_result, 'id', 'N/A')})")
-#     return {"status": "executed", "exec_id": getattr(exec_result, 'id', 'N/A')}
-
-
-# @router.post("/bot/stop")
-# def stop_container():
-#     print("Stoppe Container 'kleinbot'...")
-
-#     try:
-#         container = client.containers.get("kleinbot")
-#         container.stop()
-#         container.remove()
-#         return {"status": "stopped"}
-#     except docker.errors.NotFound:
-#         return {"error": "Container 'kleinbot' existiert nicht."}
-
+shared_ads = os.getenv("SHARED_ADS", "unknown")
+shared_pics = os.getenv("SHARED_PIC", "unknown")
+kleinbot_data = os.getenv("KLEINBOT_DATA", "unknown")
 
 @router.post("/bot/start")
-def start_container(kaparameter: str = Body(..., embed=True)):
-    print(f"KA-Parameter: {kaparameter}")
-    print("Starte Container 'kleinbot'...")
+def start_container():
+    print("Starting Container ''...")
 
-    # Existierenden Container entfernen
     existing = [c for c in client.containers.list(all=True) if c.name == "kleinbot"]
     if existing:
-        print("Vorherigen Container gefunden â€“ entferne ihn...")
+        print("Found existing container, deleting it...")
         existing[0].remove(force=True)
 
-    # Container starten (Umgebung + VNC)
     container = client.containers.run(
         image="kleinbot:cookie",
         name="kleinbot",
@@ -113,47 +42,53 @@ def start_container(kaparameter: str = Body(..., embed=True)):
             "CHROMIUM_PROFILE": "/mnt/data/cache",
         },
         volumes={
-            "/docker/klein/shared/ads": {"bind": "/mnt/data/ads", "mode": "rw"},
-            "/docker/klein/shared/ads/pics": {"bind": "/mnt/data/ads/pics", "mode": "rw"},
-            "/docker/klein/bot/data": {"bind": "/mnt/data", "mode": "rw"},
+            shared_ads: {"bind": "/mnt/data/ads", "mode": "rw"},
+            shared_pics: {"bind": "/mnt/data/ads/pics", "mode": "rw"},
+            kleinbot_data: {"bind": "/mnt/data", "mode": "rw"},
         },
-        ports={"6080/tcp": 6080, "5900/tcp": 5900},
+        ports={
+            "6080/tcp": 6080, 
+            "5900/tcp": 5900
+            },
         detach=True,
         tty=True,
         stdin_open=True
     )
 
-    print(f"Container gestartet: {container.short_id}")
+    print(f"Container started: {container.short_id}")
     return {"status": "running", "container_id": container.short_id}
 
 
 @router.post("/bot/runCommand")
 def run_command():
-    print("Starte den Kleinanzeigen-Bot-Prozess...")
+    print("Running the bot command")
 
     try:
         container = client.containers.get("kleinbot")
     except docker.errors.NotFound:
-        return {"error": "Container 'kleinbot' lÃ¤uft nicht."}
+        return {"error": "Container \"name\" odes not run"}
 
     exec_result = container.exec_run(
         cmd="/opt/kleinanzeigen-bot --config=/mnt/data/config.yaml verify",
-        user="pwuser",
-        detach=True
+        detach=False,
+        stdout=True,
+        stderr=True
     )
+    output = exec_result.output.decode("utf-8", errors="ignore")
+    print(f"=== BOT OUTPUT BEGIN ===\n")
+    print(f"{output}\n")
+    print(f"=== BOT OUTPUT END ===")
+    return {"status": "executed", "output": output}
 
-    print(f"Bot gestartet (exec ID: {getattr(exec_result, 'id', 'N/A')})")
-    return {"status": "executed", "exec_id": getattr(exec_result, 'id', 'N/A')}
-
-
-@router.post("/bot/stop")
+@router.post("/bot/stopCommand")
 def stop_container():
-    print("Stoppe Container 'kleinbot'...")
-
+    print("Stopping command ''...")
     try:
         container = client.containers.get("kleinbot")
-        container.stop()
-        container.remove()
-        return {"status": "stopped"}
+        container.kill(signal="SIGINT")
+        print("Stopping command! (CTRL+C)")
+        return {"status": "interrupted"}
     except docker.errors.NotFound:
-        return {"error": "Container 'kleinbot' existiert nicht."}
+        return {"error": "Container 'name' not found."}
+    except Exception as e:
+        return {"error": str(e)}

@@ -44,7 +44,16 @@
         "type": "shell",
         "command": "docker compose down",
         "group": "build",
-        "problemMatcher": []
+        "problemMatcher": [],
+        "dependsOn": [
+          "remove kleinbot"
+        ],
+      },
+      {
+        "label": "remove kleinbot",
+        "type": "shell",
+        "command": "docker container rm -f kleinbot",
+        "group": "build",
       },
       {
         "label": "Update_env script",
