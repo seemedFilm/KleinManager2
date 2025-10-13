@@ -1,0 +1,1412 @@
+diff --git a/.dockerignore b/.dockerignore
+index 67ab9d7..d350ba7 100644
+--- a/.dockerignore
++++ b/.dockerignore
+@@ -8,7 +8,7 @@ build/
+ dist/
+ .vscode
+ .gitignore
+-.dockerignore
+ Dockerfile
+ docker-compose.yaml
++.env
+ 
+diff --git a/.env b/.env
+index c16fb70..26f29d0 100644
+--- a/.env
++++ b/.env
+@@ -1,12 +1,8 @@
+-GIT_COMMIT="f21341d"
+-GIT_DATE="2025-09-25 15:15:07 +0200"
+-BUILD_DATE="2025-10-10 09:36:42"
+-APP_VERSION="v0-42"
+-BRANCH_NAME="bot-starting"
++GIT_COMMIT="f069571"
++GIT_DATE="2025-09-22 00:44:19 +0200"
++BUILD_DATE="2025-09-22 09:51:38"
++APP_VERSION="v0-38"
+ X11_DISPLAY=":0"
+ KLEINBOT_NAME="kleinbot"
+-KLEINBOT_LOGS="/docker/klein/bot/data/logs"
+-KLEINBOT_CACHE="/docker/klein/bot/cache"
+ KLEINBOT_DATA="/docker/klein/bot/data"
+-SHARED_ADS="/docker/klein/shared/ads"
+-SHARED_PIC="/docker/klein/shared/ads/pics"
++ADS="/docker/klein/shared/ads"
+\ No newline at end of file
+diff --git a/.vscode/tasks.json b/.vscode/tasks.json
+index a850b99..171ff58 100644
+--- a/.vscode/tasks.json
++++ b/.vscode/tasks.json
+@@ -3,23 +3,6 @@
+     // for the documentation about the tasks.json format
+     "version": "2.0.0",
+     "tasks": [
+-      {
+-        "label": "Docker Compose Up build",
+-        "type": "shell",
+-        "command": "docker compose up -d build",
+-        "group": "build"
+-      },
+-      {
+-        "label": "logs",
+-        "type": "shell",
+-        "command": "docker logs -f kleinmanager",
+-        "dependsOrder": "sequence",
+-        "group": {
+-          "kind": "build",
+-          "isDefault": true
+-        },
+-        "problemMatcher": []
+-      },
+       {
+         "label": "restart",
+         "type": "shell",
+@@ -28,32 +11,50 @@
+         "dependsOn": [
+           "Docker Compose Down",
+           "Update_env script",
+-          "Docker Compose Up"
++          "Update_config script",
++          "Docker Compose Up -d build"
+         ],
+         "group": "build",
+         "problemMatcher": []
+       },
+       {
+-        "label": "Docker Compose Up",
++        "label": "Docker Compose Up -d build",
++        "type": "shell",
++        "command": "docker-compose up -d --build",
++        "dependsOn": [
++          "Update Git Env"
++        ],
++        "group": "build"
++      },
++      {
++        "label": "Docker Compose Up -d",
++        "type": "shell",
++        "command": "docker-compose up -d",
++        "group": "build"
++      },
++      {
++        "label": "Docker Compose Down  --volumes --rmi all",
+         "type": "shell",
+-        "command": "docker compose up --build",
++        "command": "docker-compose down --volumes --rmi all",
+         "group": "build"
+       },
+       {
+         "label": "Docker Compose Down",
+         "type": "shell",
+-        "command": "docker compose down",
+-        "group": "build",
+-        "problemMatcher": [],
+-        "dependsOn": [
+-          "remove kleinbot"
+-        ],
++        "command": "docker-compose down",
++        "group": "build"
+       },
+       {
+-        "label": "remove kleinbot",
++        "label": "Docker system prune",
+         "type": "shell",
+-        "command": "docker container rm -f kleinbot",
+-        "group": "build",
++        "command": "docker system prune -f",
++        "group": "build"
++      },
++      {
++        "label": "Update_config script",
++        "type": "shell",
++        "command": "./update_config.sh",
++        "group": "build"
+       },
+       {
+         "label": "Update_env script",
+diff --git a/Dockerfile b/Dockerfile
+index af50149..9742e50 100644
+--- a/Dockerfile
++++ b/Dockerfile
+@@ -5,17 +5,16 @@ ARG GIT_COMMIT
+ ARG GIT_DATE
+ ARG BUILD_DATE
+ ARG APP_VERSION
+-ARG BRANCH_NAME
+ 
+ ENV GIT_COMMIT=$GIT_COMMIT
+ ENV GIT_DATE=$GIT_DATE
+ ENV BUILD_DATE=$BUILD_DATE
+ ENV APP_VERSION=$APP_VERSION
+-ENV BRANCH_NAME=$BRANCH_NAME
+ 
+ COPY . /app
+ RUN mkdir -p /app/ads 
+-
++#RUN mv "/app/ad_Gameboy Spiele Divers.json" "/app/ads/"
++#RUN cp "/app/ads/ad_Gameboy Spiele Divers.json" "/app/ads/ad_Gameboy_Spiele_Divers2.json"
+ RUN pip install -r /app/requirements.txt
+ RUN pip install --no-cache-dir -r /app/requirements.txt
+ 
+diff --git a/ad_Gameboy Spiele Divers.json b/ad_Gameboy Spiele Divers.json
+new file mode 100644
+index 0000000..802d5cc
+--- /dev/null
++++ b/ad_Gameboy Spiele Divers.json	
+@@ -0,0 +1,20 @@
++{
++  "title": "Gameboy Spiele Divers",
++  "description": "Ich verkaufe hier die folgenden Gameboy Spiele in OVP und CiB\r\n\r\nTierisch Wild OVP | CiB | AGB-BWLP-NOE = 15€ VB (Top Anleitung)\r\nMX 2002 Ricky Carmichael OVP | CiB | AGB-A2XP-EUR = 20€ VB (Neues Inlay, Top Anleitung)\r\nTriff die Robinsons OVP | CiB | AGB-BRHP-NOE = 15€ VB (Neues Inlay, Top Anleitung)\r\nDie Chroniken von Narnia | CiB | AGB-B2WP-NOE = 5€ (Neues Inlay)\r\nDrome Racers | CiB | AGB-AOEX-EUU = 50€ FB (Festes Inlay, Top Anleitung)\r\nOttifanten Pinball | CiB | AGB-BOFD-NOE = 28€ VB (Neues Inlay, Top Anleitung)\r\nAlex Rider Strombreaker | CiB | AGB-BAWX-NOE = 9€ VB (Festes Inlay, Top Anleitung)",
++  "category": "161/227/sonstige",
++  "price": 60,
++  "price_type": "FIXED",
++  "shipping_options": [
++    "DHL_2",
++    "Hermes_Päckchen",
++    "DHL_5",
++    "Hermes_M"
++  ],
++  "sell_directly": false,
++  "images": [
++    "C:/Users/Patrick/Pictures/Ebay/gb/1.JPG",
++    "C:/Users/Patrick/Pictures/Ebay/gb/2.JPG",
++    "C:/Users/Patrick/Pictures/Ebay/gb/3.JPG",
++    "C:/Users/Patrick/Pictures/Ebay/gb/4.JPG"
++  ]
++}
+\ No newline at end of file
+diff --git a/app/api/load_ads.py b/app/api/load_ads.py
+index 077bd5b..1357177 100644
+--- a/app/api/load_ads.py
++++ b/app/api/load_ads.py
+@@ -2,9 +2,13 @@ from fastapi import APIRouter
+ from pathlib import Path
+ 
+ router = APIRouter()
++
+ ADS_DIR = Path("/app/ads")
+ 
+ 
++
++
++
+ @router.get("/ads/files")
+ def list_ads_files():
+     if not ADS_DIR.exists():
+@@ -16,5 +20,8 @@ def list_ads_files():
+         print(f" Found file: {f.name}")
+         if f.is_file() and f.suffix.lower() in [".json", ".yaml", ".yml"]:
+             files.append(f.name)
++
+     print(f" Returning files: {files}")
++    
++    
+     return {"files": files}
+diff --git a/app/api/routes_bot.py b/app/api/routes_bot.py
+index ce567f5..30d3ead 100644
+--- a/app/api/routes_bot.py
++++ b/app/api/routes_bot.py
+@@ -1,94 +1,40 @@
+ import docker
+-import os
+-import time
+-from fastapi import APIRouter, WebSocket, Body
+-from dotenv import load_dotenv
++import threading
++from fastapi import APIRouter, WebSocket
+ 
+ 
+ router = APIRouter()
+ client = docker.from_env()
++# Merker, ob wir schon einen Stream-Thread laufen haben
+ log_threads = {}
+-load_dotenv()
+-active_sockets = set()
+-
+-def require_env(key: str) -> str:
+-    value = os.getenv(key)
+-    if not value:
+-        print(f"require_env: {key} = {value}")
+-    return value
+-
+-router = APIRouter()
+-client = docker.from_env()
+-shared_ads = os.getenv("SHARED_ADS", "unknown")
+-shared_pics = os.getenv("SHARED_PIC", "unknown")
+-kleinbot_data = os.getenv("KLEINBOT_DATA", "unknown")
+-
+-@router.post("/bot/start")
+-def start_container():
+-    print("Starting Container ''...")
+-
+-    existing = [c for c in client.containers.list(all=True) if c.name == "kleinbot"]
+-    if existing:
+-        print("Found existing container, deleting it...")
+-        existing[0].remove(force=True)
+-
+-    container = client.containers.run(
+-        image="kleinbot:cookie",
+-        name="kleinbot",
+-        shm_size="1g",
+-        environment={
+-            "DISPLAY": ":0",
+-            "LOGGING_ENABLE": "TRUE",
+-            "CHROMIUM_PROFILE": "/mnt/data/cache",
+-        },
+-        volumes={
+-            shared_ads: {"bind": "/mnt/data/ads", "mode": "rw"},
+-            shared_pics: {"bind": "/mnt/data/ads/pics", "mode": "rw"},
+-            kleinbot_data: {"bind": "/mnt/data", "mode": "rw"},
+-        },
+-        ports={
+-            "6080/tcp": 6080, 
+-            "5900/tcp": 5900
+-            },
+-        detach=True,
+-        tty=True,
+-        stdin_open=True
+-    )
+-
+-    print(f"Container started: {container.short_id}")
+-    return {"status": "running", "container_id": container.short_id}
+ 
++active_sockets = set()
+ 
+-@router.post("/bot/runCommand")
+-def run_command():
+-    print("Running the bot command")
+ 
++@router.post("/bot/publish")
++def start_bot():
+     try:
++        print("▶ Starte Container 'kleinbot'...")
+         container = client.containers.get("kleinbot")
+-    except docker.errors.NotFound:
+-        return {"error": "Container \"name\" odes not run"}
++        container.start()
++       
+ 
+-    exec_result = container.exec_run(
+-        cmd="/opt/kleinanzeigen-bot --config=/mnt/data/config.yaml verify",
+-        detach=False,
+-        stdout=True,
+-        stderr=True
+-    )
+-    output = exec_result.output.decode("utf-8", errors="ignore")
+-    print(f"=== BOT OUTPUT BEGIN ===\n")
+-    print(f"{output}\n")
+-    print(f"=== BOT OUTPUT END ===")
+-    return {"status": "executed", "output": output}
++        return {"status": "started", "id": container.id}
++    except Exception as e:
++        print(f"❌ Fehler beim Starten: {e}")
++        return {"error": str(e)}
+ 
+-@router.post("/bot/stopCommand")
+-def stop_container():
+-    print("Stopping command ''...")
++@router.post("/bot/publish")
++def start_bot():
+     try:
+         container = client.containers.get("kleinbot")
+-        container.kill(signal="SIGINT")
+-        print("Stopping command! (CTRL+C)")
+-        return {"status": "interrupted"}
+-    except docker.errors.NotFound:
+-        return {"error": "Container 'name' not found."}
++        if container.status != "running":
++            print(f"Starte Container 'kleinbot'...")
++            container.start()
++        else:
++            print(f"Container 'kleinbot' läuft bereits.")
++
++        return {"status": "started", "id": container.id}
+     except Exception as e:
+-        return {"error": str(e)}
+\ No newline at end of file
++        print(f"Fehler beim Starten: {e}")
++        return {"error": str(e)}
+diff --git a/bot/config.yaml b/bot/config.yaml
+new file mode 100644
+index 0000000..e69de29
+diff --git a/config.yaml b/config.yaml
+new file mode 100644
+index 0000000..e69de29
+diff --git a/docker-compose.yaml b/docker-compose.yaml
+index f8f7ec7..cd184f9 100644
+--- a/docker-compose.yaml
++++ b/docker-compose.yaml
+@@ -3,22 +3,30 @@ services:
+     build:
+       context: .
+       dockerfile: Dockerfile
+-      args:
++      args:               
+         GIT_COMMIT: ${GIT_COMMIT}
+         GIT_DATE: ${GIT_DATE}
+-    container_name: kleinmanage
++    container_name: kleinmanager    
+     ports:
+-      - "8080:8000" 
+-      - "5678:5678"
++      - "8080:8000"   
+     volumes:
+-      - ${KLEINBOT_DATA}:/app/data
+-      - ${SHARED_ADS}:/app/ads
+-      - ${SHARED_PIC}:/app/ads/pics
++      - /docker/klein/manager/data:/app/data
++      - ${ADS}:/app/ads
+       - /var/run/docker.sock:/var/run/docker.sock
+     environment:
+       - GIT_COMMIT=${GIT_COMMIT}
+       - GIT_DATE=${GIT_DATE}
+       - BUILD_DATE=${BUILD_DATE}
+       - APP_VERSION=${APP_VERSION}
+-      - BRANCH_NAME=${BRANCH_NAME}
+-    
++    # depends_on:
++    #   - kleinbot
++
++  kleinbot:
++    image: ghcr.io/second-hand-friends/kleinanzeigen-bot:latest
++    container_name: ${KLEINBOT_NAME}
++    shm_size: "256m"
++    environment:
++      - DISPLAY=${X11_DISPLAY}
++    volumes:  
++      - ${KLEINBOT_DATA}:/mnt/data
++      - ${ADS}:/mnt/data/ads
+\ No newline at end of file
+diff --git a/kleinanzeigen-bot/.gitignore b/kleinanzeigen-bot/.gitignore
+index 7f10c1e..733c755 100644
+--- a/kleinanzeigen-bot/.gitignore
++++ b/kleinanzeigen-bot/.gitignore
+@@ -9,9 +9,7 @@ _LOCAL/
+ /data
+ /*.log
+ /src/kleinanzeigen_bot/_version.py
+-KleinManager2.code-workspace
+-
+-
++downloaded-ads
+ 
+ # python
+ /.venv
+@@ -37,10 +35,7 @@ __pycache__
+ /*.iws
+ 
+ # Visual Studio Code
+-.vscode
+-
+-# Github
+-.github
++/.vscode
+ 
+ # OSX
+ .DS_Store
+diff --git a/kleinanzeigen-bot/README.md b/kleinanzeigen-bot/README.md
+index d6e5d8d..3899c87 100644
+--- a/kleinanzeigen-bot/README.md
++++ b/kleinanzeigen-bot/README.md
+@@ -1,12 +1,5 @@
+ # kleinanzeigen-bot
+ 
+-Export Cookies:
+-python -m venv venv
+-.\venv\Scripts\activate
+-python -m pip install --upgrade pip
+-pip install pycryptodome pywin32
+-.\venv\Scripts\python.exe export_chrome_cookies.py
+-
+ [![Build Status](https://github.com/Second-Hand-Friends/kleinanzeigen-bot/actions/workflows/build.yml/badge.svg)](https://github.com/Second-Hand-Friends/kleinanzeigen-bot/actions/workflows/build.yml)
+ [![License](https://img.shields.io/github/license/Second-Hand-Friends/kleinanzeigen-bot.svg?color=blue)](LICENSE.txt)
+ [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.1%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
+diff --git a/kleinanzeigen-bot/docker-compose.yaml b/kleinanzeigen-bot/docker-compose.yaml
+deleted file mode 100644
+index 77e38d2..0000000
+--- a/kleinanzeigen-bot/docker-compose.yaml
++++ /dev/null
+@@ -1,19 +0,0 @@
+-services:
+-  kleinbot:
+-    image: kleinbot:cookie
+-    container_name: kleinbot
+-    shm_size: 1g
+-    environment:
+-      - DISPLAY=:0
+-      #- KLEINBOT_NAME=kleinbot
+-      - LOGGING_ENABLE=TRUE
+-      - CHROMIUM_PROFILE=/mnt/data/cache
+-      #- KLEINBOT_COOKIE=/mnt/data/kleinanzeigen_cookies.json
+-      #- KLEINBOT_STORAGE=/mnt/data/kleinanzeigen_localstorage.json
+-    volumes:
+-      - /docker/klein/shared/ads:/mnt/data/ads:rw
+-      - /docker/klein/shared/ads/pics:/mnt/data/ads/pics:rw
+-      - /docker/klein/bot/data:/mnt/data:rw
+-    ports:
+-      - "6080:6080"   # Zugriff über Browser (NoVNC)
+-      - "5900:5900"   # optional Zugriff per VNC-Client
+diff --git a/kleinanzeigen-bot/docker/build-image.sh b/kleinanzeigen-bot/docker/build-image.sh
+index 790f777..56fed6b 100644
+--- a/kleinanzeigen-bot/docker/build-image.sh
++++ b/kleinanzeigen-bot/docker/build-image.sh
+@@ -37,9 +37,8 @@ cp -f "$project_root/.gitignore" "$project_root/.dockerignore"
+ #################################################
+ # specify target docker registry/repo
+ #################################################
+-#image_repo=second-hand-friends/kleinanzeigen-bot
+-image_repo=kleinbot
+-image_name=$image_repo:cookie
++image_repo=second-hand-friends/kleinanzeigen-bot
++image_name=$image_repo:latest
+ 
+ 
+ #################################################
+diff --git a/kleinanzeigen-bot/docker/image/Dockerfile b/kleinanzeigen-bot/docker/image/Dockerfile
+index 9aad75f..e580016 100644
+--- a/kleinanzeigen-bot/docker/image/Dockerfile
++++ b/kleinanzeigen-bot/docker/image/Dockerfile
+@@ -25,11 +25,11 @@ RUN <<EOF
+   echo "#################################################"
+   echo "Installing root CAs..."
+   echo "#################################################"
+-  apt-get install --no-install-recommends -y ca-certificates curl
++  apt-get install --no-install-recommends -y ca-certificates
+   update-ca-certificates
+ 
+   echo "#################################################"
+-  echo "Installing Chromium... & pwuser for starting chromium as non-root user"
++  echo "Installing Chromium..."
+   echo "#################################################"
+   apt-get install --no-install-recommends -y chromium
+ 
+@@ -41,23 +41,8 @@ RUN <<EOF
+     /var/log/{apt,alternatives.log,bootstrap.log,dpkg.log} \
+     /tmp/* /var/tmp/*
+ 
+-  useradd -ms /bin/bash pwuser 
+-
+ EOF
+ 
+-# install X11
+-RUN apt-get update && apt-get install -y \
+-    xvfb \
+-    x11vnc \
+-    fluxbox \
+-    novnc \
+-    websockify \
+-    nano \
+-    xterm \
+-    xfonts-base \
+- && rm -rf /var/lib/apt/lists/*
+-
+-
+ ######################
+ # build image
+ ######################
+@@ -109,22 +94,16 @@ RUN /opt/app/dist/kleinanzeigen-bot --help
+ ######################
+ # final image
+ ######################
+-# Basis-Image laden
+ FROM runtime-base-image
+-
+-# Binärdateien/Artefakte vom Build-Image kopieren
+ COPY --from=build-image /opt/app/dist/kleinanzeigen-bot /opt/kleinanzeigen-bot
+ 
+-# ---- Build Args (werden von update_env.sh gesetzt) ----
+ ARG BUILD_DATE
+ ARG GIT_COMMIT_HASH
+ ARG GIT_COMMIT_DATE
+ ARG GIT_REPO_URL
+-ARG KLEINBOT_COOKIE
+-ARG KLEINBOT_STORAGE
+ 
+-# ---- Labels für Metadaten ----
+-LABEL maintainer="Sebastian Thomschke" \
++LABEL \
++  maintainer="Sebastian Thomschke" \
+   org.label-schema.schema-version="1.0" \
+   org.label-schema.build-date=$BUILD_DATE \
+   org.label-schema.vcs-ref=$GIT_COMMIT_HASH \
+@@ -135,53 +114,16 @@ LABEL maintainer="Sebastian Thomschke" \
+   org.opencontainers.image.title="kleinanzeigen-bot" \
+   org.opencontainers.image.description="CLI application to ease publishing of ads to kleinanzeigen.de"
+ 
++# https://stackoverflow.com/a/59812588/5116073
+ ENV PYTHONUNBUFFERED=1
+-ENV DISPLAY=":0"
+-ENV X11_DISPLAY=":0"
+-#ENV KLEINBOT_NAME="kleinbot"
+-ENV KLEINBOT_LOGS="./logs"
+-ENV KLEINBOT_DATA="/klein/bot/data"
+-#ENV KLEINBOT_COOKIE="kleinanzeigen_cookies.json"
+-#ENV KLEINBOT_STORAGE="/mnt/data/kleinanzeigen_localstorage.json"
+-ENV SHARED_ADS="/klein/shared/ads"
+-ENV SHARED_PIC="/klein/shared/pics"
+-ENV LOGGING_ENABLE="FALSE"
+-# ---- Default Configs ----
+-ENV INIT_SH_FILE='' \
+-    CONFIG_FILE=/mnt/data/config.yaml
+-
+-RUN echo 'alias ll="ls -alF"' >> ~/.bashrc
+-RUN echo 'alias ll="ls -alF"' >> /home/pwuser/.bashrc
+-RUN echo 'alias start="./opt/run.sh publish"'>> ~/.bashrc
+-RUN bash
+-
++ENV DISPLAY=0:0
+ 
+-COPY docker/image/run.sh /opt/run.sh
+-COPY docker/image/start_chromium.sh /opt/start_chromium.sh
+-RUN chmod +x /opt/start_chromium.sh
+-#changed for debug purposes
+-RUN chmod +x /opt/run.sh 
++ENTRYPOINT ["/bin/bash", "/opt/run.sh"]
+ 
++ENV \
++  INIT_SH_FILE='' \
++  CONFIG_FILE=/mnt/data/config.yaml
+ 
++COPY docker/image/run.sh /opt/run.sh
+ 
+ VOLUME /mnt/data
+-VOLUME /mnt/data/ads
+-VOLUME /mnt/data/ads/pics
+-VOLUME /mnt/data/cache
+-
+-ENTRYPOINT ["/bin/bash", "-c"]
+-
+-CMD ["\
+-  Xvfb :0 -screen 0 1280x800x16 & \
+-  sleep 2 && \
+-  fluxbox & \
+-  x11vnc -display :0 -nopw -forever -rfbport 5900 & \
+-  ln -sf /usr/share/novnc/vnc.html /usr/share/novnc/index.html && \
+-  websockify --web=/usr/share/novnc/ 6080 localhost:5900 & \
+-  until xdpyinfo -display :0 >/dev/null 2>&1; do echo 'Warte auf Xvfb...'; sleep 1; done && \
+-  xterm -display :0 -geometry 120x40+10+10 -fa Monospace -fs 10 & \
+-  tail -f /dev/null \
+-"]
+-
+-
+-
+diff --git a/kleinanzeigen-bot/docker/image/run.sh b/kleinanzeigen-bot/docker/image/run.sh
+index 122e102..f5385f7 100644
+--- a/kleinanzeigen-bot/docker/image/run.sh
++++ b/kleinanzeigen-bot/docker/image/run.sh
+@@ -20,8 +20,4 @@ fi
+ 
+ cd /mnt/data
+ 
+-/opt/start_chromium.sh
+-
+-#changed for debug purpose
+-#/opt/kleinanzeigen-bot --config /mnt/data/config.yaml "$@"
+ /opt/kleinanzeigen-bot --config $CONFIG_FILE "$@"
+diff --git a/kleinanzeigen-bot/docker/image/start_chromium.sh b/kleinanzeigen-bot/docker/image/start_chromium.sh
+deleted file mode 100644
+index 0883fbe..0000000
+--- a/kleinanzeigen-bot/docker/image/start_chromium.sh
++++ /dev/null
+@@ -1,36 +0,0 @@
+-#!/usr/bin/env bash
+-echo "Deleting old chromium locks..."
+-rm -rf /mnt/data/cache/Single*
+-echo "Finished deleting old chromium locks."
+-
+-
+-
+-if [ ! -d "/mnt/data/cache" ]; then
+-    echo "ERROR: cache mount missing at /mnt/data/cache"
+-    echo "Please create and mount a volume at /mnt/data/cache"
+-    echo "Exiting!"
+-    exit 1
+-fi
+-#  --headless=new \
+-
+-# Chromium Startparameter (sichtbar, nicht headless)
+-CHROMIUM_CMD=(
+-  /usr/bin/chromium
+-  --no-sandbox
+-  --disable-dev-shm-usage
+-  --disable-gpu
+-  --remote-debugging-port=9222
+-  --user-data-dir=/mnt/data/cache-tmp
+-  about:blank
+-)
+-
+-# Logging-Optionen
+-if [ "${LOGGING_ENABLE}" = "TRUE" ]; then
+-    LOGFILE="/mnt/data/logs/chromium.log"
+-    mkdir -p /mnt/data/logs
+-    echo "INFO: Logging enabled. Writing Chromium output to $LOGFILE"
+-    "${CHROMIUM_CMD[@]}" >/dev/null 2>>"$LOGFILE" &
+-else
+-    echo "INFO: Logging disabled. Chromium output will appear in terminal."
+-    "${CHROMIUM_CMD[@]}" &
+-fi
+\ No newline at end of file
+diff --git a/kleinanzeigen-bot/kleinanzeigen-bot.code-workspace b/kleinanzeigen-bot/kleinanzeigen-bot.code-workspace
+deleted file mode 100644
+index 58d6891..0000000
+--- a/kleinanzeigen-bot/kleinanzeigen-bot.code-workspace
++++ /dev/null
+@@ -1,14 +0,0 @@
+-{
+-	"folders": [
+-		{
+-			"path": "."
+-		},
+-		{
+-			"path": "../../../../docker/klein/shared/ads"
+-		},
+-		{
+-			"path": "../../../../docker/klein/bot/data"
+-		}
+-	],
+-	"settings": {}
+-}
+\ No newline at end of file
+diff --git a/kleinanzeigen-bot/src/kleinanzeigen_bot/__init__.py b/kleinanzeigen-bot/src/kleinanzeigen_bot/__init__.py
+index 975b55e..15be46b 100644
+--- a/kleinanzeigen-bot/src/kleinanzeigen_bot/__init__.py
++++ b/kleinanzeigen-bot/src/kleinanzeigen_bot/__init__.py
+@@ -22,8 +22,6 @@ from .utils.files import abspath
+ from .utils.i18n import Locale, get_current_locale, pluralize, set_current_locale
+ from .utils.misc import ainput, ensure, is_frozen
+ from .utils.web_scraping_mixin import By, Element, Is, WebScrapingMixin
+-from kleinanzeigen_bot.utils.cookies import import_cookies_and_localstorage
+-
+ 
+ # W0406: possibly a bug, see https://github.com/PyCQA/pylint/issues/3933
+ 
+@@ -33,7 +31,6 @@ LOG.setLevel(loggers.INFO)
+ colorama.just_fix_windows_console()
+ 
+ 
+-
+ class AdUpdateStrategy(enum.Enum):
+     REPLACE = enum.auto()
+     MODIFY = enum.auto()
+@@ -377,7 +374,7 @@ class KleinanzeigenBot(WebScrapingMixin):
+ 
+         config_yaml = dicts.load_dict_if_exists(self.config_file_path, _("config"))
+         self.config = Config.model_validate(config_yaml, strict = True, context = self.config_file_path)
+-             
++
+         # load built-in category mappings
+         self.categories = dicts.load_dict_from_module(resources, "categories.yaml", "categories")
+         deprecated_categories = dicts.load_dict_from_module(resources, "categories_old.yaml", "categories")
+@@ -391,17 +388,10 @@ class KleinanzeigenBot(WebScrapingMixin):
+         self.browser_config.binary_location = self.config.browser.binary_location
+         self.browser_config.extensions = [abspath(item, relative_to = self.config_file_path) for item in self.config.browser.extensions]
+         self.browser_config.use_private_window = self.config.browser.use_private_window
+-        print("")
+-        print(f"self.config.browser.user_data_dir: {self.config.browser.user_data_dir}")
+-        print("")
+         if self.config.browser.user_data_dir:
+             self.browser_config.user_data_dir = abspath(self.config.browser.user_data_dir, relative_to = self.config_file_path)
+         self.browser_config.profile_name = self.config.browser.profile_name
+ 
+-        print("")
+-        print(f"self.config.browser.user_data_dir: {self.config.browser.user_data_dir}")
+-        print("")
+-
+     def __check_ad_republication(self, ad_cfg:Ad, ad_file_relative:str) -> bool:
+         """
+         Check if an ad needs to be republished based on republication interval.
+@@ -1321,7 +1311,7 @@ class KleinanzeigenBot(WebScrapingMixin):
+                 or ""  # Default to empty string if all sources are None
+             )
+ 
+-            # Combine the parts and replace @ with (at) 
++            # Combine the parts and replace @ with (at)
+             final_description = str(prefix) + str(description_text) + str(suffix)
+             final_description = final_description.replace("@", "(at)")
+         else:
+@@ -1377,6 +1367,7 @@ def main(args:list[str]) -> None:
+     #    We now handle exceptions explicitly using a top-level try/except block.
+ 
+     atexit.register(loggers.flush_all_handlers)
++
+     try:
+         bot = KleinanzeigenBot()
+         atexit.register(bot.close_browser_session)
+@@ -1391,5 +1382,3 @@ if __name__ == "__main__":
+     loggers.configure_console_logging()
+     LOG.error("Direct execution not supported. Use 'pdm run app'")
+     sys.exit(1)
+-
+-
+diff --git a/kleinanzeigen-bot/src/kleinanzeigen_bot/__main__.py b/kleinanzeigen-bot/src/kleinanzeigen_bot/__main__.py
+index b35db6d..de67206 100644
+--- a/kleinanzeigen-bot/src/kleinanzeigen_bot/__main__.py
++++ b/kleinanzeigen-bot/src/kleinanzeigen_bot/__main__.py
+@@ -1,8 +1,7 @@
+ # SPDX-FileCopyrightText: © Sebastian Thomschke and contributors
+ # SPDX-License-Identifier: AGPL-3.0-or-later
+ # SPDX-ArtifactOfProjectHomePage: https://github.com/Second-Hand-Friends/kleinanzeigen-bot/
+-import sys, time # isort: skip
+-from nodriver.cdp.network import CookieParam
++import sys, time  # isort: skip
+ from gettext import gettext as _
+ 
+ import kleinanzeigen_bot
+diff --git a/kleinanzeigen-bot/src/kleinanzeigen_bot/utils/cookies.py b/kleinanzeigen-bot/src/kleinanzeigen_bot/utils/cookies.py
+deleted file mode 100644
+index 550a5ad..0000000
+--- a/kleinanzeigen-bot/src/kleinanzeigen_bot/utils/cookies.py
++++ /dev/null
+@@ -1,78 +0,0 @@
+-import os
+-import json
+-import logging
+-from nodriver.cdp.network import CookieParam
+-
+-LOG = logging.getLogger(__name__)
+-
+-async def import_cookies_and_localstorage(browser, page):
+-    cookie_file = os.environ.get("KLEINBOT_COOKIE")
+-    storage_file = os.environ.get("KLEINBOT_STORAGE")
+-    if not cookie_file or not os.path.exists(cookie_file):
+-        LOG.info("Keine Cookie-Datei gesetzt oder Datei nicht gefunden, normaler Login wird verwendet.")
+-        return
+-    if not storage_file or not os.path.exists(storage_file):
+-        LOG.info("Keine Storage-Datei gesetzt oder Datei nicht gefunden, normaler Login wird verwendet.")
+-        return
+-
+-    LOG.info("Lade Cookies aus: %s", cookie_file)
+-    try:
+-        with open(cookie_file, "r", encoding="utf-8") as f:
+-            cookies = json.load(f)
+-
+-        params = []
+-        for cookie in cookies:
+-            try:
+-                cj = {
+-                    "name": cookie["name"],
+-                    "value": cookie["value"],
+-                    "domain": cookie.get("domain", ".kleinanzeigen.de"),
+-                    "path": cookie.get("path", "/"),
+-                }
+-                if "secure" in cookie:
+-                    cj["secure"] = bool(cookie["secure"])
+-                if "expires" in cookie:
+-                    try:
+-                        cj["expires"] = int(cookie["expires"])
+-                    except Exception:
+-                        pass
+-
+-                params.append(CookieParam.from_json(cj))
+-            except Exception as e:
+-                LOG.warning("Cookie %s übersprungen: %s", cookie.get("name"), e)
+-
+-        if params:
+-            await browser.cookies.set_all(cookies=params)
+-            LOG.info("Cookies erfolgreich importiert (%d Stück).", len(params))
+-        else:
+-            LOG.warning("Keine gültigen Cookies gefunden.")
+-    except Exception as e:
+-        LOG.error("Fehler beim Import der Cookies: %s", e)
+-    else:
+-        LOG.info("Keine Cookie-Datei gesetzt oder Datei nicht gefunden - überspringe Cookie-Import.")
+-
+- # ---- LOCAL STORAGE -----------------------------------------------------
+-    if storage_file and os.path.exists(storage_file):
+-        LOG.info("Lade LocalStorage aus: %s", storage_file)
+-        try:
+-            with open(storage_file, "r", encoding="utf-8") as f:
+-                storage_items = json.load(f)
+-
+-            # LocalStorage-Schlüssel/Werte ins aktuelle Tab-Skript schreiben
+-            for key, value in storage_items.items():
+-                try:
+-                    # Werte sicher escapen (f für JS-String)
+-                    js = f"localStorage.setItem({json.dumps(key)}, {json.dumps(value)});"
+-                    await page.evaluate(js)
+-                except Exception as e:
+-                    LOG.warning("LocalStorage-Eintrag %s übersprungen: %s", key, e)
+-
+-            LOG.info("LocalStorage erfolgreich importiert (%d Einträge).", len(storage_items))
+-        except Exception as e:
+-            LOG.error("Fehler beim Import des LocalStorage: %s", e)
+-    else:
+-        LOG.info("Keine LocalStorage-Datei gesetzt oder Datei nicht gefunden - überspringe LocalStorage-Import.")
+-
+-    # Seite neu laden, damit alles aktiv wird
+-    await page.reload()
+-    LOG.info("Cookies und LocalStorage importiert und Seite neu geladen.")
+\ No newline at end of file
+diff --git a/kleinanzeigen-bot/src/kleinanzeigen_bot/utils/web_scraping_mixin.py b/kleinanzeigen-bot/src/kleinanzeigen_bot/utils/web_scraping_mixin.py
+index 349d9cc..580ffc2 100644
+--- a/kleinanzeigen-bot/src/kleinanzeigen_bot/utils/web_scraping_mixin.py
++++ b/kleinanzeigen-bot/src/kleinanzeigen_bot/utils/web_scraping_mixin.py
+@@ -5,14 +5,6 @@ import asyncio, enum, inspect, json, os, platform, secrets, shutil, subprocess,
+ from collections.abc import Callable, Coroutine, Iterable
+ from gettext import gettext as _
+ from typing import Any, Final, cast
+-#pl
+-from kleinanzeigen_bot.utils.cookies import import_cookies_and_localstorage
+-
+-#from .utils.cookies import import_cookies_and_localstorage
+-
+-
+-
+-
+ 
+ try:
+     from typing import Never  # type: ignore[attr-defined,unused-ignore] # mypy
+@@ -572,32 +564,20 @@ class WebScrapingMixin:
+ 
+         return result
+ 
+-    async def web_find(
+-        self,
+-        selector_type: By,
+-        selector_value: str,
+-        *,
+-        parent: Element | None = None,
+-        timeout: int | float = 5,
+-        ) -> Element:
++    async def web_find(self, selector_type:By, selector_value:str, *, parent:Element | None = None, timeout:int | float = 5) -> Element:
+         """
+         Locates an HTML element by the given selector type and value.
+ 
+-
+         :param timeout: timeout in seconds
+         :raises TimeoutError: if element could not be found within time
+         """
+-        LOG.info(
+-            f"web_find called from {inspect.stack()[1].function} "
+-            f"with selector_type={selector_type}, value={selector_value}, timeout={timeout}"
+-)
+         match selector_type:
+             case By.ID:
+                 escaped_id = selector_value.translate(METACHAR_ESCAPER)
+                 return await self.web_await(
+-                lambda: self.page.query_selector(f"#{escaped_id}"),
+-                timeout=timeout,                
+-                timeout_error_message = f"No HTML element found with ID '{selector_value}' within timeout3: {timeout} seconds.")
++                    lambda: self.page.query_selector(f"#{escaped_id}", parent),
++                    timeout = timeout,
++                    timeout_error_message = f"No HTML element found with ID '{selector_value}' within {timeout} seconds.")
+             case By.CLASS_NAME:
+                 escaped_classname = selector_value.translate(METACHAR_ESCAPER)
+                 return await self.web_await(
+@@ -693,10 +673,6 @@ class WebScrapingMixin:
+             LOG.debug("  => skipping, [%s] is already open", url)
+             return
+         self.page = await self.browser.get(url = url, new_tab = False, new_window = False)
+-        #pl
+-        #await import_cookies_into_page(self.browser, self.page)
+-        await import_cookies_and_localstorage(self.browser, self.page)
+-        
+         await self.web_await(lambda: self.web_execute("document.readyState == 'complete'"), timeout = timeout,
+                 timeout_error_message = f"Page did not finish loading within {timeout} seconds.")
+ 
+diff --git a/main.py b/main.py
+index ce1469a..955c927 100644
+--- a/main.py
++++ b/main.py
+@@ -98,6 +98,5 @@ def version():
+         "gitCommit": os.getenv("GIT_COMMIT", "unknown"),
+         "gitDate": os.getenv("GIT_DATE", "unknown"),
+         "buildDate": os.getenv("BUILD_DATE", "unknown"),
+-        "appVersion": os.getenv("APP_VERSION", "unknown"),
+-        "branchName": os.getenv("BRANCH_NAME", "unknown")
++        "appVersion": os.getenv("APP_VERSION", "unknown")
+     }
+\ No newline at end of file
+diff --git a/routers/ui_router.py b/routers/ui_router.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/static/css/kabot.css b/static/css/kabot.css
+deleted file mode 100644
+index dab8001..0000000
+--- a/static/css/kabot.css
++++ /dev/null
+@@ -1,55 +0,0 @@
+-#KaBotParameter {
+-    appearance: none;           /* Standard */
+-    -webkit-appearance: none;   /* Safari/Chrome */
+-    -moz-appearance: none;      /* Firefox */
+-    min-width: 180px;
+-    padding: 12px 24px;
+-    font-weight: 600;
+-    /* text-decoration-color: #1c1cc1; */
+-    border-radius: 0.5rem; 
+-    /* text-emphasis-color: inherit; */
+-    /* text-emphasis: #1c1cc1; */
+-    background: linear-gradient(to right, #dc2626, #ea580c); 
+-    color: white;
+-    
+-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+-    transition: all 0.2s ease-in-out;
+-}
+-/* Fix für Firefox, um Pfeil zu verstecken */
+-#KaBotParameter::-ms-expand {
+-    display: none; /* Für alte IE/Edge */
+-}
+-
+-/* Chevron-Styling (dein eigenes Icon bleibt weiß) */
+-#KaBotParameter + i {
+-    color: white; /* macht dein Icon immer weiß */
+-}
+-
+-#KaBotParameter option {
+-    background-color: #1f2937; 
+-    color: #f9fafb;          
+-}
+-#KaBotParameter option:hover,
+-#KaBotParameter option:focus {
+-    background-color: #374151;
+-    color: #fff;
+-}
+-
+-
+-#KaBotParameter:hover {
+-    background: linear-gradient(to right, #b91c1c, #c2410c); 
+-}
+-
+-#KaBotParameter:focus {
+-    outline: none;
+-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.5);
+-}
+-
+-#KaBotParameter + i {
+-    position: absolute;
+-    right: 0.75rem;
+-    top: 50%;
+-    transform: translateY(-50%);
+-    pointer-events: none;
+-    color: white;
+-}
+diff --git a/static/css/style.css b/static/css/style.css
+index de09ba4..d102156 100644
+--- a/static/css/style.css
++++ b/static/css/style.css
+@@ -41,55 +41,6 @@ button {
+     font-size: 16px;
+ }
+ 
+-
+ button:hover {
+     background-color: #357abd;
+-}
+-/* select {
+-    background-color: #4a90e2;
+-    color: #fff;
+-    border: none;
+-    padding: 10px 20px;
+-    border-radius: 4px;
+-    cursor: pointer;
+-    font-size: 16px;
+-} */
+-
+-tooltip {
+-  position: relative;
+-  display: inline-block;
+-  border-bottom: 1px dotted black;
+-}
+-
+-tooltip .tooltiptext {
+-  visibility: hidden;
+-  width: 120px;
+-  background-color: #555;
+-  color: #fff;
+-  text-align: center;
+-  border-radius: 6px;
+-  padding: 5px 0;
+-  position: absolute;
+-  z-index: 1;
+-  bottom: 125%;
+-  left: 50%;
+-  margin-left: -60px;
+-  opacity: 0;
+-  transition: opacity 0.3s;
+-}
+-
+-tooltip .tooltiptext::after {
+-  content: "";
+-  position: absolute;
+-  top: 100%;
+-  left: 50%;
+-  margin-left: -5px;
+-  border-width: 5px;
+-  border-style: solid;
+-  border-color: #555 transparent transparent transparent;
+-}
+-tooltip:hover .tooltiptext {
+-  visibility: visible;
+-  opacity: 1;
+-}
+-
++}
+\ No newline at end of file
+diff --git a/static/js/app.js b/static/js/app.js
+index 2cf5420..b53da77 100644
+--- a/static/js/app.js
++++ b/static/js/app.js
+@@ -10,12 +10,8 @@ class KaBot {
+ 
+     async loadAdsFiles() {
+         try {
+-            console.info("adsFileContainer =", this.adsFileContainer);
+             const res = await fetch("/api/v1/ads/files");
+-            const data = await res.json();            
+-           
+-            console.info("Response:", data);
+-
++            const data = await res.json();
+             this.adsFileContainer.innerHTML = "";
+             if (!data.files || data.files.length === 0) {
+                 this.adsFileContainer.innerHTML = "<p class='text-gray-400'>Keine Dateien gefunden.</p>";
+@@ -75,7 +71,6 @@ async function loadVersion() {
+         document.getElementById("gitDate").textContent = `${data.gitDate}`;
+         document.getElementById("buildDate").textContent = `${data.buildDate}`;
+         document.getElementById("appVersion").textContent = `${data.appVersion}`;
+-        document.getElementById("branchName").textContent = `${data.branchName}`;
+     } catch (err) {
+         console.error("Konnte Version nicht laden:", err);
+         document.getElementById("gitVersion").textContent = "Version unbekannt";
+@@ -143,11 +138,7 @@ class KleinManager extends KleinManagerCore {
+             }
+         });
+ 
+-        // new KaBot("Ka-Bot");
+-        window.addEventListener("DOMContentLoaded", () => {
+-            new KaBot("Ka-Bot");
+-        });
+-
++        new KaBot("Ka-Bot");
+     }
+ 
+     showSection(section) {
+diff --git a/static/js/kleinanzeigen.js b/static/js/kleinanzeigen.js
+index 15151aa..842f70b 100644
+--- a/static/js/kleinanzeigen.js
++++ b/static/js/kleinanzeigen.js
+@@ -1,19 +1,4 @@
+ 
+-function setStatus(msg) {
+-    const logBox = document.getElementById("kabotLog");
+-    if (logBox) logBox.textContent = msg;
+-    console.log(msg);
+-}
+-
+-function appendLog(msg) {
+-    const logBox = document.getElementById("kabotLog");
+-    if (logBox) {
+-        const time = new Date().toLocaleTimeString();
+-        logBox.textContent += `\n[${time}] ${msg}`;
+-        logBox.scrollTop = logBox.scrollHeight;
+-    }
+-    console.log(msg);
+-}
+ class KleinanzeigenManager extends KleinManagerCore {
+     constructor() {
+         super();
+@@ -23,88 +8,46 @@ class KleinanzeigenManager extends KleinManagerCore {
+ 
+     refreshAdsFileList(htmlElementId = "dummy") {
+         try {
+-            this.apiRequest("/ads/files");
++            this.apiRequest('/ads/files');
++
+         }
+         catch (error) {
+-        }
+-    }
+-
+-    async getKAParameter() {
+-        const res = await fetch("/api/v1/logging_level");
+-        const data = await res.json();
+-        return data.kaparameter;
+-    }
+-
+-    async setKAParameter(kaparameter) {
+-        await fetch("/api/v1/logging_level", {
+-            method: "POST",
+-            headers: { "Content-Type": "application/json" },
+-            body: JSON.stringify({ kaparameter }),
+-        });
+-        console.log("KaBot Parameter", kaparameter);
++             }
+     }
+ 
+-    async startContainer(htmlElementId = "dummy") {
+-        setStatus("Starting container ...");
+-
++    async loadAdFile(htmlElementId = "dummy") {
+         try {
+-            const response = await fetch(`/api/v1/bot/start`, {
+-                method: "POST",
+-                headers: { "Content-Type": "application/json" },                
++            let selectedAdFile = document.querySelector("input[name='adsFile']:checked");
++            if (!selectedAdFile) {
++                return;
++            }
++            let fileName = selectedAdFile.value;
++           
++            const res = await fetch("/api/v1/bot/publish", {
++                method: "POST"
+             });
+ 
+-            const data = await response.json();
+-            if (data.error) {
+-                setStatus(`Error: ${data.error}`);
+-            } else {
+-                setStatus(`Container started (ID: ${data.container_id || "?"})`);
+-                appendLog("Container started.");
++            if (!res.ok) {
++                const err = await res.json();
++                return;
+             }
+-        } catch (err) {
+-            setStatus(`Error: ${err}`);
+-        }
+-    }
+-    
+-    async runBotCommand() {
+-        setStatus("Starting Kleinanzeigen-Bot ...");
+ 
+-        try {
+-            let kaparameter = document.getElementById("KaBotParameter").value;
+-
+-            const response = await fetch(`/api/v1/bot/runCommand`, {
+-                method: "POST",
+-                headers: { "Content-Type": "application/json" },
+-                body: JSON.stringify({ kaparameter: kaparameter }),
+-            });
+-              const data = await response.json();
+ 
+-        if (data.error) {
+-            setStatus(`Error: ${data.error}`);
+-        } else {
+-            setStatus(`✅ Bot started.`);
+-            appendLog(data.output || "No logs received.");
+-        }
+-    } catch (err) {
+-        setStatus(`Error: ${err}`);
++        } catch (error) {
++           }
+     }
+-}
+-async stopCommand() {
+-        setStatus("Stopping container...");
+-        try {
+-            
+-            const response = await fetch(`/api/v1/bot/stopCommand`, { 
+-                method: "POST" },
+-            );
+-            const data = await response.json();
++    startLogStream() {
++        const eventSource = new EventSource("/api/v1/bot/log");
+ 
+-            if (data.error) {
+-                setStatus(`Error: ${data.error}`);
+-            } else {
+-                setStatus("Command stopped.");
+-                appendLog("Command stopped.");
+-            }
+-        } catch (err) {
+-            setStatus(`Error: ${err}`);
+-        }
++        eventSource.onmessage = (event) => {
++            const logContainer = document.getElementById("logOutput");
++            logContainer.textContent += event.data + "\n";
++            logContainer.scrollTop = logContainer.scrollHeight; // auto-scroll
++        };
++
++        eventSource.onerror = (err) => {
++            console.error("Log stream error:", err);
++            eventSource.close();
++        };
+     }
+ }
+\ No newline at end of file
+diff --git a/templates/index.html b/templates/index.html
+index 283a76d..9a680cd 100644
+--- a/templates/index.html
++++ b/templates/index.html
+@@ -9,9 +9,6 @@
+     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+     <link rel="stylesheet" href="/static/css/style.css">
+-    <link rel="stylesheet" href="/static/css/kabot.css">
+-    
+-
+ </head>
+ 
+ <body class="bg-gray-900">
+@@ -167,10 +164,6 @@
+                             <td>Version:</td>
+                             <td><span id="appVersion">empty...</span></td>
+                         </tr>
+-                         <tr>
+-                            <td>Branchname:</td>
+-                            <td><span id="branchName">empty...</span></td>
+-                        </tr>
+                     </table>
+                 </div>
+             </div>
+@@ -343,80 +336,37 @@
+                 </div>
+             </div>
+ 
+-     <!-- Ka-Bot Controls -->
+-   
+-     <div id="adsFileList" class="mb-6 bg-gray-800 rounded-xl p-4 border border-gray-700">
++            <!-- Ka-Bot Section -->
++            <div id="Ka-Bot" class="section p-4">
++                <div id="adsFileList" class="mb-6 bg-gray-800 rounded-xl p-4 border border-gray-700">
+                     <h3 class="text-lg font-semibold mb-2 text-white">Vorlagen auswählen:</h3>
+                     <div id="adsFileContainer" class="space-y-1 text-white">
+                         <!-- AD list will be placed here -->
+                     </div>
+                 </div>
+-                
+-    <div class="flex items-center flex-wrap justify-start gap-3 mt-4 overflow-x-auto">
+-               
+-  <!-- Button: Reload -->
+-  <button onclick="app.refreshAdsFileList('kabotLog')"
+-      class="flex-shrink-0 relative px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg
+-             hover:from-orange-700 hover:to-red-700 transition-all duration-200 shadow-lg group">
+-      <div class="flex items-center justify-center text-white whitespace-nowrap">
+-          <i class="fas fa-refresh text-lg mr-3"></i>
+-          <span class="font-semibold">Reload files</span>
+-      </div>
+-  </button>
+-
+-  <!-- Button: Start -->
+-  <button onclick="app.startContainer('kabotLog')"
+-      class="flex-shrink-0 relative px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg
+-             hover:from-orange-700 hover:to-red-700 transition-all duration-200 shadow-lg group">
+-      <div class="flex items-center justify-center text-white whitespace-nowrap">
+-          <i class="fas fa-play text-lg mr-3"></i>
+-          <span class="font-semibold">Start Kleinbot</span>
+-      </div>
+-  </button>
+-
+-  <!-- Button: Run -->
+-  <button onclick="app.runBotCommand('kabotLog')"
+-      class="flex-shrink-0 relative px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg
+-             hover:from-orange-700 hover:to-red-700 transition-all duration-200 shadow-lg group">
+-      <div class="flex items-center justify-center text-white whitespace-nowrap">
+-          <i class="fas fa-terminal text-lg mr-3"></i>
+-          <span class="font-semibold">Run Command</span>
+-      </div>
+-  </button>
+-
+-  <!-- Dropdown: Parameter -->
+-  <div class="flex-shrink-0 relative inline-flex items-center">
+-    <select id="KaBotParameter"
+-            onchange="changeKAParameter(this.value)"
+-            class="px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg font-semibold
+-                   shadow-lg hover:from-orange-700 hover:to-red-700 transition-all duration-200
+-                   focus:outline-none focus:ring-2 focus:ring-orange-300 cursor-pointer appearance-none pr-10">
+-        <option value="publish">Publish</option>
+-        <option value="verify">Verify</option>
+-        <option value="update">Update</option>
+-        <option value="">---</option>
+-        <option value="--help" selected="true">Help</option>
+-        <option value="diagnose">Diagnose</option>
+-    </select>
+-    <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-blue-300"></i>
+-  </div>
+-
+-  <!-- Button: Stop -->
+-  <button onclick="app.stopCommand('kabotLog')"
+-      class="flex-shrink-0 relative px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg
+-             hover:from-orange-700 hover:to-red-700 transition-all duration-200 shadow-lg group">
+-      <div class="flex items-center justify-center text-white whitespace-nowrap">
+-          <i class="fas fa-stop text-lg mr-3"></i>
+-          <span class="font-semibold">Stop Command</span>
+-      </div>
+-  </button>
+-
+-</div>
++                <button onclick="app.refreshAdsFileList('kabotLog')"
++                    class="relative px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg hover:from-orange-700 hover:to-red-700 transition-all duration-200 shadow-lg group">
++                    <div class="flex items-center justify-center text-white">
++                        <i class="fas fa-refresh text-lg mr-3"></i>
++                        <span class="font-semibold">Reload files</span>
++                    </div>
++                    <span id="notificationBadge"
++                        class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center hidden animate-pulse">0</span>
++                </button>
++                <button onclick="app.loadAdFile('kabotLog')"
++                    class="relative px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg hover:from-orange-700 hover:to-red-700 transition-all duration-200 shadow-lg group">
++                    <div class="flex items-center justify-center text-white">
++                        <i class="fas fa-bell text-lg mr-3"></i>
++                        <span class="font-semibold">Load AD template</span>
++                    </div>
++                    <span id="notificationBadge"
++                        class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center hidden animate-pulse">0</span>
++                </button>
+ 
+ 
+                 <!-- Log-Ausgabe -->
+                 <div id="kabotLog"
+-                    class="kabotLog kabotLogbg-gray-900 border border-gray-700 rounded-xl p-4 text-gray-300 h-64 overflow-y-auto">
++                    class="bg-gray-900 border border-gray-700 rounded-xl p-4 text-gray-300 h-64 overflow-y-auto">
+                     Ka-Bot Log...
+                 </div>
+             </div>
+@@ -432,6 +382,19 @@
+                 <option value="CRITICAL">CRITICAL</option>
+             </select>
+ 
++            <script>
++                async function changeLogLevel(level) {
++                    await setLoggingLevel(level);
++                }
++
++                // Beim Laden Dropdown auf aktuellen Level setzen
++                document.addEventListener("DOMContentLoaded", async () => {
++                    const level = await getLoggingLevel();
++                    document.getElementById("logLevel").value = level;
++                });
++            </script>
++
++
+             <!-- Settings Section -->
+             <div id="settings" class="section hidden">
+                 <h2 class="text-2xl lg:text-3xl font-bold text-white mb-6 lg:mb-8 mt-12 lg:mt-0"
+@@ -734,7 +697,6 @@
+     </div>
+ 
+     <!-- JavaScript Files -->
+-    <!-- <script src="/static/js/logger.js"></script> -->
+     <script src="/static/js/core.js"></script>
+     <script src="/static/js/dashboard.js"></script>
+     <script src="/static/js/orders.js"></script>
+diff --git a/update_env.sh b/update_env.sh
+index 67c69df..8e09eb7 100755
+--- a/update_env.sh
++++ b/update_env.sh
+@@ -10,8 +10,6 @@ GIT_COMMIT=$(git rev-parse --short HEAD)
+ GIT_DATE=$(git log -1 --format=%cd --date=iso)
+ BUILD_DATE=$(date '+%Y-%m-%d %H:%M:%S')
+ APP_VERSION="v0-$(date '+%S')"
+-BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+-
+ 
+ # Funktion: Variable ersetzen oder hinzufügen, Werte in Anführungszeichen
+ set_or_update() {
+@@ -30,12 +28,5 @@ set_or_update "GIT_COMMIT" "$GIT_COMMIT"
+ set_or_update "GIT_DATE" "$GIT_DATE"
+ set_or_update "BUILD_DATE" "$BUILD_DATE"
+ set_or_update "APP_VERSION" "$APP_VERSION"
+-set_or_update "BRANCH_NAME" "$BRANCH_NAME"
+ 
+-echo "✅ .env aktualisiert: 
+-GIT_COMMIT=\"$GIT_COMMIT\"
+-GIT_DATE=\"$GIT_DATE\"
+-BUILD_DATE=\"$BUILD_DATE\"
+-APP_VERSION=\"$APP_VERSION\"
+-BRANCH_NAME=\"$BRANCH_NAME\"
+-"
+\ No newline at end of file
++echo "✅ .env aktualisiert: GIT_COMMIT=\"$GIT_COMMIT\", GIT_DATE=\"$GIT_DATE\", BUILD_DATE=\"$BUILD_DATE\", APP_VERSION=\"$APP_VERSION\""

@@ -21,13 +21,6 @@ class KleinanzeigenManager extends KleinManagerCore {
 
     }
 
-    refreshAdsFileList(htmlElementId = "dummy") {
-        try {
-            this.apiRequest("/ads/files");
-        }
-        catch (error) {
-        }
-    }
 
     async getKAParameter() {
         const res = await fetch("/api/v1/logging_level");
@@ -42,6 +35,43 @@ class KleinanzeigenManager extends KleinManagerCore {
             body: JSON.stringify({ kaparameter }),
         });
         console.log("KaBot Parameter", kaparameter);
+    }
+
+    async refreshAds(htmlElementId = "dummy") {
+        try {
+            setStatus("Reloading Ads...");
+
+            // ✅ richtiger HTTP-Methodentyp:
+            const response = await fetch(`/api/v1/ads/files`, { method: "GET" });
+
+            // ✅ JSON auslesen:
+            const data = await response.json();
+
+            // ✅ Konsolen-Output prüfen:
+            setStatus(`Response JSON: ${data}`);
+
+             // ✅ Zugriff auf einzelne Werte:
+            if (data.files && data.files.length > 0) {
+                const firstFile = data.files[0];
+                setStatus(`Gefundene Datei: ${firstFile}`);
+                console.log("Erste Datei:", firstFile);
+            } else {
+                setStatus("Keine Dateien gefunden.");
+            }
+            const container = document.getElementById("adsFileContainer");
+            container.innerHTML = "";
+
+            data.files.forEach(file => {
+                const el = document.createElement("div");
+                el.textContent = file;
+                el.className = "p-2 bg-gray-700 text-white rounded";
+                container.appendChild(el);
+            });
+
+        //    this.apiRequest("/ads/files");
+        }
+        catch (error) {
+        }
     }
 
     async startContainer(htmlElementId = "dummy") {

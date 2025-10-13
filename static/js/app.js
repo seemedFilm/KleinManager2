@@ -143,10 +143,8 @@ class KleinManager extends KleinManagerCore {
             }
         });
 
-        // new KaBot("Ka-Bot");
-        window.addEventListener("DOMContentLoaded", () => {
-            new KaBot("Ka-Bot");
-        });
+       new KaBot("Ka-Bot");
+       
 
     }
 
