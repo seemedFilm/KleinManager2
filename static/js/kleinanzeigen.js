@@ -23,7 +23,7 @@ class KleinanzeigenManager extends KleinManagerCore {
 
     refreshAdsFileList(htmlElementId = "dummy") {
         try {
-            this.apiRequest('/ads/files');
+            this.apiRequest("/ads/files");
         }
         catch (error) {
         }

@@ -1,0 +1,55 @@
+#KaBotParameter {
+    appearance: none;           /* Standard */
+    -webkit-appearance: none;   /* Safari/Chrome */
+    -moz-appearance: none;      /* Firefox */
+    min-width: 180px;
+    padding: 12px 24px;
+    font-weight: 600;
+    /* text-decoration-color: #1c1cc1; */
+    border-radius: 0.5rem; 
+    /* text-emphasis-color: inherit; */
+    /* text-emphasis: #1c1cc1; */
+    background: linear-gradient(to right, #dc2626, #ea580c); 
+    color: white;
+    
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease-in-out;
+}
+/* Fix für Firefox, um Pfeil zu verstecken */
+#KaBotParameter::-ms-expand {
+    display: none; /* Für alte IE/Edge */
+}
+
+/* Chevron-Styling (dein eigenes Icon bleibt weiß) */
+#KaBotParameter + i {
+    color: white; /* macht dein Icon immer weiß */
+}
+
+#KaBotParameter option {
+    background-color: #1f2937; 
+    color: #f9fafb;          
+}
+#KaBotParameter option:hover,
+#KaBotParameter option:focus {
+    background-color: #374151;
+    color: #fff;
+}
+
+
+#KaBotParameter:hover {
+    background: linear-gradient(to right, #b91c1c, #c2410c); 
+}
+
+#KaBotParameter:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.5);
+}
+
+#KaBotParameter + i {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: white;
+}

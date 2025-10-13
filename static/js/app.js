@@ -10,8 +10,12 @@ class KaBot {
 
     async loadAdsFiles() {
         try {
+            console.info("adsFileContainer =", this.adsFileContainer);
             const res = await fetch("/api/v1/ads/files");
-            const data = await res.json();
+            const data = await res.json();            
+           
+            console.info("Response:", data);
+
             this.adsFileContainer.innerHTML = "";
             if (!data.files || data.files.length === 0) {
                 this.adsFileContainer.innerHTML = "<p class='text-gray-400'>Keine Dateien gefunden.</p>";
@@ -139,7 +143,11 @@ class KleinManager extends KleinManagerCore {
             }
         });
 
-        new KaBot("Ka-Bot");
+        // new KaBot("Ka-Bot");
+        window.addEventListener("DOMContentLoaded", () => {
+            new KaBot("Ka-Bot");
+        });
+
     }
 
     showSection(section) {

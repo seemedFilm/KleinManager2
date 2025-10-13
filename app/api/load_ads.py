@@ -16,8 +16,5 @@ def list_ads_files():
         print(f" Found file: {f.name}")
         if f.is_file() and f.suffix.lower() in [".json", ".yaml", ".yml"]:
             files.append(f.name)
-
     print(f" Returning files: {files}")
-    
-    
     return {"files": files}
