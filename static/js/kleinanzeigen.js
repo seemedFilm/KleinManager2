@@ -79,7 +79,6 @@ class KleinanzeigenManager extends KleinManagerCore {
         }
     }
 
-
     async startContainer(htmlElementId = "dummy") {
         setStatus("Starting container ...");
 
