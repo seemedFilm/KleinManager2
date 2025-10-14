@@ -22,7 +22,7 @@
 
 /* Chevron-Styling (dein eigenes Icon bleibt weiß) */
 #KaBotParameter + i {
-    color: white; /* macht dein Icon immer weiß */
+    color: white; 
 }
 
 #KaBotParameter option {
@@ -34,7 +34,6 @@
     background-color: #374151;
     color: #fff;
 }
-
 
 #KaBotParameter:hover {
     background: linear-gradient(to right, #b91c1c, #c2410c); 
@@ -52,4 +51,16 @@
     transform: translateY(-50%);
     pointer-events: none;
     color: white;
+}
+
+#kabotLog {
+    white-space: pre-wrap;
+    font-family: monospace;
+    background-color: #111827; /* optional: dark background */
+    color: white;            /* helles Grau für Text */
+    font-size: 15px;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    overflow-y: auto;
+    max-height: 400px;
 }

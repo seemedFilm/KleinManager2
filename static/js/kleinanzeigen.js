@@ -92,7 +92,7 @@ class KleinanzeigenManager extends KleinManagerCore {
             if (data.error) {
                 setStatus(`Error: ${data.error}`);
             } else {
-                setStatus(`Container started (ID: ${data.container_id || "?"})`);
+                appendLog(`Container started (ID: ${data.container_id || "?"})`);
                 appendLog("Container started.");
             }
         } catch (err) {

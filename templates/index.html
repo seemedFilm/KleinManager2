@@ -373,7 +373,14 @@
           <span class="font-semibold">Start Kleinbot</span>
       </div>
   </button>
-
+  <button onclick="app.stopContainer('kabotLog')"
+      class="flex-shrink-0 relative px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg
+             hover:from-orange-700 hover:to-red-700 transition-all duration-200 shadow-lg group">
+      <div class="flex items-center justify-center text-white whitespace-nowrap">
+          <i class="fas fa-stop text-lg mr-3"></i>
+          <span class="font-semibold">Stop Kleinbot</span>
+      </div>
+  </button>
   <!-- Button: Run -->
   <button onclick="app.runBotCommand('kabotLog')"
       class="flex-shrink-0 relative px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg
