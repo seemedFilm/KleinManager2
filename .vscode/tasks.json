@@ -3,32 +3,14 @@
     // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
+     
       {
-        "label": "Docker Compose Up build",
+        "label": "restart1",
         "type": "shell",
-        "command": "docker compose up -d build",
-        "group": "build"
-      },
-      {
-        "label": "logs",
-        "type": "shell",
-        "command": "docker logs -f kleinmanager",
-        "dependsOrder": "sequence",
-        "group": {
-          "kind": "build",
-          "isDefault": true
-        },
-        "problemMatcher": []
-      },
-      {
-        "label": "restart",
-        "type": "shell",
-        "command": "docker logs -f kleinmanager",
+        "command": "docker compose up --build",
         "dependsOrder": "sequence",
         "dependsOn": [
           "Docker Compose Down",
-          "Update_env script",
-          "Docker Compose Up"
         ],
         "group": "build",
         "problemMatcher": []
@@ -45,9 +27,6 @@
         "command": "docker compose down",
         "group": "build",
         "problemMatcher": [],
-        "dependsOn": [
-          "remove kleinbot"
-        ],
       },
       {
         "label": "remove kleinbot",

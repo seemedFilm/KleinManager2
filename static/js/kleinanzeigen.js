@@ -18,7 +18,6 @@ class KleinanzeigenManager extends KleinManagerCore {
     constructor() {
         super();
         this.adsFiles = [];
-
     }
 
 
@@ -39,40 +38,47 @@ class KleinanzeigenManager extends KleinManagerCore {
 
     async refreshAds(htmlElementId = "dummy") {
         try {
+            const container = document.getElementById("adsFileContainer");
+            if (!container) return;
+
             setStatus("Reloading Ads...");
-
-            // ✅ richtiger HTTP-Methodentyp:
             const response = await fetch(`/api/v1/ads/files`, { method: "GET" });
-
-            // ✅ JSON auslesen:
             const data = await response.json();
 
-            // ✅ Konsolen-Output prüfen:
-            setStatus(`Response JSON: ${data}`);
-
-             // ✅ Zugriff auf einzelne Werte:
-            if (data.files && data.files.length > 0) {
-                const firstFile = data.files[0];
-                setStatus(`Gefundene Datei: ${firstFile}`);
-                console.log("Erste Datei:", firstFile);
-            } else {
-                setStatus("Keine Dateien gefunden.");
-            }
-            const container = document.getElementById("adsFileContainer");
             container.innerHTML = "";
 
-            data.files.forEach(file => {
-                const el = document.createElement("div");
-                el.textContent = file;
-                el.className = "p-2 bg-gray-700 text-white rounded";
-                container.appendChild(el);
+            if (!data.files || data.files.length === 0) {
+                container.innerHTML = "<p class='text-gray-400'>Keine Dateien gefunden.</p>";
+                return;
+            }
+
+            data.files.forEach((file, index) => {
+                const label = document.createElement("label");
+                label.className = "flex items-center space-x-2 p-2 bg-gray-700 rounded cursor-pointer hover:bg-gray-600";
+
+                const radio = document.createElement("input");
+                radio.type = "radio";
+                radio.name = "adsFile";
+                radio.value = file;
+                if (index === 0) radio.checked = true;
+
+                const span = document.createElement("span");
+                span.textContent = file;
+
+                label.appendChild(radio);
+                label.appendChild(span);
+                container.appendChild(label);
             });
 
-        //    this.apiRequest("/ads/files");
-        }
-        catch (error) {
+            console.log("✅ Ads geladen:", data.files);
+
+        } catch (error) {
+            console.error("Fehler beim Laden der Dateien:", error);
+            document.getElementById("adsFileContainer").innerHTML =
+                "<p class='text-red-400'>Fehler beim Laden der Dateien.</p>";
         }
     }
+
 
     async startContainer(htmlElementId = "dummy") {
         setStatus("Starting container ...");
@@ -96,10 +102,9 @@ class KleinanzeigenManager extends KleinManagerCore {
     }
     
     async runBotCommand() {
-        setStatus("Starting Kleinanzeigen-Bot ...");
-
         try {
             let kaparameter = document.getElementById("KaBotParameter").value;
+            appendLog(`Starting Kleinanzeigen-Bot, with parameter: ${kaparameter}`);
 
             const response = await fetch(`/api/v1/bot/runCommand`, {
                 method: "POST",
@@ -111,7 +116,7 @@ class KleinanzeigenManager extends KleinManagerCore {
         if (data.error) {
             setStatus(`Error: ${data.error}`);
         } else {
-            setStatus(`✅ Bot started.`);
+            appendLog(`Bot started.`);
             appendLog(data.output || "No logs received.");
         }
     } catch (err) {

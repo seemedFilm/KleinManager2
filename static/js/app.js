@@ -1,10 +1,28 @@
 class KaBot {
     constructor(sectionId) {
-        this.section = document.getElementById(sectionId);
+    this.section = document.getElementById(sectionId);
+    if (this.section) {
         this.log = this.section.querySelector("#kabotLog");
-        this.adsFileContainer = document.getElementById("adsFileContainer");
+    } else {
+        this.log = null;
+        console.warn("Ka-Bot Section wurde beim Initialisieren nicht gefunden!");
+    }
 
-        this.loadAdsFiles();
+    this.adsFileContainer = document.getElementById("adsFileContainer");
+    app.refreshAds();
+
+}
+
+      tryLoadAds() {
+        const checkInterval = setInterval(() => {
+            if (window.app && app.kleinanzeigenManager) {
+                clearInterval(checkInterval);
+                console.log("KleinanzeigenManager available, loading ad files");
+                app.kleinanzeigenManager.refreshAds();
+            } else {
+                console.log("Waiting for KleinanzeigenManager...");
+            }
+        }, 200);
     }
 
 
@@ -143,9 +161,7 @@ class KleinManager extends KleinManagerCore {
             }
         });
 
-       new KaBot("Ka-Bot");
-       
-
+    new KaBot("Ka-Bot");
     }
 
     showSection(section) {
@@ -176,5 +192,4 @@ class KleinManager extends KleinManagerCore {
     }
 }
 
-// 👉 App initialisieren (nur einmal!)
 const app = new KleinManager();
