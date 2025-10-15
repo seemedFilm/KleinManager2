@@ -21,3 +21,4 @@ services:
       - BUILD_DATE=${BUILD_DATE}
       - APP_VERSION=${APP_VERSION}
       - BRANCH_NAME=${BRANCH_NAME}
+      - KLEINBOT_NAME=kleinbot

@@ -1,7 +1,10 @@
 
 function setStatus(msg) {
     const logBox = document.getElementById("kabotLog");
-    if (logBox) logBox.textContent = msg;
+    if (logBox) {
+        const time = new Date().toLocaleTimeString();
+        logBox.textContent = `\n[${time}] ${msg}`;
+    }
     console.log(`${msg}`);
 }
 
@@ -15,25 +18,10 @@ function appendLog(msg) {
     console.log(msg);
 }
 class KleinanzeigenManager extends KleinManagerCore {
+
     constructor() {
         super();
         this.adsFiles = [];
-    }
-
-
-    async getKAParameter() {
-        const res = await fetch("/api/v1/logging_level");
-        const data = await res.json();
-        return data.kaparameter;
-    }
-
-    async setKAParameter(kaparameter) {
-        await fetch("/api/v1/logging_level", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ kaparameter }),
-        });
-        console.log("KaBot Parameter", kaparameter);
     }
 
     async refreshAds(htmlElementId = "dummy") {
@@ -153,7 +141,6 @@ class KleinanzeigenManager extends KleinManagerCore {
             if (data.error) {
                 setStatus(`Error: ${data.error}`);
             } else {
-                setStatus("Command stopped.");
                 appendLog("Command stopped.");
             }
         } catch (err) {

@@ -22,7 +22,7 @@ client = docker.from_env()
 shared_ads = os.getenv("SHARED_ADS", "unknown")
 shared_pics = os.getenv("SHARED_PIC", "unknown")
 kleinbot_data = os.getenv("KLEINBOT_DATA", "unknown")
-
+kleinbot_name = os.getenv("KLEINBOT_NAME", "unknown")
 
 @router.post("/bot/start")
 def start_container():
@@ -73,7 +73,7 @@ def run_command():
     try:
         container = client.containers.get("kleinbot")
     except docker.errors.NotFound:
-        return {"error": f"Container kleinbot odes not run"}
+        return {"error": f"Container kleinbot does not run"}
 
     exec_result = container.exec_run(
         cmd="/opt/kleinanzeigen-bot --config=/mnt/data/config.yaml verify",

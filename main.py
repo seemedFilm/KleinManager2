@@ -21,12 +21,11 @@ from app.api.routes_bot import router as bot
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("🚀 Starting KleinManager...")
     print("📋 Starting background monitoring tasks...")
-
-
     await background_task_manager.start_all_tasks()
     yield
     print("🛑 Stopping background monitoring tasks...")
