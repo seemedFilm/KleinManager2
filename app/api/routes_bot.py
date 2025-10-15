@@ -27,14 +27,14 @@ kleinbot_name = os.getenv("KLEINBOT_NAME", "unknown")
 @router.post("/bot/start")
 def start_container():
 
-    existing = [c for c in client.containers.list(all=True) if c.name == "kleinbot"]
+    existing = [c for c in client.containers.list(all=True) if c.name == kleinbot_name]
     if existing:
         print("Found existing container, deleting it...")
         existing[0].remove(force=True)
 
     container = client.containers.run(
         image="kleinbot:cookie",
-        name="kleinbot",
+        name=kleinbot_name,
         shm_size="1g",
         environment={
             "DISPLAY": ":0",
@@ -60,8 +60,7 @@ def start_container():
 
 @router.post("/bot/stop")
 def stop_container():
-    print(f"botname: kleinbot")
-    container = client.containers.get("kleinbot")
+    container = client.containers.get(kleinbot_name)
     result = container.stop()
     print(f"Stopping Resultcode: {result}")
     return {"status": "stopped", "container_id": container.short_id}
@@ -71,9 +70,9 @@ def run_command():
     print("Running the bot command")
 
     try:
-        container = client.containers.get("kleinbot")
+        container = client.containers.get(kleinbot_name)
     except docker.errors.NotFound:
-        return {"error": f"Container kleinbot does not run"}
+        return {"error": f"Container {kleinbot_name} does not run"}
 
     exec_result = container.exec_run(
         cmd="/opt/kleinanzeigen-bot --config=/mnt/data/config.yaml verify",
@@ -91,11 +90,11 @@ def run_command():
 def stop_container():
     print("Stopping command ''...")
     try:
-        container = client.containers.get("kleinbot")
+        container = client.containers.get(kleinbot_name)
         container.kill(signal="SIGINT")
         print("Stopping command! (CTRL+C)")
         return {"status": "interrupted"}
     except docker.errors.NotFound:
-        return {"error": f"Container kleinbot not found."}
+        return {"error": f"Container {kleinbot_name} not found."}
     except Exception as e:
         return {"error": str(e)}
