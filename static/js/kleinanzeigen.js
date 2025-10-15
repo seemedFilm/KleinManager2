@@ -2,7 +2,7 @@
 function setStatus(msg) {
     const logBox = document.getElementById("kabotLog");
     if (logBox) logBox.textContent = msg;
-    console.log(msg);
+    console.log(`${msg}`);
 }
 
 function appendLog(msg) {
@@ -100,20 +100,19 @@ class KleinanzeigenManager extends KleinManagerCore {
         }
     }
     async stopContainer() {
-        setStatus("Stopping container...");
+        appendLog("Stopping container...");
         
         try {
             const response = await fetch(`/api/v1/bot/stop`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },                
             });
-            
+
             const data = await response.json();
             if (data.error) {
                 setStatus(`Error: ${data.error}`);
             } else {
-                appendLog(`Container started (ID: ${data.container_id || "?"})`);
-                appendLog("Container started.");
+                appendLog(`Container stopped (ID: ${data.container_id || "?"})`);
             }
 
         } catch (err) {

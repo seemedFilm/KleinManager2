@@ -23,9 +23,9 @@ shared_ads = os.getenv("SHARED_ADS", "unknown")
 shared_pics = os.getenv("SHARED_PIC", "unknown")
 kleinbot_data = os.getenv("KLEINBOT_DATA", "unknown")
 
+
 @router.post("/bot/start")
 def start_container():
-    print("Starting Container ''...")
 
     existing = [c for c in client.containers.list(all=True) if c.name == "kleinbot"]
     if existing:
@@ -60,7 +60,7 @@ def start_container():
 
 @router.post("/bot/stop")
 def stop_container():
-    print(f"stopping container")
+    print(f"botname: kleinbot")
     container = client.containers.get("kleinbot")
     result = container.stop()
     print(f"Stopping Resultcode: {result}")
@@ -73,7 +73,7 @@ def run_command():
     try:
         container = client.containers.get("kleinbot")
     except docker.errors.NotFound:
-        return {"error": "Container \"name\" odes not run"}
+        return {"error": f"Container kleinbot odes not run"}
 
     exec_result = container.exec_run(
         cmd="/opt/kleinanzeigen-bot --config=/mnt/data/config.yaml verify",
@@ -96,6 +96,6 @@ def stop_container():
         print("Stopping command! (CTRL+C)")
         return {"status": "interrupted"}
     except docker.errors.NotFound:
-        return {"error": "Container 'name' not found."}
+        return {"error": f"Container kleinbot not found."}
     except Exception as e:
         return {"error": str(e)}
