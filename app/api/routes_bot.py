@@ -58,6 +58,13 @@ def start_container():
     print(f"Container started: {container.short_id}")
     return {"status": "running", "container_id": container.short_id}
 
+@router.post("/bot/stop")
+def stop_container():
+    print(f"stopping container")
+    container = client.containers.get("kleinbot")
+    result = container.stop()
+    print(f"Stopping Resultcode: {result}")
+    return {"status": "stopped", "container_id": container.short_id}
 
 @router.post("/bot/runCommand")
 def run_command():

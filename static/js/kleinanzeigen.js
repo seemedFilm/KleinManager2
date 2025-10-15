@@ -99,7 +99,27 @@ class KleinanzeigenManager extends KleinManagerCore {
             setStatus(`Error: ${err}`);
         }
     }
-    
+    async stopContainer() {
+        setStatus("Stopping container...");
+        
+        try {
+            const response = await fetch(`/api/v1/bot/stop`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },                
+            });
+            
+            const data = await response.json();
+            if (data.error) {
+                setStatus(`Error: ${data.error}`);
+            } else {
+                appendLog(`Container started (ID: ${data.container_id || "?"})`);
+                appendLog("Container started.");
+            }
+
+        } catch (err) {
+            appendLog(`Error: ${err}`);
+        }
+    }
     async runBotCommand() {
         try {
             let kaparameter = document.getElementById("KaBotParameter").value;
@@ -118,11 +138,11 @@ class KleinanzeigenManager extends KleinManagerCore {
             appendLog(`Bot started.`);
             appendLog(data.output || "No logs received.");
         }
-    } catch (err) {
-        setStatus(`Error: ${err}`);
+        } catch (err) {
+            setStatus(`Error: ${err}`);
+        }
     }
-}
-async stopCommand() {
+    async stopCommand() {
         setStatus("Stopping container...");
         try {
             
