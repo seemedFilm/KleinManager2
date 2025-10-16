@@ -65,6 +65,15 @@ def stop_container():
     print(f"Stopping Resultcode: {result}")
     return {"status": "stopped", "container_id": container.short_id}
 
+@router.get("/bot/status")
+def bot_status():
+    try:
+        container = client.containers.get(kleinbot_name)
+        container.reload()
+        return {"status": container.status}  
+    except Exception:
+        return {"status": "not_found"}
+
 @router.post("/bot/runCommand")
 def run_command():
     print("Running the bot command")

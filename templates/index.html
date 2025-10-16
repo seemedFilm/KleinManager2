@@ -76,8 +76,12 @@
                         <i class="fas fa-chart-line mr-3 w-5 text-center"></i>
                         <span data-i18n="nav.dashboard">Dashboard</span>
                     </button>
-
-                    <button onclick="app.showSection('Ka-Bot')"
+                    <button onclick="app.showSection('ad-builder')"
+                        class="nav-item active w-full text-left px-4 py-3 rounded-lg flex items-center text-gray-200 hover:bg-gray-700 transition-colors duration-200">
+                        <i class="fas fa-chart-line mr-3 w-5 text-center"></i>
+                        <span data-i18n="nav.adbuilder">Ad-Builder</span>
+                    </button>
+                    <button onclick="app.showSection('ka-bot')"
                         class="nav-item active w-full text-left px-4 py-3 rounded-lg flex items-center text-gray-200 hover:bg-gray-700 transition-colors duration-200">
                         <i class="fas fa-chart-line mr-3 w-5 text-center"></i>
                         <span data-i18n="nav.kabot">kabot</span>
@@ -368,7 +372,7 @@
       class="flex-shrink-0 relative px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg
              hover:from-orange-700 hover:to-red-700 transition-all duration-200 shadow-lg group">
       <div class="flex items-center justify-center text-white whitespace-nowrap">
-          <i class="fas fa-play text-lg mr-3"></i>
+          <i class="fas fa-stop text-lg mr-3" id="startButton"></i>
           <span class="font-semibold">Start Kleinbot</span>
       </div>
   </button>
@@ -416,8 +420,26 @@
           <span class="font-semibold">Stop Command</span>
       </div>
   </button>
+  </div>
+                  <!-- Log-Ausgabe -->
+                <div id="kabotLog"
+                    class="kabotLog kabotLogbg-gray-900 border border-gray-700 rounded-xl p-4 text-gray-300 h-64 overflow-y-auto">
+                    Ka-Bot Log...
+                </div>
+            </div>
+            <!-- Logs Section -->
+            <!-- <div id="logOutput" class="bg-black text-green-400 p-4 rounded-lg h-64 overflow-y-auto font-mono"></div> -->
 
-</div>
+            <!-- <label for="logLevel">Logging-Level:</label>
+            <select id="logLevel" onchange="changeLogLevel(this.value)">
+                <option value="DEBUG">DEBUG</option>
+                <option value="INFO">INFO</option>
+                <option value="WARNING">WARNING</option>
+                <option value="ERROR">ERROR</option>
+                <option value="CRITICAL">CRITICAL</option>
+            </select> -->
+
+
             <!-- Settings Section -->
             <div id="settings" class="section hidden">
                 <h2 class="text-2xl lg:text-3xl font-bold text-white mb-6 lg:mb-8 mt-12 lg:mt-0"

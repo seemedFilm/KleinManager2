@@ -165,6 +165,8 @@ class KleinManager extends KleinManagerCore {
         setTimeout(() => {
             new KaBot("Ka-Bot");
             }, 500);
+        setInterval(updateContainerStatus, 3000); // alle 3 Sekunden prüfen
+
     }
 
     showSection(section) {
@@ -185,7 +187,8 @@ class KleinManager extends KleinManagerCore {
         this.closeMobileMenu();
 
         if (section === 'dashboard') this.loadDashboard();
-        //else if (section === 'Ka-Bot') this.loadAdsFiles();
+        else if (section === 'ka-bot') this.loadAdsFiles();
+        //else if (section === 'ad-builder') this.loadAdBuilder();
         else if (section === 'orders') this.loadOrders();
         else if (section === 'watcher') this.loadWatchedItems();
         else if (section === 'tracking') this.loadTracking();

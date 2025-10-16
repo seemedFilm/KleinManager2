@@ -64,3 +64,10 @@
     overflow-y: auto;
     max-height: 400px;
 }
+#startButton {
+  transition: color 0.3s ease, transform 0.3s ease;
+  color: red;
+}
+#startButton.fa-spin {
+  transform: rotate(0deg);
+}
