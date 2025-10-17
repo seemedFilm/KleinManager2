@@ -25,8 +25,7 @@ class KaBot {
         }, 200);
     }
 
-
-    async loadAdsFiles() {
+async loadAdsFiles() {
         try {
             console.info("adsFileContainer =", this.adsFileContainer);
             const res = await fetch("/api/v1/ads/files");
@@ -70,6 +69,7 @@ class KaBot {
         }
     }
 
+    
     getSelectedFile() {
         const selected = this.adsFileContainer.querySelector("input[name='adsFile']:checked");
         this.log.in
@@ -115,7 +115,9 @@ class KleinManager extends KleinManagerCore {
         this.statisticsManager = new StatisticsManager();
         this.settingsManager = new SettingsManager();
         this.notificationsManager = new NotificationsManager();
+
         this.kleinanzeigenManager = new KleinanzeigenManager();
+        
 
         this.copyMethodsFromManager(this.dashboardManager);
         this.copyMethodsFromManager(this.ordersManager);
@@ -125,8 +127,9 @@ class KleinManager extends KleinManagerCore {
         this.copyMethodsFromManager(this.statisticsManager);
         this.copyMethodsFromManager(this.settingsManager);
         this.copyMethodsFromManager(this.notificationsManager);
-        this.copyMethodsFromManager(this.kleinanzeigenManager);
 
+        this.copyMethodsFromManager(this.kleinanzeigenManager);
+        
         this.init();
     }
 
@@ -172,7 +175,7 @@ class KleinManager extends KleinManagerCore {
     showSection(section) {
         document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
         document.getElementById(section).classList.remove('hidden');
-
+        console.log("Switch to section: ", section);
         document.querySelectorAll('.nav-item').forEach(n => {
             n.classList.remove('active', 'bg-blue-900/50', 'border-l-4', 'border-blue-500');
         });
@@ -188,7 +191,7 @@ class KleinManager extends KleinManagerCore {
 
         if (section === 'dashboard') this.loadDashboard();
         else if (section === 'ka-bot') this.loadAdsFiles();
-        //else if (section === 'ad-builder') this.loadAdBuilder();
+        else if (section === 'ad-builder') this.loadAdBuilder();
         else if (section === 'orders') this.loadOrders();
         else if (section === 'watcher') this.loadWatchedItems();
         else if (section === 'tracking') this.loadTracking();

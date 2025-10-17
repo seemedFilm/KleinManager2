@@ -28,9 +28,7 @@ class KleinanzeigenManager extends KleinManagerCore {
         if (section && !section.classList.contains("hidden")) {
             this.updateContainerStatus();
         }
-    }, 3000);
-
-
+        }, 3000);
     }
 
     async refreshAds(htmlElementId = "dummy") {
