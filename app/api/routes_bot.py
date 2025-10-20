@@ -17,8 +17,8 @@ def require_env(key: str) -> str:
         print(f"require_env: {key} = {value}")
     return value
 
-router = APIRouter()
-client = docker.from_env()
+#router = APIRouter()
+#client = docker.from_env()
 shared_ads = os.getenv("SHARED_ADS", "unknown")
 shared_pics = os.getenv("SHARED_PIC", "unknown")
 kleinbot_data = os.getenv("KLEINBOT_DATA", "unknown")
