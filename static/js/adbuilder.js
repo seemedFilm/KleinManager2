@@ -34,6 +34,48 @@ class Adbuilder extends KleinManagerCore {
             });
     }
 
+    async upload_images() {
+        const files = document.getElementById("Images").files;
+        const resultList = document.getElementById("uploadResult");
+        const title = document.getElementById("title").value.trim();
+        console.log("Uploading images with title:", title);
+        if (!title) {
+            alert("Bitte gib einen Titel ein!");
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append("title", title);  // 🔹 Titel mitsenden
+        for (let file of files) {
+            formData.append("files", file);
+        }
+        console.log("FormData prepared with files:", files);
+        try {
+            const response = await fetch("/api/v1/adbuilder/upload_images", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+
+            resultList.innerHTML = "";
+
+          if (data.images) {
+            data.images.forEach(filename => {
+                const li = document.createElement("li");
+                li.textContent = filename;
+                resultList.appendChild(li);
+            });
+            console.log(`✅ Bilder in ${data.ad_directory} gespeichert`);
+            } else {
+                console.error("Fehler beim Upload:", data);
+            }
+        } catch (err) {
+            console.error("Upload fehlgeschlagen:", err);
+        }
+}
+
+
     saveAdFile() {
         try {
             const title = document.getElementById("Tb_title").value;

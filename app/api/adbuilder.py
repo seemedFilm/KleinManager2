@@ -1,13 +1,15 @@
-from fastapi import APIRouter, FastAPI, Request
+from fastapi import APIRouter, FastAPI, Request, UploadFile, File, Form
+from fastapi.responses import JSONResponse
 from pathlib import Path
+import shutil
 import json
 import os
 
 router = APIRouter()
 app = FastAPI()
 
-shared_ads = Path(os.getenv("SHARED_ADS"))
-shared_pics = Path(os.getenv("SHARED_PIC"))
+SHARED_ADS = Path(os.getenv("SHARED_ADS"))
+SHARED_PICS = Path(os.getenv("SHARED_PIC"))
 
 
 @router.post("/adbuilder/builder")
@@ -28,7 +30,8 @@ async def build(request: Request):
     except Exception as ex:
         print(f"❌ Fehler beim Speichern der Ad-Datei: {ex}")
         return {"status": "error", "message": str(ex)}
-    
+   
+#Fills the category html list from categories.txt 
 @router.get("/adbuilder/categories")
 async def get_categories():
     try:
@@ -45,3 +48,27 @@ async def get_categories():
 
     except Exception as ex:
         return {"error": str(ex)}
+    
+@router.post("/adbuilder/upload_images")
+async def upload_images(
+    title: str = Form(...),
+    files: list[UploadFile] = File(...)
+):
+    print(f"Uploading images for ad title: {title}")
+    print(f"Number of files received: {files}")
+    ad_directory = SHARED_PICS / title
+    ad_directory.mkdir(parents=True, exist_ok=True)
+    saved_images = []
+    print(f"saved_images initialized: {saved_images}")
+    for file in files:
+        file_path = ad_directory / file.filename
+
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+        saved_images.append(file.filename)
+
+    return JSONResponse({
+        "images": saved_images,
+        "ad_directory": str(ad_directory)
+        })

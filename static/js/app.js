@@ -167,7 +167,8 @@ class KleinManager extends KleinManagerCore {
         setTimeout(() => {
             new KaBot("Ka-Bot");
             }, 500);
-        setInterval(updateContainerStatus, 3000); // alle 3 Sekunden prüfen
+        //Commented for debug
+        //setInterval(updateContainerStatus, 3000); // alle 3 Sekunden prüfen
 
     }
 

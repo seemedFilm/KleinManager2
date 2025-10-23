@@ -357,7 +357,7 @@
   <form id="adForm">
     <label for="Tb_title">Titel:</label>
     <div class="w-1/2">
-        <input type="text" id="Tb_title" name="Tb_title" placeholder="Titel der Anzeige" />
+        <input type="text" id="title" name="Tb_title" placeholder="Titel der Anzeige" />
     </div>
     <label for="Tb_description">Beschreibung:</label>
     <textarea id="Tb_description" name="Tb_description" rows="5" placeholder="Beschreibung hier eingeben..."></textarea>
@@ -400,15 +400,14 @@
     </label>
   </div>
 
-
-  <div id="pictures" class="basis-3/4 flex flex-col border border-gray-700 rounded-xl p-4">
-    <label for="Lb_Images" class="font-bold mb-2 text-gray-200">Bilder:</label>
-
     <!-- Inhalt: links Upload + Vorschau, rechts Buttons -->
+  <div id="pictures" class="basis-3/4 flex flex-col border border-gray-700 rounded-xl p-4">
+    <label for="Images" class="font-bold mb-2 text-gray-200">Bilder:</label>
+
     <div class="flex flex-row gap-4 items-start">
       <!-- Linke Seite -->
       <div class="flex flex-col w-2/3">
-        <input type="file" id="Lb_Images" name="Lb_Images" multiple
+        <input type="file" id="Images" name="Lb_Images"  accept="image/jpeg,image/png"  multiple
           class="w-fit text-sm text-gray-300 mb-2 file:mr-2 file:px-3 file:py-1 
                  file:rounded file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700" />
 
@@ -421,12 +420,12 @@
 
       <!-- Rechte Seite -->
       <form class="flex flex-col gap-2 w-1/3">
-        <button type="button" id="Bt_SelectImages"
+        <button type="button" id="uploadButton" onclick="app.upload_images()"
           class="px-3 py-2 bg-gradient-to-r from-orange-600 to-red-600 
                  text-white rounded-lg hover:from-orange-700 hover:to-red-700 text-sm">
           Bilder auswählen
         </button>
-
+         <ul id="uploadResult" class="text-gray-300 mt-3"></ul>
         <button type="button" id="save_adfile" onclick="app.saveAdFile()"
           class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
           Anzeige speichern
