@@ -3,46 +3,57 @@ class Adbuilder extends KleinManagerCore {
         super();
     }
 
+
     loadAdBuilder() {
-        console.log("AdBuilder geladen");
-       //this.loadForm2Data();
+       console.log("AdBuilder geladen");
+       this.loadCategories();
     }
-    // getForm2Values() {
-    //     return {
-    //         field1: document.getElementById('input1')?.value || '',
-    //         field2: document.getElementById('input2')?.value || '',
-    //         field3: document.getElementById('input3')?.value || '',
-    //         checkbox: document.getElementById('checkbox1')?.checked || false,
-    //         dropdown: document.getElementById('dropdown1')?.value || ''
-    //     };
-    // }
 
-    // saveForm2Data() {
-    //     const data = this.getForm2Values();
-    //     console.log("Form2 gespeichert:", data);
-    //     localStorage.setItem('form2Data', JSON.stringify(data));
-    //     this.showToast('Formulardaten gespeichert.', 'success');
-    // }
+    async loadCategories() {       
+            const categorySelect = document.getElementById("Lb_category");
+           
+            const res = await fetch ("/api/v1/adbuilder/categories", {
+                method: "GET" 
+            });
+            const data = await res.json();
 
-    // clearForm2Data() {
-    //     ['input1', 'input2', 'input3'].forEach(id => document.getElementById(id).value = '');
-    //     document.getElementById('checkbox1').checked = false;
-    //     document.getElementById('dropdown1').value = '';
-    //     localStorage.removeItem('form2Data');
-    //     this.showToast('Formular zurÃ¼ckgesetzt.', 'warning');
-    // }
+            categorySelect.innerHTML = "";
+            if (data.error) {
+                    console.error("Error fetching categories:", data.error);
+                    return;
+            }
+            if (!data.categories || data.categories.length === 0) {
+                    console.error("No categories found.");
+                    return;
+                }
+            data.categories.forEach(category => {
+                const option = document.createElement("option");
+                option.value = category;
+                option.textContent = category;
+                categorySelect.appendChild(option);
+            });
+    }
 
-    // loadForm2Data() {
-    //     const saved = localStorage.getItem('form2Data');
-    //     if (saved) {
-    //         const data = JSON.parse(saved);
-    //         document.getElementById('input1').value = data.field1 || '';
-    //         document.getElementById('input2').value = data.field2 || '';
-    //         document.getElementById('input3').value = data.field3 || '';
-    //         document.getElementById('checkbox1').checked = data.checkbox || false;
-    //         document.getElementById('dropdown1').value = data.dropdown || '';
-    //     }
-    // }
+    saveAdFile() {
+        try {
+            const title = document.getElementById("Tb_title").value;
+            fetch("/api/v1/adbuilder/builder", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    title: document.getElementById("Tb_title").value,
+                    description: document.getElementById("Tb_description").value
+                 })
+
+            });
+        console.log(title); 
+            
+        } catch (error) {
+            console.log(`Error: ${error}`);
+        }
+      
+    }
+   
 }
 
 // Registrierung im Haupt-App Objekt

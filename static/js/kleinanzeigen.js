@@ -37,7 +37,9 @@ class KleinanzeigenManager extends KleinManagerCore {
             if (!container) return;
 
             setStatus("Reloading Ads...");
-            const response = await fetch(`/api/v1/ads/files`, { method: "GET" });
+            const response = await fetch("/api/v1/ads/files", { 
+                method: "GET" 
+            });
             const data = await response.json();
 
             container.innerHTML = "";
@@ -157,9 +159,6 @@ class KleinanzeigenManager extends KleinManagerCore {
        
         try {
             setStatus("Stopping container...");
-            
-            
-            
             const response = await fetch(`/api/v1/bot/stopCommand`, { 
                 method: "POST" },
             );

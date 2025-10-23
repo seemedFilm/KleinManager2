@@ -164,7 +164,6 @@ class KleinManager extends KleinManagerCore {
             }
         });
 
-        //new KaBot("Ka-Bot");
         setTimeout(() => {
             new KaBot("Ka-Bot");
             }, 500);

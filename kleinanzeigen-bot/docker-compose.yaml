@@ -8,12 +8,14 @@ services:
       #- KLEINBOT_NAME=kleinbot
       - LOGGING_ENABLE=TRUE
       - CHROMIUM_PROFILE=/mnt/data/cache
+      - SHARED_ADS=/docker/klein/shared/ads
       #- KLEINBOT_COOKIE=/mnt/data/kleinanzeigen_cookies.json
       #- KLEINBOT_STORAGE=/mnt/data/kleinanzeigen_localstorage.json
     volumes:
       - /docker/klein/shared/ads:/mnt/data/ads:rw
       - /docker/klein/shared/ads/pics:/mnt/data/ads/pics:rw
       - /docker/klein/bot/data:/mnt/data:rw
+      - /docker/klein/manager/data:/
     ports:
       - "6080:6080"   # Zugriff über Browser (NoVNC)
       - "5900:5900"   # optional Zugriff per VNC-Client

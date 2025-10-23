@@ -383,8 +383,8 @@
     <!-- Obercontainer: Versandarten + Bilder nebeneinander -->
 <div class="flex flex-row gap-6 w-full mt-4">
 
-  <!-- Versandarten (links, 75 %) -->
-  <div id="shippingGroup" class="basis-3/4 rounded-xl border border-gray-700 p-4">
+
+  <div id="shippingGroup" class="w-fit rounded-xl border border-gray-700 p-4">
     <label class="font-bold">Versandarten:</label><br />
     <label class="underline mt-3 block text-gray-300">Small</label>
     <label><input type="checkbox" value="DHL_2"/> DHL 2 kg</label><br />
@@ -400,8 +400,8 @@
     </label>
   </div>
 
-  <!-- Bilderbereich (rechts, 25 %) -->
-  <div id="pictures" class="basis-1/4 flex flex-col border border-gray-700 rounded-xl p-4">
+
+  <div id="pictures" class="basis-3/4 flex flex-col border border-gray-700 rounded-xl p-4">
     <label for="Lb_Images" class="font-bold mb-2 text-gray-200">Bilder:</label>
 
     <!-- Inhalt: links Upload + Vorschau, rechts Buttons -->
@@ -426,15 +426,16 @@
                  text-white rounded-lg hover:from-orange-700 hover:to-red-700 text-sm">
           Bilder auswählen
         </button>
-        <button type="button" id="Bt_Create_adfile"
+
+        <button type="button" id="save_adfile" onclick="app.saveAdFile()"
           class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
           Anzeige speichern
         </button>
-        <button type="button" id="Bt_LoadAd"
+        <button type="button" id="load_adfile"
           class="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm">
           Anzeige laden
         </button>
-        <button type="button" id="Bt_ClearForm"
+        <button type="button" id="clear_adfile"
           class="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm">
           Formular leeren
         </button>
