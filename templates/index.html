@@ -355,130 +355,127 @@
   <h1>Anzeige erstellen</h1>
 
   <form id="adForm">
-    <label for="Tb_title">Titel:</label>
+    <label for="title">Titel:</label>
     <div class="w-1/2">
-        <input type="text" id="title" name="Tb_title" placeholder="Titel der Anzeige" />
+        <input type="text" id="title" name="title" placeholder="Titel der Anzeige" />
     </div>
-    <label for="Tb_description">Beschreibung:</label>
-    <textarea id="Tb_description" name="Tb_description" rows="5" placeholder="Beschreibung hier eingeben..."></textarea>
+    <label for="description">Beschreibung:</label>
+    <textarea id="description" name="description" rows="5" placeholder="Beschreibung hier eingeben..."></textarea>
 
-    <label for="Lb_category">Kategorie:</label>
-    <select id="Lb_category" name="Lb_category">
+    <label for="category">Kategorie:</label>
+    <select id="category" name="category">
       <option value="">-- Kategorie auswählen --</option>
     </select>
+    <div class="w-full">
+        <div class="w-1/2">
+            <label for="price">Preis (€):</label>
+            <input type="text" id="price" name="price" maxlength="20" pattern="\d*" inputmode="numeric">
 
-    <div class="w-1/2">
-    <label for="Tb_price">Preis (€):</label>
-    <input type="text" id="Tb_price" name="Tb_price" maxlength="20" pattern="\d*" inputmode="numeric">
-        
-    <label for="Cb_pricetype">Preistyp:</label>
-    <select id="Cb_pricetype" name="Cb_pricetype">
-      <option value="">-- auswählen --</option>
-      <option value="VB">Verhandlungsbasis</option>
-      <option value="Festpreis">Festpreis</option>
-      <option value="Zu verschenken">Zu verschenken</option>
-    </select>
+            <div class="flex items-center gap-3 mt-2">
+                <div class="flex flex-col">
+                    <label for="price_type">Preistyp:</label>
+                    <select id="price_type" name="price_type">
+                    <option value="">-- auswählen --</option>
+                    <option value="VB">Verhandlungsbasis</option>
+                    <option value="Festpreis">Festpreis</option>
+                    <option value="Zu verschenken">Zu verschenken</option>
+                    </select>
+                </div>
+
+            <label class="flex items-center gap-1 mt-5">
+                <input type="checkbox" id="Cb_DirectSell" value="sell_directly"
+                    class="w-4 h-4 accent-blue-600">
+                <span class="text-gray-200">Direktverkauf</span>
+            </label>
+            </div>
+        </div>
     </div>
-    
-    <!-- Obercontainer: Versandarten + Bilder nebeneinander -->
-<div class="flex flex-row gap-6 w-full mt-4">
 
-
-  <div id="shippingGroup" class="w-fit rounded-xl border border-gray-700 p-4">
+ <!-- Obercontainer: Versandarten + Bilder nebeneinander -->
+<div class="flex flex-row gap-6 w-full mt-4 items-stretch">
+  <!-- Versandoptionen -->
+  <div id="shipping_options" class="w-fit rounded-xl border border-gray-700 p-4 flex-shrink-0 overflow-y-auto max-h-[400px]">
     <label class="font-bold">Versandarten:</label><br />
+
     <label class="underline mt-3 block text-gray-300">Small</label>
-    <label><input type="checkbox" value="DHL_2"/> DHL 2 kg</label><br />
-    <label><input type="checkbox" value="Hermes_S" /> Hermes S</label><br />
+    <label><input type="checkbox" value="DHL_2" data-group="small" /> DHL 2 kg</label><br />
+    <label><input type="checkbox" value="Hermes_S" data-group="small" /> Hermes S</label><br />
+
     <label class="underline mt-4 block text-gray-300">Medium</label>
-    <label><input type="checkbox" value="DHL_5" /> DHL 5 kg</label><br />
-    <label><input type="checkbox" value="Hermes_M" /> Hermes M</label><br />
+    <label><input type="checkbox" value="DHL_5" data-group="medium" /> DHL 5 kg</label><br />
+    <label><input type="checkbox" value="Hermes_M" data-group="medium" /> Hermes M</label><br />
+
     <label class="underline mt-4 block text-gray-300">Large</label>
-    <label><input type="checkbox" value="DHL_10" /> DHL 10 kg</label><br />
-    <label><input type="checkbox" value="Hermes_L" /> Hermes L</label><br />
-    <label class="mt-3 block">
-      <input type="checkbox" class="mr-2" id="Cb_DirectSell" /> Direktverkauf
-    </label>
+    <label><input type="checkbox" value="DHL_10" data-group="large" /> DHL 10 kg</label><br />
+    <label><input type="checkbox" value="Hermes_L" data-group="large" /> Hermes L</label><br />
   </div>
 
-    <!-- Inhalt: links Upload + Vorschau, rechts Buttons -->
-  <div id="pictures" class="basis-3/4 flex flex-col border border-gray-700 rounded-xl p-4">
-    <label for="Images" class="font-bold mb-2 text-gray-200">Bilder:</label>
+  <!-- Versandgruppen-Logik -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const checkboxes = document.querySelectorAll("#shipping_options input[type='checkbox']");
+      checkboxes.forEach(cb => {
+        cb.addEventListener("change", e => {
+          if (e.target.checked) {
+            const group = e.target.dataset.group;
+            checkboxes.forEach(other => {
+              if (other.dataset.group !== group) other.checked = false;
+            });
+          }
+        });
+      });
+    });
+  </script>
 
-    <div class="flex flex-row gap-4 items-start">
-      <!-- Linke Seite -->
-      <div class="flex flex-col w-2/3">
-        <input type="file" id="Images" name="Lb_Images"  accept="image/jpeg,image/png"  multiple
-          class="w-fit text-sm text-gray-300 mb-2 file:mr-2 file:px-3 file:py-1 
-                 file:rounded file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700" />
+  <!-- Bilderbereich -->
+  <div id="pictures" class="basis-3/4 flex flex-col border border-gray-700 rounded-xl p-4">
+  <label for="Images" class="font-bold mb-2 text-white">Bilder:</label>
+
+  <div class="flex flex-row gap-4 items-start h-full">
+    <!-- Linke Seite -->
+    <div class="flex flex-col w-1/3">
+      <input type="file" id="Images" name="Images" accept="image/jpeg,image/png" multiple
+        class="w-fit text-sm text-white mb-2 file:mr-2 file:px-3 file:py-1 
+               file:rounded file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700" />
 
         <ul id="imageList"
-            class="flex flex-wrap gap-2 border border-gray-600 rounded-lg p-2 min-h-[80px] 
-                   max-h-24 overflow-y-auto bg-gray-800 text-gray-400 text-sm">
-          <li class="italic">Keine Bilder ausgewählt...</li>
+            class="border border-gray-700 rounded-lg p-2 text-sm text-white 
+                bg-gray-800 min-h-[8px] max-h-[200px] overflow-y-auto overflow-x-hidden 
+                box-border">
+        <li class="italic text-gray-300">Keine Bilder ausgewählt...</li>
         </ul>
-      </div>
-
-      <!-- Rechte Seite -->
-      <form class="flex flex-col gap-2 w-1/3">
-        <button type="button" id="uploadButton" onclick="app.upload_images()"
-          class="px-3 py-2 bg-gradient-to-r from-orange-600 to-red-600 
-                 text-white rounded-lg hover:from-orange-700 hover:to-red-700 text-sm">
-          Bilder auswählen
-        </button>
-         <ul id="uploadResult" class="text-gray-300 mt-3"></ul>
-        <button type="button" id="save_adfile" onclick="app.saveAdFile()"
-          class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
-          Anzeige speichern
-        </button>
-        <button type="button" id="load_adfile"
-          class="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm">
-          Anzeige laden
-        </button>
-        <button type="button" id="clear_adfile"
-          class="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm">
-          Formular leeren
-        </button>
-      </form>
     </div>
+
+    <!-- Rechte Seite -->
+    <form class="flex flex-col gap-2 w-2/3">
+      <button type="button" id="uploadButton" onclick="app.loadThumbnails('title')"
+        class="px-3 py-2 bg-gradient-to-r from-orange-600 to-red-600 
+               text-white rounded-lg hover:from-orange-700 hover:to-red-700 text-sm">
+        Bilder Vorschau
+      </button>
+      <button type="button" id="save_adfile" onclick="app.saveAdFile()"
+        class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+        Anzeige speichern
+      </button>
+      <button type="button" id="load_adfile" onclick="app.loadAdFile()"
+        class="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm">
+        Anzeige laden
+      </button>
+      <button type="button" id="clear_adfile"
+        class="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm">
+        Formular leeren
+      </button>
+    </form>
   </div>
 </div>
-
-
-
-
-
-  <h3>Gespeicherte Anzeigen</h3>
-  <select id="Lb_AdsList" size="5"></select>
-  <button type="button" id="Bt_DeleteAd">Ausgewählte löschen</button>
-
-  <div id="adDetails" style="margin-top:20px;">
-    <h4>Anzeige Details</h4>
-    <p>ID: <span id="Lb_kaIdValue">-</span></p>
-    <p>Erstellt am: <span id="Lb_kaCreatedValue">-</span></p>
-    <p>Geändert am: <span id="Lb_kaUpdatedValue">-</span></p>
-    <p>Content Hash: <span id="Lb_contentHashValue">-</span></p>
-  </div>
 </div>
-
-<script>
-  // Beispielhafte Logik für Bildanzeige
-  document.getElementById("Lb_Images").addEventListener("change", function (e) {
-    const list = document.getElementById("imageList");
-    list.innerHTML = "";
-    Array.from(e.target.files).forEach(file => {
-      const li = document.createElement("li");
-      li.textContent = file.name;
-      list.appendChild(li);
-    });
-  });
-
-  document.getElementById("Bt_ClearForm").addEventListener("click", function () {
-    document.getElementById("adForm").reset();
-    document.getElementById("imageList").innerHTML = "";
-  });
-</script>
-
-
+       <div id="adsFileList" class="mb-6 bg-gray-800 rounded-xl p-4 border border-gray-700">
+                    <h3 class="text-lg font-semibold mb-2 text-white">Vorlagen auswählen:</h3>
+                    <div id="adsFileContainer" class="space-y-1 text-white">
+                        <!-- AD list will be placed here -->
+                    </div>
+     </div>
+</div>
 </div>
 <!-- ================= END FORM2 SECTION ================= -->
 

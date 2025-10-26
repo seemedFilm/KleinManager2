@@ -8,6 +8,8 @@ function setStatus(msg) {
     console.log(`${msg}`);
 }
 
+
+
 function appendLog(msg) {
     const logBox = document.getElementById("kabotLog");
     if (logBox) {
@@ -23,14 +25,16 @@ class KleinanzeigenManager extends KleinManagerCore {
         super();
         this.adsFiles = [];
         setInterval(() => this.updateContainerStatus(), 3000);
-        const poll = setInterval(() => {
-        const section = document.getElementById("Ka-Bot");
-        if (section && !section.classList.contains("hidden")) {
-            this.updateContainerStatus();
-        }
-        }, 3000);
+        // const poll = setInterval(() => {
+        // const section = document.getElementById("Ka-Bot");
+        // if (section && !section.classList.contains("hidden")) {
+        //     this.updateContainerStatus();
+        // }
+        // }, 3000);
     }
-
+    loadKaBot() {
+        console.log("Ka-Bot geladen");
+    }
     async refreshAds(htmlElementId = "dummy") {
         try {
             const container = document.getElementById("adsFileContainer");

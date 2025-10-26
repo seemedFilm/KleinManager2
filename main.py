@@ -18,6 +18,7 @@ from app.services.background_tasks import background_task_manager
 from app.api.load_ads import router as load_ads
 from app.api.routes_bot import router as bot
 from app.api.adbuilder import router as adbuilder
+from app.api.adbuilder import mount_images
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -56,7 +57,7 @@ app.include_router(router)
 app.include_router(load_ads, prefix="/api/v1", tags=["ads"])
 app.include_router(bot, prefix="/api/v1", tags=["bot"])
 app.include_router(adbuilder, prefix="/api/v1", tags=["adbuilder"])
-
+mount_images(app)
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):

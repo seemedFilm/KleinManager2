@@ -1,12 +1,13 @@
 from fastapi import APIRouter, FastAPI, Request, UploadFile, File, Form
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 import shutil
 import json
 import os
+import re
 
 router = APIRouter()
-app = FastAPI()
 
 SHARED_ADS = Path(os.getenv("SHARED_ADS"))
 SHARED_PICS = Path(os.getenv("SHARED_PIC"))
@@ -54,21 +55,45 @@ async def upload_images(
     title: str = Form(...),
     files: list[UploadFile] = File(...)
 ):
-    print(f"Uploading images for ad title: {title}")
-    print(f"Number of files received: {files}")
-    ad_directory = SHARED_PICS / title
+    safe_title = re.sub(r'[^a-zA-Z0-9_\-]', '_', title)
+    
+    ad_directory = SHARED_PICS / safe_title
     ad_directory.mkdir(parents=True, exist_ok=True)
     saved_images = []
-    print(f"saved_images initialized: {saved_images}")
+    if len(files) > 16:
+        return JSONResponse({"error": "Maximal 16 Bilder erlaubt!"}, status_code=400)
+
     for file in files:
         file_path = ad_directory / file.filename
-
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
-
         saved_images.append(file.filename)
 
+    print(f"✅ {len(saved_images)} Bilder gespeichert unter {ad_directory}")
+
     return JSONResponse({
-        "images": saved_images,
-        "ad_directory": str(ad_directory)
-        })
+        "uploaded": saved_images,
+        "target_dir": str(ad_directory)
+    })
+def mount_images(app):
+    app.mount("/ads/pics", StaticFiles(directory=str(SHARED_PICS)), name="ads_pics")
+    
+@router.get("/adbuilder/images")
+async def list_images(title: str):
+    safe_title = re.sub(r'[^a-zA-Z0-9_\-]', '_', title)
+    ad_dir = SHARED_PICS / safe_title
+
+    if not ad_dir.exists():
+        return JSONResponse({"images": []})
+
+    # Nur Bilddateien auflisten (jpg, jpeg, png, webp)
+    valid_ext = [".jpg", ".jpeg", ".png", ".webp"]
+    files = [
+        f.name for f in ad_dir.iterdir()
+        if f.is_file() and f.suffix.lower() in valid_ext
+    ]
+
+    return JSONResponse({
+        "title": safe_title,
+        "images": files
+    })
