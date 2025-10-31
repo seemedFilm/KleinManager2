@@ -8,8 +8,6 @@ function setStatus(msg) {
     console.log(`${msg}`);
 }
 
-
-
 function appendLog(msg) {
     const logBox = document.getElementById("kabotLog");
     if (logBox) {
@@ -24,7 +22,8 @@ class KleinanzeigenManager extends KleinManagerCore {
     constructor() {
         super();
         this.adsFiles = [];
-        setInterval(() => this.updateContainerStatus(), 3000);
+        //setInterval(() => this.updateContainerStatus(), 3000);
+
         // const poll = setInterval(() => {
         // const section = document.getElementById("Ka-Bot");
         // if (section && !section.classList.contains("hidden")) {
@@ -32,17 +31,17 @@ class KleinanzeigenManager extends KleinManagerCore {
         // }
         // }, 3000);
     }
-    loadKaBot() {
+    async loadKaBot() {
         console.log("Ka-Bot geladen");
     }
-    async refreshAds(htmlElementId = "dummy") {
+    async refreshAds2(htmlElementId = "dummy") {
         try {
             const container = document.getElementById("adsFileContainer");
             if (!container) return;
 
             setStatus("Reloading Ads...");
-            const response = await fetch("/api/v1/ads/files", { 
-                method: "GET" 
+            const response = await fetch("/api/v1/ads/files", {
+                method: "GET"
             });
             const data = await response.json();
 
@@ -79,9 +78,8 @@ class KleinanzeigenManager extends KleinManagerCore {
                 "<p class='text-red-400'>Fehler beim Laden der Dateien.</p>";
         }
     }
-
     async startContainer(htmlElementId = "dummy") {
-     
+
 
         try {
             setStatus("Starting container ...");
@@ -91,7 +89,7 @@ class KleinanzeigenManager extends KleinManagerCore {
 
             const response = await fetch(`/api/v1/bot/start`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },                
+                headers: { "Content-Type": "application/json" },
             });
 
             const data = await response.json();
@@ -104,14 +102,14 @@ class KleinanzeigenManager extends KleinManagerCore {
                 appendLog("Container started.");
                 icon.style.color = "limegreen";
                 icon.className = "fas fa-play text-lg mr-3";
-                
+
             }
         } catch (err) {
             setStatus(`Error: ${err}`);
         }
     }
     async stopContainer() {
-        
+
         try {
             appendLog("Stopping container...");
             const icon = document.getElementById("startButton");
@@ -120,12 +118,12 @@ class KleinanzeigenManager extends KleinManagerCore {
 
             const response = await fetch(`/api/v1/bot/stop`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },                
+                headers: { "Content-Type": "application/json" },
             });
 
             const data = await response.json();
             if (data.error) {
-                setStatus(`Error: ${data.error}`);                
+                setStatus(`Error: ${data.error}`);
             } else {
                 appendLog(`Container stopped (ID: ${data.container_id || "?"})`);
                 icon.style.color = "red";
@@ -147,24 +145,25 @@ class KleinanzeigenManager extends KleinManagerCore {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ kaparameter: kaparameter }),
             });
-              const data = await response.json();
+            const data = await response.json();
 
-        if (data.error) {
-            setStatus(`Error: ${data.error}`);
-        } else {
-            appendLog(`Bot started.`);
-            appendLog(data.output || "No logs received.");
-        }
+            if (data.error) {
+                setStatus(`Error: ${data.error}`);
+            } else {
+                appendLog(`Bot started.`);
+                appendLog(data.output || "No logs received.");
+            }
         } catch (err) {
             setStatus(`Error: ${err}`);
         }
     }
     async stopCommand() {
-       
+
         try {
             setStatus("Stopping container...");
-            const response = await fetch(`/api/v1/bot/stopCommand`, { 
-                method: "POST" },
+            const response = await fetch(`/api/v1/bot/stopCommand`, {
+                method: "POST"
+            },
             );
             const data = await response.json();
 
@@ -177,30 +176,30 @@ class KleinanzeigenManager extends KleinManagerCore {
             setStatus(`Error: ${err}`);
         }
     }
-async updateContainerStatus() {
-    const icon = document.getElementById("startButton");
-    if (!icon) return;
+    async updateContainerStatus() {
+        const icon = document.getElementById("startButton");
+        if (!icon) return;
 
-    try {
-        const response = await fetch("/api/v1/bot/status");
-        console.log("updateContainerStatus")
-        const data = await response.json();
-        const status = data.status;
+        try {
+            const response = await fetch("/api/v1/bot/status");
+            console.log("updateContainerStatus")
+            const data = await response.json();
+            const status = data.status;
 
-        if (status === "running") {
-            icon.style.color = "limegreen";
-            icon.className = "fas fa-play text-lg mr-3";
-        } else if (status === "exited" || status === "not_found") {
-            icon.style.color = "red";
-            icon.className = "fas fa-stop text-lg mr-3";
-        } else {
-            icon.style.color = "orange";
-            icon.className = "fas fa-spinner fa-spin text-lg mr-3";
+            if (status === "running") {
+                icon.style.color = "limegreen";
+                icon.className = "fas fa-play text-lg mr-3";
+            } else if (status === "exited" || status === "not_found") {
+                icon.style.color = "red";
+                icon.className = "fas fa-stop text-lg mr-3";
+            } else {
+                icon.style.color = "orange";
+                icon.className = "fas fa-spinner fa-spin text-lg mr-3";
+            }
+
+        } catch (err) {
+            console.error(`Could not retrieve container status ${err}`);
+            icon.style.color = "gray";
         }
-
-    } catch (err) {
-        console.error(`Could not retrieve container status ${err}`);
-        icon.style.color = "gray";
     }
-}
 }

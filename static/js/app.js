@@ -9,7 +9,7 @@ class KaBot {
     }
 
     this.adsFileContainer = document.getElementById("adsFileContainer");
-    app.refreshAds();
+    //app.refreshAds();
 
 }
 

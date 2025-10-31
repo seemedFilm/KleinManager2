@@ -19,6 +19,7 @@ from app.api.load_ads import router as load_ads
 from app.api.routes_bot import router as bot
 from app.api.adbuilder import router as adbuilder
 from app.api.adbuilder import mount_images
+from pathlib import Path
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -49,6 +50,8 @@ app = FastAPI(
 # Static files
 static_dir = os.path.join(base_path, "static")
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
+SHARED_PICS = Path(os.getenv("SHARED_PIC", "/mnt/ads/pics"))
+app.mount("/ads/pics", StaticFiles(directory=str(SHARED_PICS)), name="ads_pics")
 
 # Templates
 templates = Jinja2Templates(directory=os.path.join(base_path, "templates"))
