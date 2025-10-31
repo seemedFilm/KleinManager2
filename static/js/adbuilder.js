@@ -3,20 +3,86 @@ class Adbuilder extends KleinManagerCore {
         super();
         this.refreshAds();
         this.clearAdForm();
+        this.customTranslations = {
+            en: {
+                title: "Title",
+                description: "Description",
+                category: "Category",
+                price: "Price (€)",
+                priceType: "Price Type",
+                shipping: "Shipping Options",
+                save: "Save",
+                load: "Load",
+                clear: "Clear",
+                preview: "Preview",
+                alert_noTitle: "Please enter a title!",
+                alert_saved: "Ad saved successfully!",
+                info_loadCategory: "Category loaded"
+            },
+            de: {
+                title: "Titel",
+                description: "Beschreibung",
+                category: "Kategorie",
+                price: "Preis (€)",
+                priceType: "Preistyp",
+                shipping: "Versandoptionen",
+                save: "Speichern",
+                load: "Laden",
+                clear: "Leeren",
+                preview: "Vorschau",
+                alert_noTitle: "Bitte einen Titel eingeben!",
+                alert_saved: "Anzeige erfolgreich gespeichert!",
+                info_loadCategory: "Kategorie geladen"
+            }
+        };
+
+        // Sprache aus localStorage lesen
+        this.currentLang = localStorage.getItem("language") || "en";
+
+        // Observer für Sprachwechsel registrieren
+        document.addEventListener("languageChanged", () => this.applyAdbuilderTranslations());
     }
-    
+   
+    applyAdbuilderTranslations() {
+        const t = this.customTranslations[this.currentLang];
+
+        const elements = {
+            titleLabel: document.querySelector("label[for='title']"),
+            descriptionLabel: document.querySelector("label[for='description']"),
+            categoryLabel: document.querySelector("label[for='category']"),
+            priceLabel: document.querySelector("label[for='price']"),
+            priceTypeLabel: document.querySelector("label[for='price_type']"),
+            shippingLabel: document.querySelector("#shipping_options label.font-bold"),
+            saveButton: document.querySelector("#save_adfile"),
+            loadButton: document.querySelector("#load_adfile"),
+            clearButton: document.querySelector("#clear_adfile"),
+            previewButton: document.querySelector("#uploadButton"),
+        };
+
+        if (elements.titleLabel) elements.titleLabel.textContent = t.title;
+        if (elements.descriptionLabel) elements.descriptionLabel.textContent = t.description;
+        if (elements.categoryLabel) elements.categoryLabel.textContent = t.category;
+        if (elements.priceLabel) elements.priceLabel.textContent = t.price;
+        if (elements.priceTypeLabel) elements.priceTypeLabel.textContent = t.priceType;
+        if (elements.shippingLabel) elements.shippingLabel.textContent = t.shipping;
+
+        if (elements.saveButton) elements.saveButton.textContent = t.save;
+        if (elements.loadButton) elements.loadButton.textContent = t.load;
+        if (elements.clearButton) elements.clearButton.textContent = t.clear;
+        if (elements.previewButton) elements.previewButton.textContent = t.preview;
+    }
 
     loadAdBuilder() {
         console.log("AdBuilder geladen");
+        this.applyAdbuilderTranslations();
         this.loadCategories();
-
     }
 
     async loadCategories() {
         const categorySelect = document.getElementById("category");
         const res = await fetch("/api/v1/adbuilder/categories", { method: "GET" });
         const data = await res.json();
-
+        console.log(this.customTranslations[this.currentLang].info_loadCategory);
         categorySelect.innerHTML = "";
         if (data.error) {
             console.error("Error fetching categories:", data.error);
