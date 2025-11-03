@@ -12,6 +12,7 @@ class Adbuilder extends KleinManagerCore {
                 category: "Category",
                 price: "Price (€)",
                 priceType: "Price Type",
+                sell_directly: "Sell Directly",
                 shipping: "Shipping Options",
                 save: "Save",
                 load: "Load",
@@ -42,7 +43,8 @@ class Adbuilder extends KleinManagerCore {
                 category: "Kategorie",
                 price: "Preis (€)",
                 priceType: "Preistyp",
-                shipping: "Versandoptionen",
+                sell_directly: "Sofortkauf",
+                shipping: "Versandoptionen:",
                 save: "Speichern",
                 load: "Laden",
                 clear: "Leeren",
@@ -85,6 +87,7 @@ class Adbuilder extends KleinManagerCore {
             categoryLabel: document.querySelector("label[for='category']"),
             priceLabel: document.querySelector("label[for='price']"),
             priceTypeLabel: document.querySelector("label[for='price_type']"),
+            sell_directlyLabel: document.querySelector("label[for='sell_directly']"),
             shippingLabel: document.querySelector("#shipping_options label.font-bold"),
             saveButton: document.querySelector("#save_adfile"),
             loadButton: document.querySelector("#load_adfile"),
@@ -97,6 +100,7 @@ class Adbuilder extends KleinManagerCore {
         if (elements.categoryLabel) elements.categoryLabel.textContent = t.category;
         if (elements.priceLabel) elements.priceLabel.textContent = t.price;
         if (elements.priceTypeLabel) elements.priceTypeLabel.textContent = t.priceType;
+        if (elements.sell_directlyLabel) elements.sell_directlyLabel.textContent = t.sell_directly;
         if (elements.shippingLabel) elements.shippingLabel.textContent = t.shipping;
 
         if (elements.saveButton) elements.saveButton.textContent = t.save;
@@ -648,3 +652,136 @@ document.addEventListener("DOMContentLoaded", () => {
         app.copyMethodsFromManager(app.adbuilder);
     }
 });
+// === Erweiterung der Sprachumschaltung (Kompatibel mit core.js) ===
+document.addEventListener("DOMContentLoaded", () => {
+    if (window.app && typeof app.toggleLanguage === "function") {
+        // Originalfunktion mit korrektem Kontext sichern
+        const originalToggleLanguage = app.toggleLanguage.bind(app);
+
+        // Neue Wrapperfunktion definieren
+        app.toggleLanguage = function() {
+            // 1️⃣ Originale Sprachumschaltung korrekt ausführen
+            originalToggleLanguage();
+
+            // 2️⃣ Event auslösen, damit andere Module (wie Adbuilder) reagieren
+            document.dispatchEvent(new Event("languageChanged"));
+
+            // 3️⃣ Adbuilder-Übersetzungen aktualisieren
+            if (app.adbuilder && typeof app.adbuilder.applyAdbuilderTranslations === "function") {
+                app.adbuilder.applyAdbuilderTranslations();
+            }
+
+            console.log("🌐 Sprache gewechselt → Seite & Adbuilder aktualisiert");
+        };
+    } else {
+        console.warn("⚠️ app.toggleLanguage() wurde nicht gefunden");
+    }
+});
+
+// === Eigene i18n-Logik nur für den Adbuilder ===
+class AdbuilderTranslator {
+    constructor() {
+        this.lang = localStorage.getItem("language") || "en";
+        this.translations = {
+            en: {
+                "adbuilder.formTitle":"Create Ad",
+                "adbuilder.title": "Title",
+                "adbuilder.description": "Description",
+                "adbuilder.category": "Category",
+                "adbuilder.price": "Price (€)",
+                "adbuilder.priceType": "Price Type:",
+                "adbuilder.priceType.default": "---select---",
+                "adbuilder.priceType.negotiable": "Negotiable",
+                "adbuilder.priceType.fixed": "Fixed",
+                "adbuilder.priceType.giveaway": "Giveaway",
+                "adbuilder.sell_directly": "Sell Directly",
+                "adbuilder.shipping": "Shipping Options:",
+                "adbuilder.shipping_type.default":"---select---",
+                "adbuilder.shipping_type.pickup":"Pickup",
+                "adbuilder.shipping_type.shipping":"Shipping",
+                "adbuilder.shipping_type.not-applicable":"Not Applicable",
+                "adbuilder.actions.save": "Save",
+                "adbuilder.actions.load": "Load",
+                "adbuilder.actions.clear": "Clear",
+                "adbuilder.actions.preview": "Preview",
+                "adbuilder.images": "Images:",
+                "adbuilder.noImages":"No pictures selected",
+                "adbuilder.templates":"Select template:",
+            },
+            de: {
+                "adbuilder.formTitle":"Erstelle Anzeige",
+                "adbuilder.title": "Titel",
+                "adbuilder.description": "Beschreibung",
+                "adbuilder.category": "Kategorie",
+                "adbuilder.price": "Preis (€)",
+                "adbuilder.priceType": "Preistyp:",
+                "adbuilder.priceType.default": "---Auswählen---",
+                "adbuilder.priceType.negotiable": "Verhandlungsbasis",
+                "adbuilder.priceType.fixed": "Festpreis",
+                "adbuilder.priceType.giveaway": "Zu Verschenken",
+                "adbuilder.sell_directly": "Sofortkauf",
+                "adbuilder.shipping": "Versandoptionen:",
+                "adbuilder.shipping_type.default":"---Auswählen---",
+                "adbuilder.shipping_type.pickup":"Abholung",
+                "adbuilder.shipping_type.shipping":"Versand",
+                "adbuilder.shipping_type.not-applicable":"Keine Angabe",
+                "adbuilder.actions.save": "Speichern",
+                "adbuilder.actions.load": "Laden",
+                "adbuilder.actions.clear": "Leeren",
+                "adbuilder.actions.preview": "Vorschau",
+                "adbuilder.images": "Bilder:",
+                 "adbuilder.noImages":"Keine Bilder ausgewählt",
+                 "adbuilder.templates":"Vorlage auswählen:",
+            }
+        };
+    }
+
+    // Sprache umschalten
+    toggleLanguage() {
+        this.lang = this.lang === "en" ? "de" : "en";
+        localStorage.setItem("language", this.lang);
+        this.applyTranslations();
+        this.updateLangIndicator();
+    }
+
+    // Übersetzungen anwenden
+    applyTranslations() {
+        const dict = this.translations[this.lang];
+        document.querySelectorAll("[data-i18n]").forEach(el => {
+            const key = el.getAttribute("data-i18n");
+            if (dict[key]) el.textContent = dict[key];
+        });
+        document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+            const key = el.getAttribute("data-i18n-placeholder");
+            if (dict[key]) el.placeholder = dict[key];
+        });
+    }
+
+    // Sprachkürzel im Button aktualisieren (optional)
+    updateLangIndicator() {
+        const indicator = document.getElementById("currentLang");
+        if (indicator) indicator.textContent = this.lang.toUpperCase();
+    }
+}
+function initAdbuilderTranslator() {
+    if (window.adbuilderTranslator) return; // Doppelte Init vermeiden
+    window.adbuilderTranslator = new AdbuilderTranslator();
+    adbuilderTranslator.applyTranslations();
+
+    const langButton = document.querySelector("button[onclick='app.toggleLanguage()']");
+    if (langButton) {
+        langButton.addEventListener("click", e => {
+            e.preventDefault();
+            adbuilderTranslator.toggleLanguage();
+        });
+    }
+
+    console.log("🈶 Adbuilder-Übersetzer initialisiert:", adbuilderTranslator.lang);
+}
+
+// Wenn DOM schon geladen ist → direkt starten
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initAdbuilderTranslator);
+} else {
+    initAdbuilderTranslator();
+}
