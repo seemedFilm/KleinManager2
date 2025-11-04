@@ -191,7 +191,7 @@ class KleinManager extends KleinManagerCore {
 
         if (section === 'dashboard') this.loadDashboard();
         else if (section === 'ka-bot') this.loadKaBot();
-        else if (section === 'adbuilder') this.loadAdBuilder();
+        // else if (section === 'adbuilder') this.loadAdBuilder();
         else if (section === 'orders') this.loadOrders();
         else if (section === 'watcher') this.loadWatchedItems();
         else if (section === 'tracking') this.loadTracking();

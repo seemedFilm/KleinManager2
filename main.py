@@ -50,8 +50,19 @@ app = FastAPI(
 # Static files
 static_dir = os.path.join(base_path, "static")
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
+# Ad files
 SHARED_PICS = Path(os.getenv("SHARED_PIC", "/mnt/ads/pics"))
 app.mount("/ads/pics", StaticFiles(directory=str(SHARED_PICS)), name="ads_pics")
+# Mount für dein Addon (HTML, JS, CSS)
+addon_path = "/app/addons/adbuilder"
+app.mount("/addons/adbuilder", StaticFiles(directory=addon_path), name="adbuilder")
+# Route für das Haupt-HTML deines Addons (falls direkt geladen werden soll)
+@app.get("/addons/adbuilder/adbuilder.html")
+def serve_adbuilder_html():
+    file_path = os.path.join(addon_path, "adbuilder.html")
+    if os.path.exists(file_path):
+        return FileResponse(file_path, media_type="text/html")
+    return {"detail": "adbuilder.html not found"}
 
 # Templates
 templates = Jinja2Templates(directory=os.path.join(base_path, "templates"))

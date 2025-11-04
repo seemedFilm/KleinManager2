@@ -14,10 +14,14 @@ ENV APP_VERSION=$APP_VERSION
 ENV BRANCH_NAME=$BRANCH_NAME
 
 COPY . /app
-RUN mkdir -p /app/ads 
+RUN mkdir -p /app/ads
+RUN mkdir -p /app/addons/adbuilder
+COPY app/addons/adbuilder /app/addons/adbuilder
 
 RUN pip install -r /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
+
+
 
 WORKDIR /app
 
