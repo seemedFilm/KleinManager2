@@ -1,93 +1,12 @@
 class Adbuilder extends KleinManagerCore {
     constructor() {
         super();
-
-        // config
-        this.maxPictures = 16;
-        this.currentLang = localStorage.getItem("language") || "en";
-
-        // translations used as fallback for elements not using data-i18n
-        const maxPictures = this.maxPictures;
-        this.customTranslations = {
-            en: {
-                title: "Title",
-                description: "Description",
-                category: "Category",
-                price: "Price (€)",
-                priceType: "Price Type",
-                sell_directly: "Sell Directly",
-                shipping: "Shipping Options",
-                save: "Save",
-                load: "Load",
-                clear: "Clear",
-                preview: "Preview",
-                alert_noTitle: "Please enter a title!",
-                alert_saved: "Ad saved successfully!",
-                errorCategory: "Error on category loading:",
-                noCategory: "No Categories found.",
-                maxPictures: `Only ${maxPictures} Pictures allowed`,
-                pictures: "Pictures saved in",
-                errorUpload: "Error during the upload",
-                infoImageList: "Imagelist successfully updated",
-                errorAdLoading: "Error during the ad loading",
-                infoThumbnail: "Pictures and thumbnails updated successfully",
-                errorThumbnail: "Thumbnail loading error:",
-                noPictures: "No Pictures found",
-                loadPictures: "saved picture(s) loaded into the list",
-                noPreview: "No preview available",
-                noPicturesSel: "No Pictures selected",
-                loadThumbnail: "thumbnail(s) loaded",
-                minPicture: "Please select at least one picture to upload!",
-                loadPreview: "Loading Preview",
-                infoFormReset: "Form reset",
-                infoCategories: "Categories loaded",
-                infoImThumb: "Image thumbnails processed",
-                infoNoAds: "No ads found",
-                loadAdFile: "Ad files loaded",
-            },
-            de: {
-                title: "Titel",
-                description: "Beschreibung",
-                category: "Kategorie",
-                price: "Preis (€)",
-                priceType: "Preistyp",
-                sell_directly: "Sofortkauf",
-                shipping: "Versandoptionen:",
-                save: "Speichern",
-                load: "Laden",
-                clear: "Leeren",
-                preview: "Vorschau",
-                alert_noTitle: "Bitte einen Titel eingeben!",
-                alert_saved: "Anzeige erfolgreich gespeichert!",
-                errorCategory: "Fehler beim Kategorie laden:",
-                noCategory: "Keine Kategorien gefunden.",
-                maxPictures: `Nur ${maxPictures} Bilder sind erlaubt`,
-                pictures: "Bilder gespeichert in",
-                errorUpload: "Fehler beim Upload",
-                infoImageList: "Bilder Liste aktualisiert.",
-                errorAdLoading: "Fehler beim Anzeige laden",
-                infoThumbnail: "Bilder und Vorschaubilder geladen.",
-                errorThumbnail: "Laden Thumbnails Fehler",
-                noPictures: "Keine Bilder gefunden",
-                loadPictures: "Bild(er) in die Liste geladen",
-                noPreview: "Keine Vorschau verfügbar",
-                noPicturesSel: "Keine Bilder ausgewählt",
-                loadThumbnail: "Thumbnail(s) geladen",
-                minPicture: "Mindestens ein Bild zum Hochladen auswählen",
-                loadPreview: "Lade Vorschau",
-                infoFormReset: "Formular zurückgesetzt",
-                infoCategories: "Kategorien geladen",
-                infoImThumb: "Thumbnails verarbeitet",
-                infoNoAds: "Keine Anzeigen gefunden",
-                loadAdFile: "Anzeigen-Dateien geladen",
-            }
-        };
-
-        // react to app language change event if fired
+        const maxPictures = 16;
         document.addEventListener("languageChanged", () => {
             this.currentLang = localStorage.getItem("language") || this.currentLang;
             this.applyAdbuilderTranslations();
         });
+
     }
 
     /* -------------------------
@@ -124,35 +43,33 @@ class Adbuilder extends KleinManagerCore {
     }
 
     applyAdbuilderTranslations() {
-        const t = this.customTranslations[this.currentLang] || this.customTranslations.en;
-        // fallback for elements that don't use data-i18n but we still want translated text
-        const map = [
-            { selector: "label[for='title']", key: "title" },
-            { selector: "label[for='description']", key: "description" },
-            { selector: "label[for='category']", key: "category" },
-            { selector: "label[for='price']", key: "price" },
-            { selector: "label[for='price_type']", key: "priceType" },
-            { selector: "label[for='sell_directly']", key: "sell_directly" },
-            { selector: "#shipping_options label.font-bold", key: "shipping" },
-            { selector: "#save_adfile", key: "save" },
-            { selector: "#load_adfile", key: "load" },
-            { selector: "#clear_adfile", key: "clear" },
-            { selector: "#uploadButton", key: "preview" },
-        ];
-        map.forEach(m => {
-            const el = document.querySelector(m.selector);
-            if (el && t[m.key]) el.textContent = t[m.key];
+        // Prüfe, ob der Translator existiert
+        if (!window.adbuilderTranslator) {
+            console.warn("⚠️  Kein AdbuilderTranslator gefunden – keine Übersetzungen angewendet.");
+            return;
+        }
+
+        const dict = adbuilderTranslator.translations[adbuilderTranslator.lang]
+            || adbuilderTranslator.translations.en
+            || {};
+
+        // Übersetze alle data-i18n-Elemente
+        document.querySelectorAll("[data-i18n]").forEach(el => {
+            const key = el.getAttribute("data-i18n");
+            let keyArray = key.split(".")
+            if (keyArray[0] == "adbuilder") {
+                if (dict[key]) {
+                    el.textContent = dict[key];
+                } else {
+
+                    console.log(`ℹ️  Kein data-i18n-Key "${keyArray[0]} - ${keyArray[1]}" in Übersetzungstabellen gefunden.`);
+                }
+            }
         });
 
-        // placeholders
-        const placeholderMap = [
-            { selector: "#title", key: "title" }
-        ];
-        placeholderMap.forEach(p => {
-            const el = document.querySelector(p.selector);
-            if (el && t[p.key]) el.placeholder = t[p.key];
-        });
+        console.log("🈶 Adbuilder-Übersetzungen aktiv (via Translator):", adbuilderTranslator?.lang || "en");
     }
+
 
     /* -------------------------
        UI wiring (events)
@@ -205,6 +122,9 @@ class Adbuilder extends KleinManagerCore {
        Categories / ad files
        ------------------------- */
     async loadCategories() {
+        const t = window.adbuilderTranslator
+            ? adbuilderTranslator.translations[adbuilderTranslator.lang]
+            : {};
         const categorySelect = document.getElementById("category");
         if (!categorySelect) return;
         try {
@@ -212,12 +132,12 @@ class Adbuilder extends KleinManagerCore {
             const data = await res.json();
             categorySelect.innerHTML = "";
             if (data.error) {
-                console.error(this.customTranslations[this.currentLang].errorCategory, data.error);
+                console.error(t["adbuilder.errorCategory"] || `Category loading error: ${data.error}`);
                 return;
             }
             if (!Array.isArray(data.categories) || data.categories.length === 0) {
-                console.warn(this.customTranslations[this.currentLang].noCategory);
-                categorySelect.innerHTML = `<option value="">${this.customTranslations[this.currentLang].noCategory}</option>`;
+                console.warn(t["adbuilder.noCategory"] || "No categories found.");
+                categorySelect.innerHTML = `<option value="">${t["adbuilder.noCategory"] || "No categories"}</option>`;
                 return;
             }
             data.categories.forEach(cat => {
@@ -226,13 +146,16 @@ class Adbuilder extends KleinManagerCore {
                 opt.textContent = cat;
                 categorySelect.appendChild(opt);
             });
-            console.log(this.customTranslations[this.currentLang].infoCategories);
+            console.log(t["adbuilder.infoCategories"] || "Categories loaded");
         } catch (err) {
-            console.error(this.customTranslations[this.currentLang].errorCategory, err);
+            console.error(t["adbuilder.errorCategory"] || "Category load failed:", err);
         }
     }
 
     async refreshAds() {
+        const t = window.adbuilderTranslator
+            ? adbuilderTranslator.translations[adbuilderTranslator.lang]
+            : {};
         try {
             const container = document.getElementById("adsFileContainer");
             if (!container) return;
@@ -240,7 +163,8 @@ class Adbuilder extends KleinManagerCore {
             const data = await res.json();
             container.innerHTML = "";
             if (!data.files || data.files.length === 0) {
-                container.innerHTML = `<p class='text-gray-400'>${this.customTranslations[this.currentLang].infoNoAds}</p>`;
+                container.innerHTML = `<p class='text-gray-400'>${t["adbuilder.infoNoAds"] || "No ads found"}</p>`;
+
                 return;
             }
             data.files.forEach((file, idx) => {
@@ -257,9 +181,9 @@ class Adbuilder extends KleinManagerCore {
                 label.appendChild(span);
                 container.appendChild(label);
             });
-            console.log(`${this.customTranslations[this.currentLang].loadAdFile}: ${data.files}`);
+            console.log(`${t["adbuilder.loadAdFile"] || "Ad files loaded"}: ${data.files}`);
         } catch (err) {
-            console.error("refreshAds error:", err);
+            console.error(`refreshAds error: ${err}`);
         }
     }
 
@@ -315,7 +239,6 @@ class Adbuilder extends KleinManagerCore {
             imageList.innerHTML = `<li class='italic text-red-400'>${this.customTranslations[this.currentLang].errorAdLoading}</li>`;
         }
     }
-
     updateImageListFromData(images = []) {
         const imageList = document.getElementById("imageList");
         if (!imageList) return;
@@ -333,7 +256,6 @@ class Adbuilder extends KleinManagerCore {
         });
         console.log(`${images.length} ${this.customTranslations[this.currentLang].loadPictures}`);
     }
-
     async showLocalThumbnails() {
         const input = document.getElementById("Images");
         const thumbsDiv = document.getElementById("thumbnails-container");
@@ -365,7 +287,6 @@ class Adbuilder extends KleinManagerCore {
         });
         console.log(`${input.files.length} ${this.customTranslations[this.currentLang].loadThumbnail}.`);
     }
-
     async loadThumbnails(title) {
         if (!title) return;
         const thumbsContainerId = "thumbnails-container";
@@ -405,7 +326,7 @@ class Adbuilder extends KleinManagerCore {
                 thumbsDiv.appendChild(img);
             });
         } catch (err) {
-            console.error(this.customTranslations[this.currentLang].errorThumbnail, err);
+            console.error(`${this.customTranslations[this.currentLang].errorThumbnail}: ${err}`);
             thumbsDiv.innerHTML = `<p class='text-red-400'>${this.customTranslations[this.currentLang].errorThumbnail}</p>`;
         }
     }
@@ -427,7 +348,7 @@ class Adbuilder extends KleinManagerCore {
             const imageNames = images.map(f => f.name);
 
             if (!titleRaw) {
-                alert(this.customTranslations[this.currentLang].alert_noTitle);
+                alert(`${this.customTranslations[this.currentLang].alert_noTitle}`);
                 return;
             }
 
@@ -447,7 +368,7 @@ class Adbuilder extends KleinManagerCore {
             });
             const data = await res.json();
             if (data.error) {
-                console.error("builder error:", data);
+                console.error(`Builder error: ${err}`);
                 alert(this.customTranslations[this.currentLang].errorAdLoading || "Error");
                 return;
             }
@@ -466,24 +387,19 @@ class Adbuilder extends KleinManagerCore {
                 }
             }
 
-            console.log(this.customTranslations[this.currentLang].alert_saved, data);
+            console.log(`${this.customTranslations[this.currentLang].alert_saved}: ${data}`);
             alert(this.customTranslations[this.currentLang].alert_saved);
 
             // refresh ad list / thumbnails
             await this.refreshAds();
-            await this.loadThumbnails(title).catch(() => {});
+            await this.loadThumbnails(title).catch(() => { });
         } catch (err) {
-            console.error("saveAdFile error:", err);
+            console.error(`SaveAdFile error: ${err}`);
             alert(this.customTranslations[this.currentLang].errorUpload || "Save error");
         }
     }
-
     async loadAdFile() {
         const selectedFile = document.querySelector('input[name="adsFile"]:checked')?.value;
-        if (!selectedFile) {
-            console.warn("No ad selected to load");
-            return;
-        }
         try {
             const res = await fetch("/api/v1/adbuilder/load_ad", {
                 method: "POST",
@@ -492,7 +408,7 @@ class Adbuilder extends KleinManagerCore {
             });
             const data = await res.json();
             if (data.error) {
-                console.error(this.customTranslations[this.currentLang].errorAdLoading, data.error);
+                console.error(`${this.customTranslations[this.currentLang].errorAdLoading}: ${data.error}`);
                 return;
             }
 
@@ -518,14 +434,13 @@ class Adbuilder extends KleinManagerCore {
             }
 
             this.updateImageListFromData(data.images || []);
-            await this.loadThumbnails(data.title).catch(() => {});
+            await this.loadThumbnails(data.title).catch(() => { });
 
             console.log(this.customTranslations[this.currentLang].infoImThumb);
         } catch (err) {
-            console.error(this.customTranslations[this.currentLang].errorAdLoading, err);
+            console.error(`${this.customTranslations[this.currentLang].errorAdLoading}: ${err}`);
         }
     }
-
     async clearAdForm() {
         try {
             ["title", "description", "price"].forEach(id => {
@@ -541,7 +456,7 @@ class Adbuilder extends KleinManagerCore {
             });
 
             // reload categories as original code did
-            await this.loadCategories().catch(() => {});
+            await this.loadCategories().catch(() => { });
             const imageList = document.getElementById("imageList");
             if (imageList) imageList.innerHTML = `<li class='italic text-gray-400'>${this.customTranslations[this.currentLang].noPicturesSel}</li>`;
 
@@ -554,9 +469,9 @@ class Adbuilder extends KleinManagerCore {
             const fileInput = document.getElementById("Images");
             if (fileInput) fileInput.value = "";
 
-            console.log(this.customTranslations[this.currentLang].infoFormReset);
+            console.log(`${this.customTranslations[this.currentLang].infoFormReset}`);
         } catch (err) {
-            console.warn("clearAdForm error:", err);
+            console.warn(`clearAdForm error: ${err}`);
         }
     }
 }
@@ -564,115 +479,131 @@ class Adbuilder extends KleinManagerCore {
 /* -------------------------
    AdbuilderTranslator (modular i18n for adbuilder)
    ------------------------- */
+// === Sprachsystem für Adbuilder ===
 class AdbuilderTranslator {
-    constructor() {
+    constructor(maxPictures = 16) {
+        this.maxPictures = maxPictures;
         this.lang = localStorage.getItem("language") || "en";
+
+        // Übersetzungstabellen
         this.translations = {
             en: {
-                 title: "Title",
-                description: "Description",
-                category: "Category",
-                price: "Price (â‚¬)",
-                priceType: "Price Type",
-                shipping: "Shipping Options",
-                save: "Save",
-                load: "Load",
-                clear: "Clear",
-                preview: "Preview",
-                alert_noTitle: "Please enter a title!",
-                alert_saved: "Ad saved successfully!",
-                errorCategory: "Error on category loading:",
-                noCategory: "No Categories found.",
-                maxPictures: `Only ${maxPictures} Pictures allowed`,
-                pictures: "Pictures saved in",
-                errorUpload: "Error during the upload",
-                infoImageList: "Imagelist successfully updated",
-                errorAdLoading: "Error during the ad loading",
-                infoThumbnail: "Pictures and thumbnails updated successfully",
-                errorThumbnail: "Thumbnail loading error",
-                noPictures: "No Pictures found",
-                loadPictures: "saved picture(s) loaded into the list",
-                noPreview: "No preview available",
-                noPicturesSel: "No Pictures selected",
-                loadThumbnail: "thumbnail(s) loaded",
-                minPicture: "Please select atleast one picture to upload!",
-                loadPreview: "Loading Preview",
-				errorAdSave: "Error during Ad saving",
-				infoAdSaved: "Ad successfully saved",
-				loadAdFile: "Ad file loaded",
-				infoImThumb: "Images and thumbnails loaded",
-				infoCategories: "Categories loaded",
-				infoFormReset: "Form reset",
-				errorImgLoad: "Error during image loading",
-				errorLoading: "Error during loading",
-				infoNoAds: "No Ad templates found"
+                "adbuilder.formTitle": "Create Ad",
+                "adbuilder.title": "Title",
+                "adbuilder.description": "Description",
+                "adbuilder.category": "Category",
+                "adbuilder.categoryDefault": "-- select --",
+                "adbuilder.price": "Price (€)",
+                "adbuilder.priceType": "Price Type:",
+                "adbuilder.priceType.default": "-- select --",
+                "adbuilder.priceType.negotiable": "Negotiable",
+                "adbuilder.priceType.fixed": "Fixed",
+                "adbuilder.priceType.giveaway": "Give Away",
+                "adbuilder.sell_directly": "Sell Directly",
+                "adbuilder.shipping": "Shipping Options:",
+                "adbuilder.shippingType": "Shipping Type:",
+                "adbuilder.shipping_type.default": "-- select --",
+                "adbuilder.shipping_type.pickup": "Pickup",
+                "adbuilder.shipping_type.shipping": "Shipping",
+                "adbuilder.shipping_type.not-applicable": "Not Applicable",
+                "adbuilder.actions.save": "Save",
+                "adbuilder.actions.load": "Load",
+                "adbuilder.actions.clear": "Clear",
+                "adbuilder.actions.preview": "Preview",
+                "adbuilder.noPreview": "No preview",
+                "adbuilder.images": "Images:",
+                "adbuilder.noImages": "No pictures selected",
+                "adbuilder.templates": "Select template:",
+                "adbuilder.maxPictures": `Only ${maxPictures} Pictures allowed`,
+                "adbuilder.chooseFiles": "Choose Files",
+                "adbuilder.noFilesSelected": "No images selected...",
+                "adbuilder.fileSelected": "image selected",
+                "adbuilder.filesSelected": "images selected"
             },
             de: {
-                title: "Titel",
-                description: "Beschreibung",
-                category: "Kategorie",
-                price: "Preis (â‚¬)",
-                priceType: "Preistyp",
-                shipping: "Versandoptionen",
-                save: "Speichern",
-                load: "Laden",
-                clear: "Leeren",
-                preview: "Vorschau",
-                alert_noTitle: "Bitte einen Titel eingeben!",
-                alert_saved: "Anzeige erfolgreich gespeichert!",
-                errorCategory: "Fehler beim Kategorie laden:",
-                noCategory: "Keine Kategorien gefunden.",
-                maxPictures: `Nur ${maxPictures} Bilder sind erlaubt`,
-                pictures: "Bilder gespeichert in",
-                errorUpload: "Fehler beim Upload",
-                infoImageList: "Bilder Liste aktualisiert.",
-                errorAdLoading: "Fehler beim Anzeige laden",
-                infoThumbnail: "Bilder und Vorschaubilder geladen.",
-                errorThumbnail: "Laden Thumbnail(s) Fehler",
-                noPictures: "Keine Bilder gefunden",
-                loadPictures: "Bild(er) in die Liste geladen",
-                noPreview: "Keine Vorschau verfÃ¼gbar",
-                noPicturesSel: "Keine Bilder ausgewÃ¤hlt",
-                loadThumbnail: "Thumbnail(s) geladen",
-                minPicture: "Mindestens ein Bild zum Hochladen auswÃ¤hlen",
-                loadPreview: "Lade Vorschau",
-				errorAdSave: "Fehler beim Anzeigen speichern",
-				infoAdSaved: "Anzeige gespeichert",
-				loadAdFile: "Anzeigen Vorlage geladen",
-				infoImThumb: "Bilder und Vorschaubilder geladen.",
-				infoCategories: "Kategorien geladen",
-				infoFormReset: "Formular zurÃ¼ckgesetzt",
-				errorImgLoad: "Fehler beim Bilder laden",
-				errorLoading: "Fehler beim laden",
-				infoNoAds: "Keine Anzeigen Vorlagen gefunden"
+                "adbuilder.formTitle": "Anzeige erstellen",
+                "adbuilder.title": "Titel",
+                "adbuilder.description": "Beschreibung",
+                "adbuilder.category": "Kategorie",
+                "adbuilder.categoryDefault": "-- auswählen --",
+                "adbuilder.price": "Preis (€)",
+                "adbuilder.priceType": "Preistyp:",
+                "adbuilder.priceType.default": "-- auswählen --",
+                "adbuilder.priceType.negotiable": "Verhandlungsbasis",
+                "adbuilder.priceType.fixed": "Festpreis",
+                "adbuilder.priceType.giveaway": "Zu verschenken",
+                "adbuilder.sell_directly": "Sofortkauf",
+                "adbuilder.shipping": "Versandoptionen:",
+                "adbuilder.shippingType": "Versandart:",
+                "adbuilder.shipping_type.default": "-- auswählen --",
+                "adbuilder.shipping_type.pickup": "Abholung",
+                "adbuilder.shipping_type.shipping": "Versand",
+                "adbuilder.shipping_type.not-applicable": "Keine Angabe",
+                "adbuilder.actions.save": "Speichern",
+                "adbuilder.actions.load": "Laden",
+                "adbuilder.actions.clear": "Leeren",
+                "adbuilder.actions.preview": "Vorschau",
+                "adbuilder.noPreview": "Keine Vorschau",
+                "adbuilder.images": "Bilder:",
+                "adbuilder.noImages": "Keine Bilder ausgewählt",
+                "adbuilder.templates": "Vorlagen auswählen:",
+                "adbuilder.maxPictures": `Nur ${maxPictures} Bilder sind erlaubt`,
+                "adbuilder.chooseFiles": "Dateien auswählen",
+                "adbuilder.noFilesSelected": "Keine Bilder ausgewählt...",
+                "adbuilder.fileSelected": "Bild ausgewählt",
+                "adbuilder.filesSelected": "Bilder ausgewählt"
             }
         };
     }
 
+    /**
+     * Sprache umschalten
+     */
     toggleLanguage() {
         this.lang = this.lang === "en" ? "de" : "en";
         localStorage.setItem("language", this.lang);
         this.applyTranslations();
         this.updateLangIndicator();
+        
+        this.lang === "en" ? `${console.log("Language switched")}` : `${console.log("Sprache gewechselt")}`
     }
 
+    /**
+     * Alle Texte auf der Seite anhand von data-i18n aktualisieren
+     */
     applyTranslations() {
-        const dict = this.translations[this.lang] || this.translations.en;
+        const dict = this.translations[this.lang] || this.translations.de;
+
+        // Texte mit data-i18n
         document.querySelectorAll("[data-i18n]").forEach(el => {
             const key = el.getAttribute("data-i18n");
             if (dict[key]) el.textContent = dict[key];
         });
+
+        // Placeholder-Attribute
         document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
             const key = el.getAttribute("data-i18n-placeholder");
             if (dict[key]) el.placeholder = dict[key];
         });
+
+        // ✅ Dropdown-Menüs (Optionen)
+        document.querySelectorAll("option[data-i18n]").forEach(opt => {
+            const key = opt.getAttribute("data-i18n");
+            if (dict[key]) opt.textContent = dict[key];
+        });
+
+        console.log("✅ Übersetzungen angewendet:", this.lang);
     }
 
+    /**
+     * Sprache im UI-Indikator aktualisieren (z. B. EN / DE Button)
+     */
     updateLangIndicator() {
         const indicator = document.getElementById("currentLang");
         if (indicator) indicator.textContent = this.lang.toUpperCase();
     }
 }
+
 
 /* -------------------------
    Initialization & integration with app.toggleLanguage
@@ -680,21 +611,18 @@ class AdbuilderTranslator {
 
 function initAdbuilderTranslator() {
     if (window.adbuilderTranslator) return;
-    window.adbuilderTranslator = new AdbuilderTranslator();
+    const maxPics = app?.adbuilder?.maxPictures || 16;
+    window.adbuilderTranslator = new AdbuilderTranslator(maxPics);
     adbuilderTranslator.applyTranslations();
 
-    // attach to the global language button if present
     const langButton = document.querySelector("button[onclick='app.toggleLanguage()']");
     if (langButton) {
-        // prevent adding multiple handlers
-        if (!langButton._adbuilderLangHooked) {
-            langButton.addEventListener("click", (e) => {
-                e.preventDefault();
-                adbuilderTranslator.toggleLanguage();
-            });
-            langButton._adbuilderLangHooked = true;
-        }
+        langButton.addEventListener("click", e => {
+            e.preventDefault();
+            adbuilderTranslator.toggleLanguage();
+        });
     }
+
     console.log("🈶 Adbuilder-Übersetzer initialisiert:", adbuilderTranslator.lang);
 }
 
@@ -728,7 +656,7 @@ function initAdbuilder() {
         app.toggleLanguage = function () {
             original();
             // let core updateTranslations run (if exists)
-            try { document.dispatchEvent(new Event("languageChanged")); } catch (e) {}
+            try { document.dispatchEvent(new Event("languageChanged")); } catch (e) { }
             // apply adbuilder translations
             if (app.adbuilder && typeof app.adbuilder.applyAdbuilderTranslations === "function") {
                 app.adbuilder.currentLang = localStorage.getItem("language") || app.adbuilder.currentLang;
