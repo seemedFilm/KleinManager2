@@ -559,13 +559,26 @@ class AdbuilderTranslator {
     /**
      * Sprache umschalten
      */
-    toggleLanguage() {
-        this.lang = this.lang === "en" ? "de" : "en";
-        localStorage.setItem("language", this.lang);
+    toggleLanguage(externalLang = null) {
+        // this.lang = this.lang === "en" ? "de" : "en";
+        // localStorage.setItem("language", this.lang);
+        // this.applyTranslations();
+        // this.updateLangIndicator();
+
+        // this.lang === "en" ? `${console.log("Language switched")}` : `${console.log("Sprache gewechselt")}`
+        // Wenn core bereits eine Sprache setzt, übernehme diese
+        if (externalLang) {
+            this.lang = externalLang;
+        } else {
+            // Fallback: falls separat aufgerufen
+            this.lang = this.lang === "en" ? "de" : "en";
+            localStorage.setItem("language", this.lang);
+        }
+
         this.applyTranslations();
         this.updateLangIndicator();
-        
         this.lang === "en" ? `${console.log("Language switched")}` : `${console.log("Sprache gewechselt")}`
+
     }
 
     /**
@@ -615,13 +628,13 @@ function initAdbuilderTranslator() {
     window.adbuilderTranslator = new AdbuilderTranslator(maxPics);
     adbuilderTranslator.applyTranslations();
 
-    const langButton = document.querySelector("button[onclick='app.toggleLanguage()']");
-    if (langButton) {
-        langButton.addEventListener("click", e => {
-            e.preventDefault();
-            adbuilderTranslator.toggleLanguage();
-        });
-    }
+    // const langButton = document.querySelector("button[onclick='app.toggleLanguage()']");
+    // if (langButton) {
+    //     langButton.addEventListener("click", e => {
+    //         e.preventDefault();
+    //         adbuilderTranslator.toggleLanguage();
+    //     });
+    // }
 
     console.log("🈶 Adbuilder-Übersetzer initialisiert:", adbuilderTranslator.lang);
 }
@@ -663,10 +676,8 @@ function initAdbuilder() {
                 app.adbuilder.applyAdbuilderTranslations();
             }
             if (window.adbuilderTranslator) {
-                // ensure translator uses same state
-                adbuilderTranslator.lang = localStorage.getItem("language") || adbuilderTranslator.lang;
-                adbuilderTranslator.applyTranslations();
-                adbuilderTranslator.updateLangIndicator();
+                const currentLang = localStorage.getItem("language") || adbuilderTranslator.lang;
+                adbuilderTranslator.toggleLanguage(currentLang);
             }
             console.log("🌐 Sprache gewechselt → Seite & Adbuilder aktualisiert");
         };
