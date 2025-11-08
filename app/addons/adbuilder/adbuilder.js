@@ -30,7 +30,7 @@ class Adbuilder extends KleinManagerCore {
             let attempts = 0;
             while (!main && attempts < 20) {
                 await new Promise(r => setTimeout(r, 200));
-                main = document.querySelector("#content-area");
+                main = document.querySelector(".lg\\:ml-64.flex-1 .p-4.lg\\:p-6");
                 attempts++;
             }
 
@@ -198,39 +198,43 @@ function initAdbuilder() {
         console.log("✅ Adbuilder-Klasse initialisiert");
     }
 
-    // === Sidebar-Integration ===
+    // === Sidebar-Integration (robust) ===
     const waitForSidebar = setInterval(() => {
-        const sidebarContainer = document.querySelector("#sidebar nav .space-y-2");
-        const settingsButton = document.querySelector("#sidebar button[onclick*='settings']");
+        const sidebar = document.getElementById("sidebar");
+        const sidebarButtonsContainer = sidebar?.querySelector("nav .space-y-2");
+        const settingsButton = sidebar?.querySelector("button[onclick*='settings']");
 
-        if (!sidebarContainer || !settingsButton) {
-            console.log("⏳ Warte auf Sidebar...");
+        if (!sidebarButtonsContainer || !settingsButton) {
+            console.log("⏳ Warte auf Sidebar-Buttons...");
             return;
         }
 
         clearInterval(waitForSidebar);
 
+        // Prüfen, ob AdBuilder-Button bereits existiert
         if (document.getElementById("menu-adbuilder")) {
-            console.log("ℹ️ Adbuilder-Button existiert bereits.");
+            console.log("ℹ️ AdBuilder-Button existiert bereits.");
             return;
         }
 
+        // 🔹 Button erzeugen
         const adbuilderBtn = document.createElement("button");
         adbuilderBtn.id = "menu-adbuilder";
         adbuilderBtn.className =
-            "w-full text-left px-4 py-3 rounded-lg flex items-center text-gray-200 hover:bg-gray-700 transition-colors duration-200";
+            "nav-item w-full text-left px-4 py-3 rounded-lg flex items-center text-gray-200 hover:bg-gray-700 transition-colors duration-200";
         adbuilderBtn.innerHTML = `
-            <i class="fas fa-tools mr-3 w-5 text-center"></i>
-            <span data-i18n="nav.adbuilder">AdBuilder</span>
-        `;
+        <i class="fas fa-tools mr-3 w-5 text-center"></i>
+        <span data-i18n="nav.adbuilder">AdBuilder</span>
+    `;
 
-        sidebarContainer.insertBefore(adbuilderBtn, settingsButton);
-        console.log("🧩 Adbuilder-Button über Settings eingefügt.");
+        // 🔹 Über Settings einfügen
+        sidebarButtonsContainer.insertBefore(adbuilderBtn, settingsButton);
+        console.log("🧩 AdBuilder-Button über Settings eingefügt.");
 
+        // 🔹 Klick-Event
         adbuilderBtn.addEventListener("click", async (e) => {
             e.preventDefault();
             await app.adbuilder.loadAdbuilderSection();
-
             if (typeof app.showSection === "function") {
                 app.showSection("adbuilder");
             } else {
@@ -238,7 +242,8 @@ function initAdbuilder() {
                 document.getElementById("adbuilder")?.classList.remove("hidden");
             }
         });
-    }, 500);
+    }, 300);
+
 
     // === Übersetzer ===
     if (!window.adbuilderTranslator) {
