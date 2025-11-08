@@ -8,3 +8,4 @@ dist
 ./pip-cache/
 __pycache__/
 /bilder
+templates.zip

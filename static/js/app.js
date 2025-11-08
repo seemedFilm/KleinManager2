@@ -83,23 +83,23 @@ async loadAdsFiles() {
 
 
 
-async function loadVersion() {
-    try {
-        const res = await fetch("/version");
-        if (!res.ok) throw new Error("Fehler beim Laden");
-        const data = await res.json();
+// async function loadVersion() {
+//     try {
+//         const res = await fetch("/version");
+//         if (!res.ok) throw new Error("Fehler beim Laden");
+//         const data = await res.json();
 
-        document.getElementById("gitCommit").textContent = `${data.gitCommit} `;
-        document.getElementById("gitDate").textContent = `${data.gitDate}`;
-        document.getElementById("buildDate").textContent = `${data.buildDate}`;
-        document.getElementById("appVersion").textContent = `${data.appVersion}`;
-        document.getElementById("branchName").textContent = `${data.branchName}`;
-    } catch (err) {
-        console.error("Konnte Version nicht laden:", err);
-        document.getElementById("gitVersion").textContent = "Version unbekannt";
-    }
-}
-document.addEventListener("DOMContentLoaded", loadVersion);
+//         document.getElementById("gitCommit").textContent = `${data.gitCommit} `;
+//         document.getElementById("gitDate").textContent = `${data.gitDate}`;
+//         document.getElementById("buildDate").textContent = `${data.buildDate}`;
+//         document.getElementById("appVersion").textContent = `${data.appVersion}`;
+//         document.getElementById("branchName").textContent = `${data.branchName}`;
+//     } catch (err) {
+//         console.error("Konnte Version nicht laden:", err);
+//         document.getElementById("gitVersion").textContent = "Version unbekannt";
+//     }
+// }
+// document.addEventListener("DOMContentLoaded", loadVersion);
 
 
 // Main Application Class
@@ -116,9 +116,6 @@ class KleinManager extends KleinManagerCore {
         this.settingsManager = new SettingsManager();
         this.notificationsManager = new NotificationsManager();
 
-        this.kleinanzeigenManager = new KleinanzeigenManager();
-        
-
         this.copyMethodsFromManager(this.dashboardManager);
         this.copyMethodsFromManager(this.ordersManager);
         this.copyMethodsFromManager(this.watcherManager);
@@ -128,7 +125,7 @@ class KleinManager extends KleinManagerCore {
         this.copyMethodsFromManager(this.settingsManager);
         this.copyMethodsFromManager(this.notificationsManager);
 
-        this.copyMethodsFromManager(this.kleinanzeigenManager);
+        // this.copyMethodsFromManager(this.kleinanzeigenManager);
         
         this.init();
     }
@@ -167,9 +164,6 @@ class KleinManager extends KleinManagerCore {
         setTimeout(() => {
             new KaBot("Ka-Bot");
             }, 500);
-        //Commented for debug
-        //setInterval(updateContainerStatus, 3000); // alle 3 Sekunden prüfen
-
     }
 
     showSection(section) {
@@ -191,7 +185,6 @@ class KleinManager extends KleinManagerCore {
 
         if (section === 'dashboard') this.loadDashboard();
         else if (section === 'ka-bot') this.loadKaBot();
-        // else if (section === 'adbuilder') this.loadAdBuilder();
         else if (section === 'orders') this.loadOrders();
         else if (section === 'watcher') this.loadWatchedItems();
         else if (section === 'tracking') this.loadTracking();
