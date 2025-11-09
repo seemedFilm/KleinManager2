@@ -1,0 +1,402 @@
+<!-- 
+    adBuilder Interface - Optimiert für Integration
+    Version: 2.0
+
+    Diese Version ist optimiert für die nahtlose Integration
+    in verschiedene Layout-Strukturen
+-->
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ad Builder</title>
+    <style>
+        /* Reset und Basis-Styles */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        .adbuilder-container {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            background: #f5f7fa;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .adbuilder-header {
+            padding: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .adbuilder-header h1 {
+            margin: 0 0 8px 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .adbuilder-header p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .adbuilder-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .adbuilder-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #7f8c8d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            bottom: -2px;
+        }
+
+        .tab-btn:hover {
+            color: #2c3e50;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-secondary {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .btn-secondary:hover {
+            background: #d5dbdd;
+        }
+
+        .placeholder {
+            text-align: center;
+            padding: 40px;
+            color: #95a5a6;
+        }
+
+        .placeholder-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .adbuilder-header {
+                padding: 16px;
+            }
+
+            .adbuilder-header h1 {
+                font-size: 22px;
+            }
+
+            .adbuilder-content {
+                padding: 16px;
+            }
+
+            .adbuilder-tabs {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                border-bottom: none;
+                border-left: 3px solid transparent;
+                padding-left: 16px;
+            }
+
+            .tab-btn.active {
+                border-left-color: #667eea;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="adbuilder-container">
+        <!-- Header -->
+        <div class="adbuilder-header">
+            <h1>📱 Ad Builder</h1>
+            <p>Erstelle und verwalte deine Anzeigen professionell</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="adbuilder-content">
+            <!-- Tabs -->
+            <div class="adbuilder-tabs">
+                <button class="tab-btn active" data-tab="create">➕ Neue Anzeige</button>
+                <button class="tab-btn" data-tab="manage">📋 Verwalten</button>
+                <button class="tab-btn" data-tab="settings">⚙️ Einstellungen</button>
+            </div>
+
+            <!-- Tab: Neue Anzeige -->
+            <div id="tab-create" class="tab-content active">
+                <h2>Neue Anzeige erstellen</h2>
+
+                <form id="adbuilder-form">
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label for="ad-title">Titel *</label>
+                            <input type="text" id="ad-title" name="title" placeholder="z.B. Sommer-Aktion 2025" required maxlength="100">
+                        </div>
+                    </div>
+
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label for="ad-description">Beschreibung</label>
+                            <textarea id="ad-description" name="description" placeholder="Beschreibe deine Anzeige..." rows="4" maxlength="500"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label for="ad-url">Ziel-URL *</label>
+                            <input type="url" id="ad-url" name="url" placeholder="https://example.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ad-category">Kategorie</label>
+                            <select id="ad-category" name="category">
+                                <option value="">-- Wählen --</option>
+                                <option value="product">🛍️ Produkt</option>
+                                <option value="service">💼 Dienstleistung</option>
+                                <option value="event">🎉 Event</option>
+                                <option value="announcement">📢 Ankündigung</option>
+                                <option value="other">📁 Sonstiges</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ad-status">Status</label>
+                            <select id="ad-status" name="status">
+                                <option value="draft">📝 Entwurf</option>
+                                <option value="active">✅ Aktiv</option>
+                                <option value="paused">⏸️ Pausiert</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ad-start-date">Startdatum</label>
+                            <input type="date" id="ad-start-date" name="startDate">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ad-end-date">Enddatum</label>
+                            <input type="date" id="ad-end-date" name="endDate">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">💾 Speichern</button>
+                        <button type="reset" class="btn btn-secondary">🔄 Zurücksetzen</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tab: Verwalten -->
+            <div id="tab-manage" class="tab-content">
+                <h2>Meine Anzeigen</h2>
+                <div class="ads-list" id="ads-list">
+                    <div class="placeholder">
+                        <div class="placeholder-icon">📭</div>
+                        <p>Noch keine Anzeigen erstellt.</p>
+                        <p style="font-size: 12px; color: #bdc3c7;">Erstelle deine erste Anzeige im Tab "Neue Anzeige"</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Einstellungen -->
+            <div id="tab-settings" class="tab-content">
+                <h2>⚙️ Einstellungen</h2>
+
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="margin-top: 0; color: #2c3e50;">Automatisierung</h3>
+
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 10px; font-weight: normal;">
+                            <input type="checkbox" id="auto-publish" style="width: auto;">
+                            <span>Auto-Veröffentlichung aktivieren</span>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 10px; font-weight: normal;">
+                            <input type="checkbox" id="auto-archive" checked style="width: auto;">
+                            <span>Automatische Archivierung</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="margin-top: 0; color: #2c3e50;">Benachrichtigungen</h3>
+
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 10px; font-weight: normal;">
+                            <input type="checkbox" id="notifications" checked style="width: auto;">
+                            <span>Benachrichtigungen aktivieren</span>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 10px; font-weight: normal;">
+                            <input type="checkbox" id="email-notifications" style="width: auto;">
+                            <span>E-Mail-Benachrichtigungen</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button id="save-settings" class="btn btn-primary">💾 Speichern</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab-Navigation
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabName = this.getAttribute('data-tab');
+
+                // Deaktiviere alle Tabs
+                document.querySelectorAll('.tab-content').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+
+                // Aktiviere gewählten Tab
+                document.getElementById('tab-' + tabName).classList.add('active');
+                this.classList.add('active');
+            });
+        });
+
+        // Formular absenden
+        const form = document.getElementById('adbuilder-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('✅ Anzeige gespeichert!');
+                this.reset();
+            });
+        }
+    </script>
+</body>
+</html>

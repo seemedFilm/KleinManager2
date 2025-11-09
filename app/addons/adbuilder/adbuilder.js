@@ -1,298 +1,198 @@
 /**
- * adBuilder Integration Module
- * Version: 1.0.0
+ * adBuilder - Dynamic Section Integration
+ * Version: 4.0 - DYNAMIC (ohne index.html zu ändern)
  * 
- * Integriert den adBuilder-Button in die bestehende Sidebar
- * ohne die index.html unter /template oder Dateien unter /static zu modifizieren
- * 
- * Verwendung:
- * - Diese Datei wird automatisch geladen
- * - Der Button wird nach dem "Settings"-Button eingefügt
- * - Beim Klick wird adbuilder.html dynamisch geladen
+ * ✅ Lädt adBuilder dynamisch in den DOM
+ * ✅ Integriert als normale Section
+ * ✅ Keine index.html Änderungen nötig
  */
 
 (function() {
     'use strict';
 
-    // Initialisierung beim DOM-Ready
+    console.log('%c✅ adBuilder v4.0 Dynamic', 'color: #2ecc71; font-weight: bold; font-size: 14px;');
+
+    const state = {
+        sectionLoaded: false
+    };
+
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initAdBuilder);
+        document.addEventListener('DOMContentLoaded', init);
     } else {
-        initAdBuilder();
+        setTimeout(init, 500);
     }
 
-    /**
-     * Hauptinitialisierungsfunktion
-     */
-    function initAdBuilder() {
-        console.log('[adBuilder] Initialisierung gestartet...');
+    function init() {
+        console.log('[adBuilder] Initialisierung...');
 
-        // Konfiguration
-        const config = {
-            buttonId: 'adbuilder-btn',
-            buttonText: 'adBuilder',
-            buttonIcon: '📱', // Optional: Icon vor dem Text
-            contentContainerId: 'adbuilder-container',
-            htmlPath: '/app/addons/adbuilder.html',
-            // Mögliche Selektoren für den Settings-Button
-            settingsSelectors: [
-                '[data-action="settings"]',
-                '[data-btn="settings"]',
-                '.settings-btn',
-                '.btn-settings',
-                'button[id*="settings"]',
-                'a[href*="settings"]'
-            ],
-            // Mögliche Selektoren für die Sidebar
-            sidebarSelectors: [
-                '.sidebar',
-                'nav.sidebar',
-                'aside',
-                '[role="navigation"]',
-                '.side-nav',
-                '#sidebar'
-            ]
-        };
+        // Warte kurz damit other scripts laden
+        // setTimeout(() => {
+        //     setupButton();
+        // }, 100);
+    }
 
-        // 1. Finde die Sidebar
-        const sidebar = findElementBySelectors(config.sidebarSelectors);
-        if (!sidebar) {
-            console.error('[adBuilder] Sidebar nicht gefunden. Integration abgebrochen.');
+    // function setupButton() {
+    //     const sidebar = document.querySelector('.sidebar');
+    //     if (!sidebar) {
+    //         console.warn('[adBuilder] Sidebar nicht gefunden, warte...');
+    //         setTimeout(setupButton, 1000);
+    //         return;
+    //     }
+
+    //     // Prüfe ob Button bereits existiert
+    //     if (document.getElementById('adbuilder-btn')) {
+    //         console.log('[adBuilder] Button existiert bereits');
+    //         return;
+    //     }
+
+    //     console.log('[adBuilder] Sidebar gefunden, erstelle Button');
+
+    //     // Erstelle Button
+    //     const btn = document.createElement('button');
+    //     btn.id = 'adbuilder-btn';
+    //     btn.className = 'sidebar-btn';
+    //     btn.innerHTML = '<span>📱</span> adBuilder';
+    //     btn.setAttribute('data-action', 'adbuilder');
+
+    //     btn.addEventListener('click', function(e) {
+    //         e.preventDefault();
+    //         console.log('[adBuilder] Button clicked');
+    //         showAdBuilder();
+    //     });
+
+    //     // Finde Settings-Button und füge davor ein
+    //     const buttons = sidebar.querySelectorAll('button');
+    //     let insertAfter = null;
+
+    //     for (let b of buttons) {
+    //         if (b.textContent.toLowerCase().includes('settings') || 
+    //             b.getAttribute('data-action') === 'settings') {
+    //             insertAfter = b;
+    //             break;
+    //         }
+    //     }
+
+    //     if (insertAfter) {
+    //         // Füge vor Settings ein
+    //         if (insertAfter.nextSibling) {
+    //             insertAfter.parentNode.insertBefore(btn, insertAfter.nextSibling);
+    //         } else {
+    //             insertAfter.parentNode.appendChild(btn);
+    //         }
+    //         console.log('[adBuilder] Button vor/nach Settings');
+    //     } else {
+    //         sidebar.insertBefore(btn, sidebar.firstChild);
+    //         console.log('[adBuilder] Button am Anfang');
+    //     }
+
+    //     console.log('✅ [adBuilder] Button ready');
+    // }
+
+    function showAdBuilder() {
+        console.log('[adBuilder] Show section');
+
+        // Finde oder erstelle Container
+        let adbuilderSection = document.getElementById('adbuilder');
+
+        if (!adbuilderSection) {
+            console.log('[adBuilder] Section existiert noch nicht, lade...');
+            loadAdBuilderSection();
             return;
         }
-        console.log('[adBuilder] Sidebar gefunden:', sidebar);
 
-        // 2. Finde den Settings-Button
-        let settingsBtn = findElementBySelectors(config.settingsSelectors, sidebar);
+        // Verstecke alle anderen Sections
+        hideAllSections();
 
-        if (!settingsBtn) {
-            console.warn('[adBuilder] Settings-Button nicht gefunden. Suche nach letztem Button...');
-            // Fallback: Nimm den letzten Button in der Sidebar
-            const buttons = sidebar.querySelectorAll('button, a[role="button"], .btn');
-            if (buttons.length > 0) {
-                settingsBtn = buttons[buttons.length - 1];
-                console.log('[adBuilder] Letzter Button gefunden:', settingsBtn);
-            }
-        } else {
-            console.log('[adBuilder] Settings-Button gefunden:', settingsBtn);
-        }
-
-        // 3. Erstelle den adBuilder-Button
-        const adBuilderBtn = createAdBuilderButton(config);
-
-        // 4. Füge den Button in die Sidebar ein
-        if (settingsBtn && settingsBtn.parentNode) {
-            // Füge nach dem Settings-Button ein
-            settingsBtn.parentNode.insertBefore(adBuilderBtn, settingsBtn.nextSibling);
-            console.log('[adBuilder] Button nach Settings eingefügt');
-        } else {
-            // Fallback: Am Ende der Sidebar anhängen
-            sidebar.appendChild(adBuilderBtn);
-            console.log('[adBuilder] Button am Ende der Sidebar eingefügt');
-        }
-
-        // 5. Registriere Click-Handler
-        adBuilderBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('[adBuilder] Button geklickt');
-            loadAdBuilderContent(config);
-
-            // Markiere Button als aktiv
-            markButtonActive(adBuilderBtn);
-        });
-
-        console.log('[adBuilder] Integration erfolgreich abgeschlossen!');
+        // Zeige adBuilder
+        adbuilderSection.classList.remove('hidden');
+        console.log('✅ [adBuilder] Section shown');
     }
 
-    /**
-     * Suche Element mit mehreren Selektoren
-     */
-    function findElementBySelectors(selectors, parent = document) {
-        for (const selector of selectors) {
-            try {
-                const element = parent.querySelector(selector);
-                if (element) return element;
-            } catch (e) {
-                console.warn('[adBuilder] Ungültiger Selektor:', selector);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Erstelle den adBuilder-Button mit Styling
-     */
-    function createAdBuilderButton(config) {
-        const button = document.createElement('button');
-        button.id = config.buttonId;
-        button.className = 'sidebar-btn adbuilder-btn';
-        button.setAttribute('data-action', 'adbuilder');
-        button.setAttribute('aria-label', 'adBuilder öffnen');
-        button.setAttribute('type', 'button');
-
-        // Button-Inhalt mit optionalem Icon
-        if (config.buttonIcon) {
-            button.innerHTML = `<span class="btn-icon">${config.buttonIcon}</span> <span class="btn-text">${config.buttonText}</span>`;
-        } else {
-            button.textContent = config.buttonText;
-        }
-
-        // Inline-Styling (falls keine CSS-Klasse vorhanden)
-        button.style.cssText = `
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            width: 100%;
-            padding: 10px 15px;
-            text-align: left;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: inherit;
-            font-family: inherit;
-            color: inherit;
-            transition: background-color 0.3s ease, transform 0.1s ease;
-        `;
-
-        // Hover-Effekt
-        button.addEventListener('mouseenter', function() {
-            this.style.backgroundColor = 'rgba(0, 0, 0, 0.08)';
-        });
-
-        button.addEventListener('mouseleave', function() {
-            if (!this.classList.contains('active')) {
-                this.style.backgroundColor = '';
-            }
-        });
-
-        // Active-Effekt beim Klicken
-        button.addEventListener('mousedown', function() {
-            this.style.transform = 'scale(0.98)';
-        });
-
-        button.addEventListener('mouseup', function() {
-            this.style.transform = '';
-        });
-
-        return button;
-    }
-
-    /**
-     * Markiere Button als aktiv
-     */
-    function markButtonActive(button) {
-        // Entferne "active" von allen Sidebar-Buttons
-        const allButtons = document.querySelectorAll('.sidebar button, .sidebar a');
-        allButtons.forEach(btn => {
-            btn.classList.remove('active');
-            btn.style.backgroundColor = '';
-        });
-
-        // Markiere den adBuilder-Button als aktiv
-        button.classList.add('active');
-        button.style.backgroundColor = 'rgba(0, 0, 0, 0.12)';
-    }
-
-    /**
-     * Lade den adBuilder HTML-Inhalt
-     */
-    function loadAdBuilderContent(config) {
-        console.log('[adBuilder] Lade Inhalt von:', config.htmlPath);
-
-        // Finde oder erstelle den Content-Container
-        let container = document.getElementById(config.contentContainerId);
-
-        if (!container) {
-            container = document.createElement('div');
-            container.id = config.contentContainerId;
-            container.className = 'adbuilder-content';
-
-            // Suche nach Main-Content-Bereich
-            const mainContentSelectors = [
-                'main',
-                '.main-content',
-                '.content',
-                '[role="main"]',
-                '#content',
-                '.page-content'
-            ];
-
-            let mainContent = findElementBySelectors(mainContentSelectors);
-
-            if (mainContent) {
-                // Ersetze den Inhalt des Main-Bereichs
-                mainContent.innerHTML = '';
-                mainContent.appendChild(container);
-            } else {
-                // Fallback: Direkt in Body einfügen
-                document.body.appendChild(container);
-            }
-
-            console.log('[adBuilder] Container erstellt');
-        }
-
-        // Zeige Loading-Indikator
-        container.innerHTML = '<div class="loading">Lädt adBuilder...</div>';
-
-        // Lade HTML via Fetch
-        fetch(config.htmlPath)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    function hideAllSections() {
+        // Finde alle Sections (die bestehen oder die wir erstellt haben)
+        document.querySelectorAll('[class*="section"], [id*="section"]').forEach(el => {
+            // Ignoriere adbuilder Section
+            if (el.id !== 'adbuilder') {
+                // Nur Elemente mit .section Klasse
+                if (el.classList.contains('section') && !el.classList.contains('hidden')) {
+                    el.classList.add('hidden');
+                    console.log('[adBuilder] Hidden:', el.id || el.className);
                 }
-                return response.text();
+            }
+        });
+    }
+
+    function loadAdBuilderSection() {
+        console.log('[adBuilder] Lade adbuilder.html...');
+
+        fetch('/app/addons/adbuilder/adbuilder.html')
+            .then(r => {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.text();
             })
             .then(html => {
-                console.log('[adBuilder] Inhalt erfolgreich geladen');
-                container.innerHTML = html;
+                console.log('[adBuilder] HTML erhalten:', html.length, 'bytes');
 
-                // Initialisiere adBuilder-Logik
-                initAdBuilderLogic();
+                // Bereinige HTML (entferne DOCTYPE, html, body Tags)
+                let cleanHTML = html
+                    .replace(/<!DOCTYPE[^>]*>/gi, '')
+                    .replace(/<\/?html[^>]*>/gi, '')
+                    .replace(/<body[^>]*>/gi, '')
+                    .replace(/<\/body>/gi, '')
+                    .replace(/<head[^>]*>.*?<\/head>/gi, '');
 
-                // Triggere Custom Event für externe Hooks
-                const event = new CustomEvent('adBuilderLoaded', { 
-                    detail: { 
-                        container: container,
-                        timestamp: Date.now()
-                    } 
-                });
-                document.dispatchEvent(event);
+                // Prüfe ob schon ein <div id="adbuilder"> existiert
+                if (!cleanHTML.includes('id="adbuilder"')) {
+                    console.log('[adBuilder] Wickel HTML in adbuilder Section');
+                    cleanHTML = `<div id="adbuilder" class="section">${cleanHTML}</div>`;
+                }
 
-                console.log('[adBuilder] Event "adBuilderLoaded" ausgelöst');
+                // Finde Einfügungspunkt
+                // Bevorzugt nach settings Section
+                let insertPoint = document.body;
+
+                const settingsSection = document.querySelector('[id="settings"]');
+                if (settingsSection) {
+                    console.log('[adBuilder] Füge nach settings ein');
+                    // Finde das Eltern-Element wo settings ist
+                    insertPoint = settingsSection.parentElement || document.body;
+                }
+
+                // Erstelle temporäres Container für innerHTML
+                const temp = document.createElement('div');
+                temp.innerHTML = cleanHTML;
+                const adbuilderDiv = temp.firstElementChild;
+
+                // Setze hidden class
+                if (!adbuilderDiv.classList.contains('hidden')) {
+                    adbuilderDiv.classList.add('hidden');
+                }
+
+                // Füge in DOM ein
+                insertPoint.appendChild(adbuilderDiv);
+
+                console.log('✅ [adBuilder] HTML eingefügt');
+                state.sectionLoaded = true;
+
+                // Jetzt zeige die Section
+                hideAllSections();
+                adbuilderDiv.classList.remove('hidden');
+
+                // Initialisiere Logik falls vorhanden
+                if (window.AdBuilderLogic) {
+                    console.log('[adBuilder] Initialisiere Logik');
+                    window.AdBuilderLogic.init();
+                }
             })
-            .catch(error => {
-                console.error('[adBuilder] Fehler beim Laden:', error);
-                container.innerHTML = `
-                    <div class="error-message">
-                        <h3>⚠️ Fehler beim Laden</h3>
-                        <p>Der adBuilder konnte nicht geladen werden.</p>
-                        <p><strong>Fehler:</strong> ${error.message}</p>
-                        <p><small>Pfad: ${config.htmlPath}</small></p>
-                    </div>
-                `;
+            .catch(err => {
+                console.error('[adBuilder] ❌ Fehler:', err.message);
+                alert('adBuilder Fehler: ' + err.message);
             });
     }
 
-    /**
-     * Initialisiere adBuilder-Logik (falls vorhanden)
-     */
-    function initAdBuilderLogic() {
-        // Warte kurz, damit das DOM vollständig gerendert ist
-        setTimeout(() => {
-            if (typeof window.AdBuilderLogic !== 'undefined') {
-                console.log('[adBuilder] Initialisiere AdBuilderLogic');
-                window.AdBuilderLogic.init();
-            } else {
-                console.warn('[adBuilder] AdBuilderLogic nicht gefunden - adbuilder-logic.js geladen?');
-            }
-        }, 100);
-    }
-
-    // Exportiere für externe Nutzung
-    window.AdBuilderIntegration = {
-        init: initAdBuilder,
-        version: '1.0.0'
+    // Public API
+    window.adBuilder = {
+        show: showAdBuilder,
+        load: loadAdBuilderSection
     };
-
 })();
