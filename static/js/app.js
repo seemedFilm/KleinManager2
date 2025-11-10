@@ -7,9 +7,7 @@ class KaBot {
         this.log = null;
         console.warn("Ka-Bot Section wurde beim Initialisieren nicht gefunden!");
     }
-
     this.adsFileContainer = document.getElementById("adsFileContainer");
-    //app.refreshAds();
 
 }
 
@@ -80,27 +78,6 @@ async loadAdsFiles() {
         return new Promise(r => setTimeout(r, ms));
     }
 }
-
-
-
-// async function loadVersion() {
-//     try {
-//         const res = await fetch("/version");
-//         if (!res.ok) throw new Error("Fehler beim Laden");
-//         const data = await res.json();
-
-//         document.getElementById("gitCommit").textContent = `${data.gitCommit} `;
-//         document.getElementById("gitDate").textContent = `${data.gitDate}`;
-//         document.getElementById("buildDate").textContent = `${data.buildDate}`;
-//         document.getElementById("appVersion").textContent = `${data.appVersion}`;
-//         document.getElementById("branchName").textContent = `${data.branchName}`;
-//     } catch (err) {
-//         console.error("Konnte Version nicht laden:", err);
-//         document.getElementById("gitVersion").textContent = "Version unbekannt";
-//     }
-// }
-// document.addEventListener("DOMContentLoaded", loadVersion);
-
 
 // Main Application Class
 class KleinManager extends KleinManagerCore {

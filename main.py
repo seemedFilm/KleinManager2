@@ -1,7 +1,6 @@
 ﻿import os, sys
 import os
 
-
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
@@ -55,7 +54,9 @@ SHARED_PICS = Path(os.getenv("SHARED_PIC", "/mnt/ads/pics"))
 app.mount("/ads/pics", StaticFiles(directory=str(SHARED_PICS)), name="ads_pics")
 # Mount für dein Addon (HTML, JS, CSS)
 addon_path = "/app/addons/adbuilder"
-app.mount("/app/addons/adbuilder", StaticFiles(directory=addon_path), name="adbuilder")
+#app.mount("/app/addons/adbuilder", StaticFiles(directory=addon_path), name="adbuilder")
+#app.mount("/app/addons/adbuilder", StaticFiles(directory=addon_path,  html=False), name="adbuilder")
+app.mount("/app/addons", StaticFiles(directory="app/addons"), name="addons")
 # Route für das Haupt-HTML deines Addons (falls direkt geladen werden soll)
 @app.get("/addons/adbuilder/adbuilder.html")
 def serve_adbuilder_html():

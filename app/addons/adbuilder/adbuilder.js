@@ -17,12 +17,20 @@ class Adbuilder extends KleinManagerCore {
     /* -----------------------------------------------
        Lädt die HTML-Section für den Adbuilder
        ----------------------------------------------- */
-    async loadAdbuilderSection() {
+async loadAdbuilderSection() {
         try {
-            
-            console.log("⏳ Lade Adbuilder HTML...");
+            // CSS nur einmal laden
+            const cssPath = "/app/addons/adbuilder/adbuilder.css";
+            if (!document.querySelector(`link[href="${cssPath}"]`)) {
+                const link = document.createElement("link");
+                link.rel = "stylesheet";
+                link.href = cssPath;
+                document.head.appendChild(link);
+                console.log(" AdBuilder CSS geladen:", cssPath);
+            }
+            console.log(" Lade Adbuilder HTML...");
 
-            const res = await fetch("/addons/adbuilder/adbuilder.html");
+            const res = await fetch("/app/addons/adbuilder/adbuilder.html");
             if (!res.ok) throw new Error(`Fehler beim Laden (HTTP ${res.status})`);
             const html = await res.text();
 
@@ -163,14 +171,12 @@ class AdbuilderTranslator {
             de: { "adbuilder.formTitle": "Anzeige erstellen" }
         };
     }
-
     toggleLanguage(externalLang = null) {
         this.lang = externalLang || (this.lang === "en" ? "de" : "en");
         localStorage.setItem("language", this.lang);
         this.applyTranslations();
         this.updateLangIndicator();
     }
-
     applyTranslations() {
         const dict = this.translations[this.lang] || this.translations.en;
         document.querySelectorAll("[data-i18n]").forEach(el => {
@@ -178,7 +184,6 @@ class AdbuilderTranslator {
             if (dict[key]) el.textContent = dict[key];
         });
     }
-
     updateLangIndicator() {
         const indicator = document.getElementById("currentLang");
         if (indicator) indicator.textContent = this.lang.toUpperCase();
@@ -193,13 +198,11 @@ function initAdbuilder() {
         setTimeout(initAdbuilder, 300);
         return;
     }
-
     if (!app.adbuilder) {
         app.adbuilder = new Adbuilder();
         app.copyMethodsFromManager?.(app.adbuilder);
         console.log("✅ Adbuilder-Klasse initialisiert");
     }
-
     // === Sidebar-Integration (robust) ===
     const waitForSidebar = setInterval(() => {
         const sidebar = document.getElementById("sidebar");
@@ -210,15 +213,12 @@ function initAdbuilder() {
             console.log("⏳ Warte auf Sidebar-Buttons...");
             return;
         }
-
         clearInterval(waitForSidebar);
-
         // Prüfen, ob AdBuilder-Button bereits existiert
         if (document.getElementById("menu-adbuilder")) {
             console.log("ℹ️ AdBuilder-Button existiert bereits.");
             return;
         }
-
         // 🔹 Button erzeugen
         const adbuilderBtn = document.createElement("button");
         adbuilderBtn.id = "menu-adbuilder";
@@ -228,11 +228,9 @@ function initAdbuilder() {
         <i class="fas fa-tools mr-3 w-5 text-center"></i>
         <span data-i18n="nav.adbuilder">AdBuilder</span>
     `;
-
         // 🔹 Über Settings einfügen
         sidebarButtonsContainer.insertBefore(adbuilderBtn, settingsButton);
         console.log("🧩 AdBuilder-Button über Settings eingefügt.");
-
         // 🔹 Klick-Event
         adbuilderBtn.addEventListener("click", async (e) => {
             e.preventDefault();
@@ -245,14 +243,11 @@ function initAdbuilder() {
             }
         });
     }, 300);
-
-
     // === Übersetzer ===
     if (!window.adbuilderTranslator) {
         window.adbuilderTranslator = new AdbuilderTranslator(16);
         adbuilderTranslator.applyTranslations();
     }
-
     // === Sprache synchronisieren ===
     if (app.toggleLanguage && !app._adbuilderToggleWrapped) {
         const original = app.toggleLanguage.bind(app);
@@ -265,7 +260,6 @@ function initAdbuilder() {
         app._adbuilderToggleWrapped = true;
     }
 }
-
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initAdbuilder);
 } else {
