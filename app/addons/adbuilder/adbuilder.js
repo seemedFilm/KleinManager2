@@ -19,6 +19,7 @@ class Adbuilder extends KleinManagerCore {
        ----------------------------------------------- */
     async loadAdbuilderSection() {
         try {
+            
             console.log("⏳ Lade Adbuilder HTML...");
 
             const res = await fetch("/addons/adbuilder/adbuilder.html");
@@ -37,7 +38,8 @@ class Adbuilder extends KleinManagerCore {
             if (!main) throw new Error("#content-area nicht gefunden.");
 
             // Section anlegen, falls sie nicht existiert
-            let container = document.getElementById("adbuilder");
+            // let container = document.getElementById("adbuilder");
+            let container = document.querySelector(".lg\\:ml-64.flex-1 .p-4.lg\\:p-6");
             if (!container) {
                 container = document.createElement("section");
                 container.id = "adbuilder";

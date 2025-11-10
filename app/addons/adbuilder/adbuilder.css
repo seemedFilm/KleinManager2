@@ -1,0 +1,43 @@
+  label {
+    color: white;
+  }
+  h1 {
+    color: red;
+    font-weight: bold;
+    size: 456px;
+  }
+
+    .container {
+    max-width: 700px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+  }
+
+  input[type="text"],
+  textarea,
+  select {
+    width: 100%;
+    padding: 6px;
+    margin-top: 4px;
+    box-sizing: border-box;
+  }
+
+  button {
+    margin: 6px 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    
+  }
+  .price {
+    width: 50%;
+  }
+
+  #adsFileList label {
+color: white;
+}
+
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
