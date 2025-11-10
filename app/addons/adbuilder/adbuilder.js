@@ -17,7 +17,7 @@ class Adbuilder extends KleinManagerCore {
     /* -----------------------------------------------
        Lädt die HTML-Section für den Adbuilder
        ----------------------------------------------- */
-async loadAdbuilderSection() {
+    async loadAdbuilderSection() {
         try {
             // CSS nur einmal laden
             const cssPath = "/app/addons/adbuilder/adbuilder.css";
@@ -151,7 +151,72 @@ async loadAdbuilderSection() {
             console.error("❌ Fehler bei refreshAds:", err);
         }
     }
+    handleFileSelection(input) {
+        const statusText = document.getElementById("fileStatusText");
+        const t = this.customTranslations?.[this.currentLang] || this.customTranslations?.en;
 
+        if (input.files.length === 0) {
+            statusText.textContent = t.noFilesSelected;
+        } else {
+            const count = input.files.length;
+            statusText.textContent = `${count} ${count === 1 ? t.fileSelected : t.filesSelected}`;
+        }
+    }
+
+    async updateImageList(title = null) {
+        const imageList = document.getElementById("imageList");
+        //imageList.innerHTML = "";
+        let files = [];
+        if (!title) {
+            files = Array.from(document.getElementById("Images").files);
+
+            if (!files.length) {
+                imageList.innerHTML =
+                    `<li class='italic text-gray-400'>${this.customTranslations[this.currentLang].noPicturesSel}</li>`;
+                return;
+            }
+            files.forEach(file => {
+                const li = document.createElement("li");
+                li.textContent = file.name;
+                li.className = "border-gray-700 py-0.5 text-gray-100";
+                imageList.appendChild(li);
+            });
+            console.log(`${files.length} ${this.customTranslations[this.currentLang].loadPictures}.`);
+            return;
+        }
+        try {
+            const res = await fetch(`/api/v1/adbuilder/load_ad`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title })
+            });
+            const data = await res.json();
+            if (data.error) {
+                console.error(`${this.customTranslations[this.currentLang].errorImgLoad}: ${data.error}`);
+                imageList.innerHTML =
+                    `<li class='italic text-red-400'>${this.customTranslations[this.currentLang].errorLoading}</li>`;
+                return;
+            }
+            if (Array.isArray(data.images) && data.images.length > 0) {
+                data.images.forEach(imgPath => {
+                    const fileName = imgPath.split(/[\\/]/).pop();
+                    const li = document.createElement("li");
+                    li.textContent = fileName;
+                    li.className = "border-gray-700 py-0.5 text-gray-100";
+                    imageList.appendChild(li);
+                });
+                console.log(`📂 ${data.images.length} ${this.customTranslations[this.currentLang].loadPictures}.`);
+            } else {
+                imageList.innerHTML =
+                    `<li class='italic text-gray-400'>${this.customTranslations[this.currentLang].noPictures}</li>`;
+            }
+        } catch (err) {
+            //console.error(`${this.customTranslations[this.currentLang].errorAdLoading}: ${err}`);
+            console.error(`Error updateImageList:  ${err}`);
+            imageList.innerHTML =
+                `<li class='${this.customTranslations[this.currentLang].errorAdLoading}</li>`;
+        }
+    }
     _wireUiEvents() {
         const saveBtn = document.getElementById("save_adfile");
         if (saveBtn) {
@@ -166,10 +231,72 @@ async loadAdbuilderSection() {
 class AdbuilderTranslator {
     constructor(maxPictures = 16) {
         this.lang = localStorage.getItem("language") || "en";
-        this.translations = {
-            en: { "adbuilder.formTitle": "Create Ad" },
-            de: { "adbuilder.formTitle": "Anzeige erstellen" }
-        };
+        this.customTranslations = {
+            en: {
+                title: "Title",
+                description: "Description",
+                category: "Category",
+                price: "Price (â‚¬)",
+                priceType: "Price Type",
+                sell_directly: "Sell Directly",
+                shipping: "Shipping Options",
+                save: "Save",
+                load: "Load",
+                clear: "Clear",
+                preview: "Preview",
+                alert_noTitle: "Please enter a title!",
+                alert_saved: "Ad saved successfully!",
+                errorCategory: "Error on category loading:",
+                noCategory: "No Categories found.",
+                maxPictures: `Only ${maxPictures} Pictures allowed`,
+                pictures: "Pictures saved in",
+                errorUpload: "Error during the upload",
+                infoImageList: "Imagelist successfully updated",
+                errorAdLoading: "Error during the ad loading",
+                infoThumbnail: "Pictures and thumbnails updated successfully",
+                errorThumbnail: "Thumbnail loading error:",
+                noPictures: "No Pictures found",
+                loadPictures: "saved picture(s) loaded into the list",
+                noPreview: "No preview available",
+                noPicturesSel: "No Pictures selected",
+                loadThumbnail: "thumbnail(s) loaded",
+                minPicture: "Please select atleast one picture to upload!",
+                loadPreview: "Loading Preview"
+            },
+            de: {
+                title: "Titel",
+                description: "Beschreibung",
+                category: "Kategorie",
+                price: "Preis (â‚¬)",
+                priceType: "Preistyp",
+                sell_directly: "Sofortkauf",
+                shipping: "Versandoptionen:",
+                save: "Speichern",
+                load: "Laden",
+                clear: "Leeren",
+                preview: "Vorschau",
+                alert_noTitle: "Bitte einen Titel eingeben!",
+                alert_saved: "Anzeige erfolgreich gespeichert!",
+                errorCategory: "Fehler beim Kategorie laden:",
+                noCategory: "Keine Kategorien gefunden.",
+                maxPictures: `Nur ${maxPictures} Bilder sind erlaubt`,
+                pictures: "Bilder gespeichert in",
+                errorUpload: "Fehler beim Upload",
+                infoImageList: "Bilder Liste aktualisiert.",
+                errorAdLoading: "Fehler beim Anzeige laden",
+                infoThumbnail: "Bilder und Vorschaubilder geladen.",
+                errorThumbnail: "Laden Thumbnails Fehler",
+                noPictures: "Keine Bilder gefunden",
+                loadPictures: "Bild(er) in die Liste geladen",
+                noPreview: "Keine Vorschau verfÃ¼gbar",
+                noPicturesSel: "No Pictures selected",
+                loadThumbnail: "Thumbnail(s) geladen",
+                minPicture: "Mindestens ein Bild zum Hochladen auswÃ¤hlen",
+                loadPreview: "Lade Vorschau"
+
+            } //sample: this.customTranslations[this.currentLang].noPreview
+        };    //sample: console.error(`${this.currentLang === "en" ? "No Categories found" : "Keine Kategorien gefunden"}`);
+
     }
     toggleLanguage(externalLang = null) {
         this.lang = externalLang || (this.lang === "en" ? "de" : "en");
@@ -178,7 +305,7 @@ class AdbuilderTranslator {
         this.updateLangIndicator();
     }
     applyTranslations() {
-        const dict = this.translations[this.lang] || this.translations.en;
+        const dict = app.translations[app.lang] || app.translations.en;
         document.querySelectorAll("[data-i18n]").forEach(el => {
             const key = el.getAttribute("data-i18n");
             if (dict[key]) el.textContent = dict[key];
