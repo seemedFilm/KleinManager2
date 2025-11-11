@@ -8,10 +8,16 @@ class Adbuilder extends KleinManagerCore {
         this.maxPictures = 16;
         this.currentLang = localStorage.getItem("language") || "en";
 
-        document.addEventListener("languageChanged", () => {
-            this.currentLang = localStorage.getItem("language") || this.currentLang;
-            this.applyAdbuilderTranslations();
-        });
+        // document.addEventListener("languageChanged", () => {
+        //     this.currentLang = localStorage.getItem("language") || this.currentLang;
+        //     this.applyAdbuilderTranslations();
+        // });
+        // Sprache aus localStorage lesen
+        this.currentLang = localStorage.getItem("language") || "en";
+        console.log(`${localStorage.getItem("language")}`)
+
+        // Observer für Sprachwechsel registrieren
+        document.addEventListener("languageChanged", () => this.applyAdbuilderTranslations());
     }
 
     /* -----------------------------------------------
@@ -83,17 +89,55 @@ class Adbuilder extends KleinManagerCore {
         }
     }
 
+    // applyAdbuilderTranslations() {
+    //     const t = this.customTranslations[this.currentLang];
+
+    //     const elements = {
+    //         titleLabel: document.querySelector("label[for='title']"),
+    //         descriptionLabel: document.querySelector("label[for='description']"),
+    //         categoryLabel: document.querySelector("label[for='category']"),
+    //         priceLabel: document.querySelector("label[for='price']"),
+    //         priceTypeLabel: document.querySelector("label[for='price_type']"),
+    //         sell_directlyLabel: document.querySelector("label[for='sell_directly']"),
+    //         shippingLabel: document.querySelector("#shipping_options label.font-bold"),
+    //         saveButton: document.querySelector("#save_adfile"),
+    //         loadButton: document.querySelector("#load_adfile"),
+    //         clearButton: document.querySelector("#clear_adfile"),
+    //         previewButton: document.querySelector("#uploadButton"),
+    //     };
+
+    //     if (elements.titleLabel) elements.titleLabel.textContent = t.title;
+    //     if (elements.descriptionLabel) elements.descriptionLabel.textContent = t.description;
+    //     if (elements.categoryLabel) elements.categoryLabel.textContent = t.category;
+    //     if (elements.priceLabel) elements.priceLabel.textContent = t.price;
+    //     if (elements.priceTypeLabel) elements.priceTypeLabel.textContent = t.priceType;
+    //     if (elements.sell_directlyLabel) elements.sell_directlyLabel.textContent = t.sell_directly;
+    //     if (elements.shippingLabel) elements.shippingLabel.textContent = t.shipping;
+
+    //     if (elements.saveButton) elements.saveButton.textContent = t.save;
+    //     if (elements.loadButton) elements.loadButton.textContent = t.load;
+    //     if (elements.clearButton) elements.clearButton.textContent = t.clear;
+    //     if (elements.previewButton) elements.previewButton.textContent = t.preview;
+    // }
     applyAdbuilderTranslations() {
-        if (!window.adbuilderTranslator) return;
-        const dict =
-            adbuilderTranslator.translations[adbuilderTranslator.lang] ||
-            adbuilderTranslator.translations.en || {};
-        document.querySelectorAll("[data-i18n]").forEach(el => {
-            const key = el.getAttribute("data-i18n");
-            if (dict[key]) el.textContent = dict[key];
-        });
-        console.log("🈶 Adbuilder Übersetzungen angewendet:", adbuilderTranslator.lang);
+    if (!window.adbuilderTranslator || !adbuilderTranslator.translations) {
+        console.warn("⚠️ Kein Übersetzer aktiv, Übersetzungen werden übersprungen.");
+        return;
     }
+
+    const dict =
+        adbuilderTranslator.translations[adbuilderTranslator.lang] ||
+        adbuilderTranslator.translations.en ||
+        {};
+
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (dict[key]) el.textContent = dict[key];
+    });
+
+    console.log("🈶 Adbuilder-Übersetzungen angewendet:", adbuilderTranslator.lang);
+}
+
 
     async loadCategories() {
         try {
@@ -296,7 +340,58 @@ class AdbuilderTranslator {
 
             } //sample: this.customTranslations[this.currentLang].noPreview
         };    //sample: console.error(`${this.currentLang === "en" ? "No Categories found" : "Keine Kategorien gefunden"}`);
-
+        this.translations = {
+            en: {
+                "adbuilder.formTitle": "Create Ad",
+                "adbuilder.title": "Title",
+                "adbuilder.description": "Description",
+                "adbuilder.category": "Category",
+                "adbuilder.price": "Price (€)",
+                "adbuilder.priceType": "Price Type:",
+                "adbuilder.priceType.default": "---select---",
+                "adbuilder.priceType.negotiable": "Negotiable",
+                "adbuilder.priceType.fixed": "Fixed",
+                "adbuilder.priceType.giveaway": "Giveaway",
+                "adbuilder.sell_directly": "Sell Directly",
+                "adbuilder.shipping": "Shipping Options:",
+                "adbuilder.shipping_type.default": "---select---",
+                "adbuilder.shipping_type.pickup": "Pickup",
+                "adbuilder.shipping_type.shipping": "Shipping",
+                "adbuilder.shipping_type.not-applicable": "Not Applicable",
+                "adbuilder.actions.save": "Save",
+                "adbuilder.actions.load": "Load",
+                "adbuilder.actions.clear": "Clear",
+                "adbuilder.actions.preview": "Preview",
+                "adbuilder.images": "Images:",
+                "adbuilder.noImages": "No pictures selected",
+                "adbuilder.templates": "Select template:",
+            },
+            de: {
+                "adbuilder.formTitle": "Erstelle Anzeige",
+                "adbuilder.title": "Titel",
+                "adbuilder.description": "Beschreibung",
+                "adbuilder.category": "Kategorie",
+                "adbuilder.price": "Preis (€)",
+                "adbuilder.priceType": "Preistyp:",
+                "adbuilder.priceType.default": "---Auswählen---",
+                "adbuilder.priceType.negotiable": "Verhandlungsbasis",
+                "adbuilder.priceType.fixed": "Festpreis",
+                "adbuilder.priceType.giveaway": "Zu Verschenken",
+                "adbuilder.sell_directly": "Sofortkauf",
+                "adbuilder.shipping": "Versandoptionen:",
+                "adbuilder.shipping_type.default": "---Auswählen---",
+                "adbuilder.shipping_type.pickup": "Abholung",
+                "adbuilder.shipping_type.shipping": "Versand",
+                "adbuilder.shipping_type.not-applicable": "Keine Angabe",
+                "adbuilder.actions.save": "Speichern",
+                "adbuilder.actions.load": "Laden",
+                "adbuilder.actions.clear": "Leeren",
+                "adbuilder.actions.preview": "Vorschau",
+                "adbuilder.images": "Bilder:",
+                "adbuilder.noImages": "Keine Bilder ausgewählt",
+                "adbuilder.templates": "Vorlage auswählen:",
+            }
+        };
     }
     toggleLanguage(externalLang = null) {
         this.lang = externalLang || (this.lang === "en" ? "de" : "en");
@@ -382,7 +477,7 @@ function initAdbuilder() {
             original();
             const currentLang = localStorage.getItem("language") || "en";
             adbuilderTranslator.toggleLanguage(currentLang);
-            console.log("🌐 Sprache gewechselt → Seite & Adbuilder aktualisiert");
+            console.log("🌐 Sprache gewechselt → Seite & Adbuilder aktualisiert", {currentLang});
         };
         app._adbuilderToggleWrapped = true;
     }

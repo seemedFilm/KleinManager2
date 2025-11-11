@@ -70,8 +70,7 @@ class KleinManagerCore {
                 'stats.newSellers': 'New Sellers',
                 'status.ordered': 'Ordered',
                 'status.shipped': 'Shipped',
-                'status.delivered': 'Delivered',
-                'adbuilder.title': 'Titel-222-ENG'
+                'status.delivered': 'Delivered'
             },
             de: {
                 'nav.dashboard': 'Übersicht',
@@ -128,8 +127,7 @@ class KleinManagerCore {
                 'stats.newSellers': 'Neue Verkäufer',
                 'status.ordered': 'Bestellt',
                 'status.shipped': 'Versendet',
-                'status.delivered': 'Zugestellt',
-                'adbuilder.title': 'Titel-222'
+                'status.delivered': 'Zugestellt'
             }
         };
     }
