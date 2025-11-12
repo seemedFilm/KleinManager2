@@ -88,7 +88,6 @@ class Adbuilder extends KleinManagerCore {
             main.appendChild(fallback);
         }
     }
-
     // applyAdbuilderTranslations() {
     //     const t = this.customTranslations[this.currentLang];
 
@@ -137,8 +136,6 @@ class Adbuilder extends KleinManagerCore {
 
         console.log("🈶 Adbuilder-Übersetzungen angewendet:", adbuilderTranslator.lang);
     }
-
-
     async loadCategories() {
         try {
             const select = document.getElementById("category");
@@ -163,7 +160,6 @@ class Adbuilder extends KleinManagerCore {
             console.error("❌ Kategorien konnten nicht geladen werden:", err);
         }
     }
-
     async refreshAds() {
         try {
             const res = await fetch("/api/v1/adbuilder/list_files");
@@ -208,15 +204,16 @@ class Adbuilder extends KleinManagerCore {
     }
 
     async updateImageList(title = null) {
-        const imageList = document.getElementById("imageList");
-        //imageList.innerHTML = "";
+        //const imageList = document.getElementById("imageList");
+         const imageList = document.getElementById("fileStatusText");
+        imageList.innerHTML = "";
         let files = [];
         if (!title) {
             files = Array.from(document.getElementById("Images").files);
 
             if (!files.length) {
                 imageList.innerHTML =
-                    `<li class='italic text-gray-400'>${this.customTranslations[this.currentLang].noPicturesSel}</li>`;
+                    `<li class='italic text-gray-400'>${adbuilderTranslator.translations[adbuilderTranslator.lang].noPictures}</li>`;
                 return;
             }
             files.forEach(file => {
@@ -225,7 +222,7 @@ class Adbuilder extends KleinManagerCore {
                 li.className = "border-gray-700 py-0.5 text-gray-100";
                 imageList.appendChild(li);
             });
-            console.log(`${files.length} ${this.customTranslations[this.currentLang].loadPictures}.`);
+            console.log(`${files.length} ${adbuilderTranslator.translations[adbuilderTranslator.lang].loadPictures}.`);
             return;
         }
         try {
@@ -236,9 +233,9 @@ class Adbuilder extends KleinManagerCore {
             });
             const data = await res.json();
             if (data.error) {
-                console.error(`${this.customTranslations[this.currentLang].errorImgLoad}: ${data.error}`);
+                console.error(`${adbuilderTranslator.translations[adbuilderTranslator.lang].errorImgLoad}: ${data.error}`);
                 imageList.innerHTML =
-                    `<li class='italic text-red-400'>${this.customTranslations[this.currentLang].errorLoading}</li>`;
+                    `<li class='italic text-red-400'>${adbuilderTranslator.translations[adbuilderTranslator.lang].errorLoading}</li>`;
                 return;
             }
             if (Array.isArray(data.images) && data.images.length > 0) {
@@ -249,22 +246,28 @@ class Adbuilder extends KleinManagerCore {
                     li.className = "border-gray-700 py-0.5 text-gray-100";
                     imageList.appendChild(li);
                 });
-                console.log(`📂 ${data.images.length} ${this.customTranslations[this.currentLang].loadPictures}.`);
+                console.log(`📂 ${data.images.length} ${adbuilderTranslator.translations[adbuilderTranslator.lang].loadPictures}.`);
             } else {
                 imageList.innerHTML =
-                    `<li class='italic text-gray-400'>${this.customTranslations[this.currentLang].noPictures}</li>`;
+                    `<li class='italic text-gray-400'>${adbuilderTranslator.translations[adbuilderTranslator.lang].noPictures}</li>`;
             }
         } catch (err) {
             //console.error(`${this.customTranslations[this.currentLang].errorAdLoading}: ${err}`);
             console.error(`Error updateImageList:  ${err}`);
             imageList.innerHTML =
-                `<li class='${this.customTranslations[this.currentLang].errorAdLoading}</li>`;
+                `<li class='${adbuilderTranslator.translations[adbuilderTranslator.lang].errorAdLoading}</li>`;
         }
     }
     _wireUiEvents() {
         const saveBtn = document.getElementById("save_adfile");
         if (saveBtn) {
             saveBtn.addEventListener("click", () => alert("Anzeige gespeichert!"));
+        }
+        const imageInput = document.getElementById("Images");
+        if (imageInput) {
+            imageInput.addEventListener("change", async (e) => {
+                await this.updateImageList(); // korrekt im Addbuilder-Kontext
+            });
         }
     }
 }
@@ -275,71 +278,71 @@ class Adbuilder extends KleinManagerCore {
 class AdbuilderTranslator {
     constructor(maxPictures = 16) {
         this.lang = localStorage.getItem("language") || "en";
-        this.customTranslations = {
-            en: {
-                title: "Title",
-                description: "Description",
-                category: "Category",
-                price: "Price (â‚¬)",
-                priceType: "Price Type",
-                sell_directly: "Sell Directly",
-                shipping: "Shipping Options",
-                save: "Save",
-                load: "Load",
-                clear: "Clear",
-                preview: "Preview",
-                alert_noTitle: "Please enter a title!",
-                alert_saved: "Ad saved successfully!",
-                errorCategory: "Error on category loading:",
-                noCategory: "No Categories found.",
-                maxPictures: `Only ${maxPictures} Pictures allowed`,
-                pictures: "Pictures saved in",
-                errorUpload: "Error during the upload",
-                infoImageList: "Imagelist successfully updated",
-                errorAdLoading: "Error during the ad loading",
-                infoThumbnail: "Pictures and thumbnails updated successfully",
-                errorThumbnail: "Thumbnail loading error:",
-                noPictures: "No Pictures found",
-                loadPictures: "saved picture(s) loaded into the list",
-                noPreview: "No preview available",
-                noPicturesSel: "No Pictures selected",
-                loadThumbnail: "thumbnail(s) loaded",
-                minPicture: "Please select atleast one picture to upload!",
-                loadPreview: "Loading Preview"
-            },
-            de: {
-                title: "Titel",
-                description: "Beschreibung",
-                category: "Kategorie",
-                price: "Preis (â‚¬)",
-                priceType: "Preistyp",
-                sell_directly: "Sofortkauf",
-                shipping: "Versandoptionen:",
-                save: "Speichern",
-                load: "Laden",
-                clear: "Leeren",
-                preview: "Vorschau",
-                alert_noTitle: "Bitte einen Titel eingeben!",
-                alert_saved: "Anzeige erfolgreich gespeichert!",
-                errorCategory: "Fehler beim Kategorie laden:",
-                noCategory: "Keine Kategorien gefunden.",
-                maxPictures: `Nur ${maxPictures} Bilder sind erlaubt`,
-                pictures: "Bilder gespeichert in",
-                errorUpload: "Fehler beim Upload",
-                infoImageList: "Bilder Liste aktualisiert.",
-                errorAdLoading: "Fehler beim Anzeige laden",
-                infoThumbnail: "Bilder und Vorschaubilder geladen.",
-                errorThumbnail: "Laden Thumbnails Fehler",
-                noPictures: "Keine Bilder gefunden",
-                loadPictures: "Bild(er) in die Liste geladen",
-                noPreview: "Keine Vorschau verfÃ¼gbar",
-                noPicturesSel: "No Pictures selected",
-                loadThumbnail: "Thumbnail(s) geladen",
-                minPicture: "Mindestens ein Bild zum Hochladen auswÃ¤hlen",
-                loadPreview: "Lade Vorschau"
+        // this.customTranslations = {
+        //     en: {
+        //         title: "Title",
+        //         description: "Description",
+        //         category: "Category",
+        //         price: "Price (â‚¬)",
+        //         priceType: "Price Type",
+        //         sell_directly: "Sell Directly",
+        //         shipping: "Shipping Options",
+        //         save: "Save",
+        //         load: "Load",
+        //         clear: "Clear",
+        //         preview: "Preview",
+        //         alert_noTitle: "Please enter a title!",
+        //         alert_saved: "Ad saved successfully!",
+        //         errorCategory: "Error on category loading:",
+        //         noCategory: "No Categories found.",
+        //         maxPictures: `Only ${maxPictures} Pictures allowed`,
+        //         pictures: "Pictures saved in",
+        //         errorUpload: "Error during the upload",
+        //         infoImageList: "Imagelist successfully updated",
+        //         errorAdLoading: "Error during the ad loading",
+        //         infoThumbnail: "Pictures and thumbnails updated successfully",
+        //         errorThumbnail: "Thumbnail loading error:",
+        //         noPictures: "No Pictures found",
+        //         loadPictures: "saved picture(s) loaded into the list",
+        //         noPreview: "No preview available",
+        //         noPicturesSel: "No Pictures selected",
+        //         loadThumbnail: "thumbnail(s) loaded",
+        //         minPicture: "Please select atleast one picture to upload!",
+        //         loadPreview: "Loading Preview"
+        //     },
+        //     de: {
+        //         title: "Titel",
+        //         description: "Beschreibung",
+        //         category: "Kategorie",
+        //         price: "Preis (â‚¬)",
+        //         priceType: "Preistyp",
+        //         sell_directly: "Sofortkauf",
+        //         shipping: "Versandoptionen:",
+        //         save: "Speichern",
+        //         load: "Laden",
+        //         clear: "Leeren",
+        //         preview: "Vorschau",
+        //         alert_noTitle: "Bitte einen Titel eingeben!",
+        //         alert_saved: "Anzeige erfolgreich gespeichert!",
+        //         errorCategory: "Fehler beim Kategorie laden:",
+        //         noCategory: "Keine Kategorien gefunden.",
+        //         maxPictures: `Nur ${maxPictures} Bilder sind erlaubt`,
+        //         pictures: "Bilder gespeichert in",
+        //         errorUpload: "Fehler beim Upload",
+        //         infoImageList: "Bilder Liste aktualisiert.",
+        //         errorAdLoading: "Fehler beim Anzeige laden",
+        //         infoThumbnail: "Bilder und Vorschaubilder geladen.",
+        //         errorThumbnail: "Laden Thumbnails Fehler",
+        //         noPictures: "Keine Bilder gefunden",
+        //         loadPictures: "Bild(er) in die Liste geladen",
+        //         noPreview: "Keine Vorschau verfÃ¼gbar",
+        //         noPicturesSel: "No Pictures selected",
+        //         loadThumbnail: "Thumbnail(s) geladen",
+        //         minPicture: "Mindestens ein Bild zum Hochladen auswÃ¤hlen",
+        //         loadPreview: "Lade Vorschau"
 
-            } //sample: this.customTranslations[this.currentLang].noPreview
-        };    //sample: console.error(`${this.currentLang === "en" ? "No Categories found" : "Keine Kategorien gefunden"}`);
+        //     } //sample: this.customTranslations[this.currentLang].noPreview
+        // };    //sample: console.error(`${this.currentLang === "en" ? "No Categories found" : "Keine Kategorien gefunden"}`);
         this.translations = {
             en: {
                 "adbuilder.formTitle": "Create Ad",
@@ -365,6 +368,9 @@ class AdbuilderTranslator {
                 "adbuilder.actions.preview": "Preview",
                 "adbuilder.images": "Images:",
                 "adbuilder.noImages": "No pictures selected",
+                "adbuilder.chooseFiles": "Choose files",
+                "adbuilder.errorAdLoading": "Error during the ad loading",
+                "adbuilder.noPictures": "No Pictures selected",
                 "adbuilder.templates": "Select template:",
             },
             de: {
@@ -391,6 +397,9 @@ class AdbuilderTranslator {
                 "adbuilder.actions.preview": "Vorschau",
                 "adbuilder.images": "Bilder:",
                 "adbuilder.noImages": "Keine Bilder ausgewählt",
+                "adbuilder.chooseFiles": "Bilder auswählen",
+                "adbuilder.errorAdLoading": "Fehler beim Anzeigen laden",
+                "adbuilder.noPictures": "Keine Bilder ausgewählt",
                 "adbuilder.templates": "Vorlage auswählen:",
             }
         };
@@ -420,6 +429,7 @@ class AdbuilderTranslator {
         console.log(`updateLangIndicator: ${indicator}`)
         if (indicator) indicator.textContent = this.lang.toUpperCase();
     }
+
 }
 
 /* ===========================================================
@@ -497,4 +507,38 @@ if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initAdbuilder);
 } else {
     initAdbuilder();
+}
+function showLocalThumbnails() {
+    const files = document.getElementById("Images").files;
+    const thumbsContainerId = "thumbnails-container";
+    const thumbsDiv = document.getElementById("thumbnails-container");
+    thumbsDiv.classList.remove("hidden");
+    thumbsDiv.innerHTML = "";
+    if (!files.length) {
+        thumbsDiv.innerHTML = `<p class='text-gray-400 italic'>${this.Translations[this.lang].noPicturesSel}</p>`;
+        thumbsDiv.classList.add("hidden");
+        return;
+    }
+    Array.from(files).forEach(file => {
+        if (!file.type.startsWith("image/")) {
+            return;
+        }
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(file);
+        img.alt = file.name;
+        img.className = "h-36 w-auto object-cover rounded-md border border-gray-600 cursor-pointer hover:scale-105 transition-transform";
+        img.onclick = () => {
+            const overlay = document.createElement("div");
+            overlay.className = "fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50";
+            overlay.onclick = () => overlay.remove();
+            const largeImg = document.createElement("img");
+            largeImg.src = img.src;
+            largeImg.className = "max-h-[90vh] max-w-[90vw] rounded-xl shadow-lg border border-gray-700";
+            overlay.appendChild(largeImg);
+            document.body.appendChild(overlay);
+        };
+        thumbsDiv.appendChild(img);
+    });
+
+    console.log(`${files.length} ${this.Translations[this.lang].loadThumbnail}.`);
 }

@@ -112,8 +112,7 @@
                             <div class="relative w-fit">
                                 <!-- Unsichtbares echtes Input -->
                                 <input type="file" id="Images" name="Images" accept="image/jpeg,image/png" multiple
-                                    class="absolute inset-0 opacity-0 cursor-pointer"
-                                    onchange="app.updateImageList(this)" />
+                                    class="absolute inset-0 opacity-0 cursor-pointer" />
 
                                 <!-- Sichtbarer „Button“ -->
                                 <button type="button" id="btnFileLabel" data-i18n="adbuilder.chooseFiles"
@@ -121,11 +120,16 @@
                                     Dateien auswählen
                                 </button>
                             </div>
-
-                            <span id="fileStatusText" data-i18n="adbuilder.noImages"
-                                class="italic text-gray-400 mt-2">
-                                Keines Bilder ausgewählt...
-                            </span>
+                            <ul id="fileStatusText">
+                                <li data-i18n="adbuilder.noImages" class="italic text-gray-400 mt-2">
+                                    No Pictures available
+                                </li>
+                            </ul>
+                            <!-- <ul id="imageList"
+                                class="w-fit min-w-[250px] border border-gray-700 rounded-lg p-2 text-sm text-white bg-gray-800 min-h-[8px] max-h-[200px] overflow-y-auto overflow-x-hidden box-border">
+                                <li class="italic text-gray-300" data-i18n="adbuilder.noImages">No Pictures available
+                                </li>
+                            </ul> -->
                         </div>
 
                         <!-- Rechts -->
