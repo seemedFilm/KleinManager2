@@ -6,15 +6,15 @@ class Adbuilder extends KleinManagerCore {
     constructor() {
         super();
         this.maxPictures = 16;
-        this.currentLang = localStorage.getItem("language") || "en";
+        //this.currentLang = localStorage.getItem("language") || "en";
 
         // document.addEventListener("languageChanged", () => {
         //     this.currentLang = localStorage.getItem("language") || this.currentLang;
         //     this.applyAdbuilderTranslations();
         // });
         // Sprache aus localStorage lesen
-        this.currentLang = localStorage.getItem("language") || "en";
-        console.log(`${localStorage.getItem("language")}`)
+        //this.currentLang = localStorage.getItem("language") || "en";
+        //console.log(`${localStorage.getItem("language")}`)
 
         // Observer für Sprachwechsel registrieren
         document.addEventListener("languageChanged", () => this.applyAdbuilderTranslations());
@@ -120,23 +120,23 @@ class Adbuilder extends KleinManagerCore {
     //     if (elements.previewButton) elements.previewButton.textContent = t.preview;
     // }
     applyAdbuilderTranslations() {
-    if (!window.adbuilderTranslator || !adbuilderTranslator.translations) {
-        console.warn("⚠️ Kein Übersetzer aktiv, Übersetzungen werden übersprungen.");
-        return;
+        if (!window.adbuilderTranslator || !adbuilderTranslator.translations) {
+            console.warn("⚠️ Kein Übersetzer aktiv, Übersetzungen werden übersprungen.");
+            return;
+        }
+
+        const dict =
+            adbuilderTranslator.translations[adbuilderTranslator.lang] ||
+            adbuilderTranslator.translations.en ||
+            {};
+
+        document.querySelectorAll("[data-i18n]").forEach(el => {
+            const key = el.getAttribute("data-i18n");
+            if (dict[key]) el.textContent = dict[key];
+        });
+
+        console.log("🈶 Adbuilder-Übersetzungen angewendet:", adbuilderTranslator.lang);
     }
-
-    const dict =
-        adbuilderTranslator.translations[adbuilderTranslator.lang] ||
-        adbuilderTranslator.translations.en ||
-        {};
-
-    document.querySelectorAll("[data-i18n]").forEach(el => {
-        const key = el.getAttribute("data-i18n");
-        if (dict[key]) el.textContent = dict[key];
-    });
-
-    console.log("🈶 Adbuilder-Übersetzungen angewendet:", adbuilderTranslator.lang);
-}
 
 
     async loadCategories() {
@@ -354,6 +354,7 @@ class AdbuilderTranslator {
                 "adbuilder.priceType.giveaway": "Giveaway",
                 "adbuilder.sell_directly": "Sell Directly",
                 "adbuilder.shipping": "Shipping Options:",
+                "adbuilder.shippingType": "Shipping Type:",
                 "adbuilder.shipping_type.default": "---select---",
                 "adbuilder.shipping_type.pickup": "Pickup",
                 "adbuilder.shipping_type.shipping": "Shipping",
@@ -379,6 +380,7 @@ class AdbuilderTranslator {
                 "adbuilder.priceType.giveaway": "Zu Verschenken",
                 "adbuilder.sell_directly": "Sofortkauf",
                 "adbuilder.shipping": "Versandoptionen:",
+                "adbuilder.shippingType": "Versandart:",
                 "adbuilder.shipping_type.default": "---Auswählen---",
                 "adbuilder.shipping_type.pickup": "Abholung",
                 "adbuilder.shipping_type.shipping": "Versand",
@@ -393,21 +395,29 @@ class AdbuilderTranslator {
             }
         };
     }
+    /* Sprache aktiv wechseln */
     toggleLanguage(externalLang = null) {
         this.lang = externalLang || (this.lang === "en" ? "de" : "en");
         localStorage.setItem("language", this.lang);
         this.applyTranslations();
-        this.updateLangIndicator();
+        console.log(`🌐 Adbuilder-Übersetzung aktualisiert (${this.lang})`);
     }
     applyTranslations() {
-        const dict = app.translations[app.lang] || app.translations.en;
-        document.querySelectorAll("[data-i18n]").forEach(el => {
+        const dict = this.translations[this.lang] || this.translations.en;
+        console.log(`🈶 applyTranslations → ${this.lang}`);
+
+        // Nur Elemente mit data-i18n, die mit "adbuilder." beginnen
+        document.querySelectorAll("[data-i18n^='adbuilder.']").forEach(el => {
             const key = el.getAttribute("data-i18n");
             if (dict[key]) el.textContent = dict[key];
         });
+        // Update Sidebar Language Indicator
+        const indicator = document.getElementById("currentLang");
+        if (indicator) indicator.textContent = this.lang.toUpperCase();
     }
     updateLangIndicator() {
         const indicator = document.getElementById("currentLang");
+        console.log(`updateLangIndicator: ${indicator}`)
         if (indicator) indicator.textContent = this.lang.toUpperCase();
     }
 }
@@ -477,10 +487,11 @@ function initAdbuilder() {
             original();
             const currentLang = localStorage.getItem("language") || "en";
             adbuilderTranslator.toggleLanguage(currentLang);
-            console.log("🌐 Sprache gewechselt → Seite & Adbuilder aktualisiert", {currentLang});
+            console.log("🌐 Sprache gewechselt → Seite & Adbuilder aktualisiert", { currentLang });
         };
         app._adbuilderToggleWrapped = true;
     }
+
 }
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initAdbuilder);
