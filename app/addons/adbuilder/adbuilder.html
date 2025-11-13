@@ -96,24 +96,14 @@
                 <div id="pictures" class="w-full flex flex-col border border-gray-700 rounded-xl p-4">
                     <div class="flex flex-row gap-4 items-start h-full">
                         <!-- Links -->
-                        <div class="flex flex-col w-1/3">
-                            <!-- <label for="Images" data-i18n="adbuilder.images"
-                                                class="font-bold mb-2 text-white">Images:</label>
-                                            <input type="file" id="Images" onchange="app.updateImageList()"
-                                                name="Images" accept="image/jpeg,image/png" multiple
-                                                class="w-fit text-sm text-white mb-2 file:mr-2 file:px-3 file:py-1 file:rounded file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700" />
-                                            <ul id="imageList"
-                                                class="w-fit min-w-[250px] border border-gray-700 rounded-lg p-2 text-sm text-white bg-gray-800 min-h-[8px] max-h-[200px] overflow-y-auto overflow-x-hidden box-border">
-                                                <li class="italic text-gray-300" data-i18n="adbuilder.noImages">No Pictures available</li>
-                                            </ul> -->
+                        <div class="flex flex-col w-1/3">                            
                             <label for="Images" data-i18n="adbuilder.images"
-                                class="font-bold mb-2 text-white">Bilder:</label>
+                                class="font-bold mb-2 text-white">Bilder</label>
 
                             <div class="relative w-fit">
                                 <!-- Unsichtbares echtes Input -->
                                 <input type="file" id="Images" name="Images" accept="image/jpeg,image/png" multiple
                                     class="absolute inset-0 opacity-0 cursor-pointer" />
-
                                 <!-- Sichtbarer „Button“ -->
                                 <button type="button" id="btnFileLabel" data-i18n="adbuilder.chooseFiles"
                                     class="file-button px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
@@ -125,11 +115,6 @@
                                     No Pictures available
                                 </li>
                             </ul>
-                            <!-- <ul id="imageList"
-                                class="w-fit min-w-[250px] border border-gray-700 rounded-lg p-2 text-sm text-white bg-gray-800 min-h-[8px] max-h-[200px] overflow-y-auto overflow-x-hidden box-border">
-                                <li class="italic text-gray-300" data-i18n="adbuilder.noImages">No Pictures available
-                                </li>
-                            </ul> -->
                         </div>
 
                         <!-- Rechts -->
