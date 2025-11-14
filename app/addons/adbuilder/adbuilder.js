@@ -5,10 +5,15 @@
 class Adbuilder extends KleinManagerCore {
     constructor() {
         super();
-        this.maxPictures = 16;        
+        this.maxPictures = 16;
         document.addEventListener("languageChanged", () => this.applyAdbuilderTranslations());
     }
-
+    // Helper
+    isEmpty(id) {
+        const el = document.getElementById(id);
+        return !el || !el.value || el.value.trim() === "";
+    }
+    // Helper
     /* -----------------------------------------------
        Lädt die HTML-Section für den Adbuilder
        ----------------------------------------------- */
@@ -209,15 +214,18 @@ class Adbuilder extends KleinManagerCore {
                 `<li class='${adbuilderTranslator.translations[adbuilderTranslator.lang]["adbuilder.errorAdLoading"]}</li>`;
         }
     }
+    //Used to attach events to HTML tags
     _wireUiEvents() {
-        const saveBtn = document.getElementById("save_adfile");
-        if (saveBtn) {
-            saveBtn.addEventListener("click", () => alert("Anzeige gespeichert!"));
-        }
+        // const saveBtn = document.getElementById("save_adfile");
+        // if (saveBtn) {
+        //     saveBtn.addEventListener("click", () =>
+        //         this.saveAdToFile()
+        //     );
+        // }
         const imageInput = document.getElementById("Images");
         if (imageInput) {
             imageInput.addEventListener("change", async (e) => {
-                await this.updateImageList(); // korrekt im Addbuilder-Kontext
+                await this.updateImageList();
             });
         }
     }
@@ -255,8 +263,23 @@ class Adbuilder extends KleinManagerCore {
 
         console.log(`${files.length} ${adbuilderTranslator.translations[adbuilderTranslator.lang].loadThumbnail}`);
     }
-    saveAdToFile() {
-        alert("fuuuuuuuuuuuuuuck gespeichert!")
+    saveAdFile() {
+        try {
+            let tit;
+            let pri;
+            let pri_type;
+            let ship_type;
+            //titel, preis, preistype, 
+            if (this.isEmpty("title")) { tit = "Keine Überschrift" }
+            if (this.isEmpty("price")) { pri = "Kein Preis" }
+            if (document.getElementById("price_type").selectedIndex === 0) { pri_type = "ungültiger Preistype" }
+            if (document.getElementById("shipping_type").selectedIndex === 0) { ship_type = "ungültige Versandart" }
+           console.log(`Meldung:\n${tit || ""}\n${pri || ""}\n${pri_type || ""}\n${ship_type || ""}\n`);
+           
+
+        } catch (err) {
+            console.log(`error: ${err}`)
+        }
     }
 }
 /* ===========================================================
@@ -264,7 +287,7 @@ class Adbuilder extends KleinManagerCore {
    =========================================================== */
 class AdbuilderTranslator {
     constructor(maxPictures = 16) {
-        this.lang = localStorage.getItem("language") || "en";       
+        this.lang = localStorage.getItem("language") || "en";
         this.translations = {
             en: {
                 "adbuilder.formTitle": "Create Ad",
@@ -285,6 +308,10 @@ class AdbuilderTranslator {
                 "adbuilder.shipping_type.shipping": "Shipping",
                 "adbuilder.shipping_type.not-applicable": "Not Applicable",
                 "adbuilder.actions.save": "Save",
+                "adbuilder.actions.save.title": "No Ad title provided",
+                "adbuilder.actions.save.price": "No price was entered",
+                "adbuilder.actions.save.pricetype": "Invalid pricetyp selected",
+                "adbuilder.actions.save.shippingtype": "Invalid shippingtyp selected",
                 "adbuilder.actions.load": "Load",
                 "adbuilder.actions.clear": "Clear",
                 "adbuilder.actions.preview": "Preview",
@@ -295,6 +322,7 @@ class AdbuilderTranslator {
                 "adbuilder.errorAdLoading": "Error during the ad loading",
                 "adbuilder.noPictures": "No Pictures selected",
                 "adbuilder.templates": "Select template:",
+                "adbuilder.actions.save.title": "",
             },
             de: {
                 "adbuilder.formTitle": "Erstelle Anzeige",
@@ -315,6 +343,10 @@ class AdbuilderTranslator {
                 "adbuilder.shipping_type.shipping": "Versand",
                 "adbuilder.shipping_type.not-applicable": "Keine Angabe",
                 "adbuilder.actions.save": "Speichern",
+                "adbuilder.actions.save.title": "Kein Angebots Titel angegeben",
+                "adbuilder.actions.save.price": "Kein Preis angegeben",
+                "adbuilder.actions.save.pricetype": "Ungültiger Preistyp",
+                "adbuilder.actions.save.shippingtype": "Ungültige Versandart",
                 "adbuilder.actions.load": "Laden",
                 "adbuilder.actions.clear": "Leeren",
                 "adbuilder.actions.preview": "Vorschau",
@@ -328,7 +360,12 @@ class AdbuilderTranslator {
             }
         };
     }
-    /* Sprache aktiv wechseln */
+    t(key) {
+        const lang = this.lang;
+        const dict = this.translations[lang] || this.translations.en;
+
+        return dict[key] || `⚠️ Missing translation: ${key}`;
+    }
     toggleLanguage(externalLang = null) {
         this.lang = externalLang || (this.lang === "en" ? "de" : "en");
         localStorage.setItem("language", this.lang);
@@ -338,7 +375,6 @@ class AdbuilderTranslator {
     applyTranslations() {
         const dict = this.translations[this.lang] || this.translations.en;
         console.log(`🈶 applyTranslations → ${this.lang}`);
-
         // Nur Elemente mit data-i18n, die mit "adbuilder." beginnen
         document.querySelectorAll("[data-i18n^='adbuilder.']").forEach(el => {
             const key = el.getAttribute("data-i18n");
@@ -358,6 +394,7 @@ class AdbuilderTranslator {
    Initialisierung
    =========================================================== */
 function initAdbuilder() {
+    window.adb_t = (key) => adbuilderTranslator.t(key);
     if (!window.app) {
         setTimeout(initAdbuilder, 300);
         return;
@@ -367,7 +404,7 @@ function initAdbuilder() {
         app.copyMethodsFromManager?.(app.adbuilder);
         console.log("✅ Adbuilder-Klasse initialisiert");
     }
-    // === Sidebar-Integration (robust) ===
+    // === Sidebar injection ===
     const waitForSidebar = setInterval(() => {
         const sidebar = document.getElementById("sidebar");
         const sidebarButtonsContainer = sidebar?.querySelector("nav .space-y-2");
