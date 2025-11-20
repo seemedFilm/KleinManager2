@@ -1,6 +1,9 @@
 /* ===========================================================
    Adbuilder Addon für KleinManager
    =========================================================== */
+//PL TBD -> muss noch angepasst werden
+// validateRequiredFields uncomment #2
+
 
 class Adbuilder extends KleinManagerCore {
     constructor() {
@@ -9,9 +12,109 @@ class Adbuilder extends KleinManagerCore {
         document.addEventListener("languageChanged", () => this.applyAdbuilderTranslations());
     }
     // Helper
-    isEmpty(id) {
+    // Liefert:
+    // { IsSuccess:true, value:"xyz" }
+    // { IsSuccess:false, reason:"empty", value:"" }
+    // { IsSuccess:false, reason:"missing-id", value:null }
+    getValue(id) {
         const el = document.getElementById(id);
-        return !el || !el.value || el.value.trim() === "";
+        if (!el) {
+            return {
+                IsSuccess: false,
+                reason: "missing-id",
+                value: null
+            };
+        }
+        const value = el.value.trim();
+        if (value === "") {
+            return {
+                IsSuccess: false,
+                reason: "empty",
+                value: ""
+            };
+        }
+        return {
+            IsSuccess: true,
+            reason: "ok",
+            value
+        };
+    }
+    // Prüft alle Pflichtfelder anhand getValue(id)
+    validateRequiredFields() {
+        const requiredFields = [
+            { id: "title", label: adbuilderTranslator.t("adbuilder.title") },
+            { id: "price", label: adbuilderTranslator.t("adbuilder.price") },
+            { id: "price_type", label: adbuilderTranslator.t("adbuilder.priceType"), isSelect: true },
+            { id: "shipping_type", label: adbuilderTranslator.t("adbuilder.shippingType"), isSelect: true }
+        ];
+        const missing = [];
+        for (const field of requiredFields) {
+            const el = document.getElementById(field.id);
+
+            // 1️⃣ Existiert das Feld nicht → Fehler
+            if (!el) {
+                missing.push(field.label);
+                continue;
+            }
+            // 2️⃣ Wenn es ein SELECT ist → Default prüfen
+            // if (field.isSelect) {
+            //     if (el.selectedIndex === 0 || el.value.trim() === "") {
+            //         missing.push(field.label);
+            //         continue;
+            //     }
+            // }
+            // 3️⃣ Normale Input-Validierung
+            const r = this.getValue(field.id);
+            if (!r.IsSuccess) {
+                missing.push(field.label);
+            }
+        }
+        return missing;
+    }
+    showMissingFieldsModal(missing) {
+        const listItems = missing
+            .map(x => `<li class="ml-5 list-disc">${x}</li>`)
+            .join("");
+
+        document.body.insertAdjacentHTML("beforeend", `
+        <div id="mandatoryModal"
+             class="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+            <div class="bg-gray-800 text-white p-6 rounded-xl shadow-xl w-80">
+                <h2 class="text-lg font-bold mb-3">${adbuilderTranslator.t("adbuilder.mandatoryTitel")}:</h2>
+                <ul>${listItems}</ul>
+
+                <button onclick="document.getElementById('mandatoryModal').remove()"
+                        class="mt-5 w-full bg-blue-600 hover:bg-blue-700 p-2 rounded">
+                    OK
+                </button>
+            </div>
+        </div>
+    `);
+    }
+    showMessageBox(title, message) {
+        document.body.insertAdjacentHTML("beforeend", `
+        <div id="mandatoryModal"
+             class="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+            <div class="bg-gray-800 text-white p-6 rounded-xl shadow-xl w-80">
+                <h2 class="text-lg font-bold mb-3">${title}:</h2>
+                <ul>${message}</ul>
+
+                <button onclick="document.getElementById('mandatoryModal').remove()"
+                        class="mt-5 w-full bg-blue-600 hover:bg-blue-700 p-2 rounded">
+                    OK
+                </button>
+            </div>
+        </div>
+    `)
+    };
+    getShippingOptions() {
+        const type = document.getElementById("shipping_type").value;
+        if (type === "SHIPPING") {
+            return Array.from(
+                document.querySelectorAll('#shipping_options input[type="checkbox"]:checked')
+            ).map(cb => cb.value);
+        }
+        return [];
     }
     // Helper
     /* -----------------------------------------------
@@ -54,6 +157,7 @@ class Adbuilder extends KleinManagerCore {
             }
             // HTML einsetzen
             container.innerHTML = html;
+            initShippingGroupExclusion();
             // Andere Sections verstecken, Adbuilder zeigen
             document.querySelectorAll("#content-area .section").forEach(sec => {
                 if (sec !== container) sec.classList.add("hidden");
@@ -160,68 +264,25 @@ class Adbuilder extends KleinManagerCore {
             statusText.textContent = `${count} ${count === 1 ? t.fileSelected : t.filesSelected}`;
         }
     }
-    async updateImageList(title = null) {
-        //const imageList = document.getElementById("imageList");
+    async updateImageList() {
+        const files = Array.from(document.getElementById("Images").files);
         const imageList = document.getElementById("fileStatusText");
         imageList.innerHTML = "";
-        let files = [];
-        if (!title) {
-            files = Array.from(document.getElementById("Images").files);
 
-            if (!files.length) {
-                imageList.innerHTML =
-                    `<li class='italic text-gray-400'>${adbuilderTranslator.translations[adbuilderTranslator.lang].noPictures}</li>`;
-                return;
-            }
-            files.forEach(file => {
-                const li = document.createElement("li");
-                li.textContent = file.name;
-                li.className = "border-gray-700 py-0.5 text-gray-100";
-                imageList.appendChild(li);
-            });
-            console.log(`${files.length} ${adbuilderTranslator.translations[adbuilderTranslator.lang]["adbuilder.loadThumbnail"]}.`);
-            return;
+        if (!files.length) {
+            imageList.innerHTML = `<li class='italic text-gray-400'>${adb_t("adbuilder.noImages")}</li>`;
+            return [];
         }
-        try {
-            const res = await fetch(`/api/v1/adbuilder/load_ad`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title })
-            });
-            const data = await res.json();
-            if (data.error) {
-                console.error(`${adbuilderTranslator.translations[adbuilderTranslator.lang].errorImgLoad}: ${data.error}`);
-                imageList.innerHTML =
-                    `<li class='italic text-red-400'>${adbuilderTranslator.translations[adbuilderTranslator.lang].errorLoading}</li>`;
-                return;
-            }
-            if (Array.isArray(data.images) && data.images.length > 0) {
-                data.images.forEach(imgPath => {
-                    const fileName = imgPath.split(/[\\/]/).pop();
-                    const li = document.createElement("li");
-                    li.textContent = fileName;
-                    li.className = "border-gray-700 py-0.5 text-gray-100";
-                    imageList.appendChild(li);
-                });
-                console.log(`📂 ${data.images.length} ${adbuilderTranslator.translations[adbuilderTranslator.lang]["adbuilder.loadPictures"]}.`);
-            } else {
-                imageList.innerHTML =
-                    `<li class='italic text-gray-400'>${adbuilderTranslator.translations[adbuilderTranslator.lang]["adbuilder.noPictures"]}</li>`;
-            }
-        } catch (err) {
-            console.error(`Error updateImageList:  ${err}`);
-            imageList.innerHTML =
-                `<li class='${adbuilderTranslator.translations[adbuilderTranslator.lang]["adbuilder.errorAdLoading"]}</li>`;
-        }
+        files.forEach(file => {
+            const li = document.createElement("li");
+            li.textContent = file.name;
+            li.className = "border-gray-700 py-0.5 text-gray-100";
+            imageList.appendChild(li);
+        });
+        return;
     }
     //Used to attach events to HTML tags
     _wireUiEvents() {
-        // const saveBtn = document.getElementById("save_adfile");
-        // if (saveBtn) {
-        //     saveBtn.addEventListener("click", () =>
-        //         this.saveAdToFile()
-        //     );
-        // }
         const imageInput = document.getElementById("Images");
         if (imageInput) {
             imageInput.addEventListener("change", async (e) => {
@@ -229,14 +290,14 @@ class Adbuilder extends KleinManagerCore {
             });
         }
     }
-    showLocalThumbnails() {
+    loadImages() {
         const files = document.getElementById("Images").files;
-        const thumbsContainerId = "thumbnails-container";
-        const thumbsDiv = document.getElementById("thumbnails-container");
+        const thumbsContainerId = "Image-list";
+        const thumbsDiv = document.getElementById("Image-list");
         thumbsDiv.classList.remove("hidden");
         thumbsDiv.innerHTML = "";
         if (!files.length) {
-            thumbsDiv.innerHTML = `<p class='text-gray-400 italic'>${adbuilderTranslator.translations[adbuilderTranslator.lang].noPictures}</p>`;
+            thumbsDiv.innerHTML = `<p class='text-gray-400 italic'>${adb_t("adbuilder.noPictures")}</p>`;
             thumbsDiv.classList.add("hidden");
             return;
         }
@@ -261,22 +322,60 @@ class Adbuilder extends KleinManagerCore {
             thumbsDiv.appendChild(img);
         });
 
-        console.log(`${files.length} ${adbuilderTranslator.translations[adbuilderTranslator.lang].loadThumbnail}`);
+        console.log(`${files.length} ${adb_t("adbuilder.loadImages")}`);
     }
-    saveAdFile() {
+    async saveAdFile() {
         try {
-            let tit;
-            let pri;
-            let pri_type;
-            let ship_type;
-            //titel, preis, preistype, 
-            if (this.isEmpty("title")) { tit = "Keine Überschrift" }
-            if (this.isEmpty("price")) { pri = "Kein Preis" }
-            if (document.getElementById("price_type").selectedIndex === 0) { pri_type = "ungültiger Preistype" }
-            if (document.getElementById("shipping_type").selectedIndex === 0) { ship_type = "ungültige Versandart" }
-           console.log(`Meldung:\n${tit || ""}\n${pri || ""}\n${pri_type || ""}\n${ship_type || ""}\n`);
-           
+            const requiredFields = this.validateRequiredFields();
+            if (requiredFields.length > 0) {
+                this.showMissingFieldsModal(requiredFields);
+                return;
+            }
+            let title = this.getValue("title").value;
+            let description = this.getValue("description").value;
+            let category = this.getValue("category").value;
+            let price = this.getValue("price").value;
+            let price_type = this.getValue("price_type").value;
+            let sell_directly = document.getElementById("sell_directly").checked;
+            let shipping_options = this.getShippingOptions();
+            let shipping_type = this.getValue("shipping_type").value;
+            if (shipping_type === "SHIPPING" && shipping_options.length === 0) {
+                this.showMessageBox(
+                    "No Shipping Options Selected",
+                    "PL TBD"
+                );
+                return;
+            }
+            const images = document.getElementById("Images").files;
 
+            const payload = new FormData();
+            payload.append("title", title.replace(/[^a-zA-Z0-9._-]/g, "_"));
+            payload.append("description", description);
+            payload.append("category", category);
+            payload.append("price", price);
+            payload.append("price_type", price_type);
+            payload.append("sell_directly", sell_directly ? "1" : "0");
+            payload.append("shipping_type", shipping_type);
+
+            Array.from(shipping_options).forEach(f => payload.append("shipping_option", f));
+            Array.from(images).forEach(i => payload.append("images", i));
+            const saveAd = await fetch("/api/v1/adbuilder/save_ad", {
+                method: "POST",
+                body: payload
+            });
+            const result = await saveAd.json();
+            if (result.success) {
+                this.showMessageBox(
+                    "Ad Saved",
+                    "Your ad has been saved successfully."
+                );
+                this.refreshAds();
+            } else {
+                this.showMessageBox(
+                    "Error Saving Ad",
+                    `There was an error saving your ad: ${result.error || "Unknown error"}`
+                );
+            }
         } catch (err) {
             console.log(`error: ${err}`)
         }
@@ -290,12 +389,13 @@ class AdbuilderTranslator {
         this.lang = localStorage.getItem("language") || "en";
         this.translations = {
             en: {
+                "adbuilder.mandatoryTitel": "Required information missing",
                 "adbuilder.formTitle": "Create Ad",
                 "adbuilder.title": "Title",
                 "adbuilder.description": "Description",
                 "adbuilder.category": "Category",
                 "adbuilder.price": "Price (€)",
-                "adbuilder.priceType": "Price Type:",
+                "adbuilder.priceType": "Price Type",
                 "adbuilder.priceType.default": "---select---",
                 "adbuilder.priceType.negotiable": "Negotiable",
                 "adbuilder.priceType.fixed": "Fixed",
@@ -317,7 +417,9 @@ class AdbuilderTranslator {
                 "adbuilder.actions.preview": "Preview",
                 "adbuilder.images": "Images:",
                 "adbuilder.noImages": "No pictures selected",
+                "adbuilder.errorImgLoad": "Error during image loading",
                 "adbuilder.chooseFiles": "Choose files",
+                "adbuilder.loadImages": "Images loaded",
                 "adbuilder.loadThumbnail": "Thumbnails loaded",
                 "adbuilder.errorAdLoading": "Error during the ad loading",
                 "adbuilder.noPictures": "No Pictures selected",
@@ -325,12 +427,13 @@ class AdbuilderTranslator {
                 "adbuilder.actions.save.title": "",
             },
             de: {
+                "adbuilder.mandatoryTitel": "Fehlende Informationen",
                 "adbuilder.formTitle": "Erstelle Anzeige",
                 "adbuilder.title": "Titel",
                 "adbuilder.description": "Beschreibung",
                 "adbuilder.category": "Kategorie",
                 "adbuilder.price": "Preis (€)",
-                "adbuilder.priceType": "Preistyp:",
+                "adbuilder.priceType": "Preistyp",
                 "adbuilder.priceType.default": "---Auswählen---",
                 "adbuilder.priceType.negotiable": "Verhandlungsbasis",
                 "adbuilder.priceType.fixed": "Festpreis",
@@ -352,7 +455,9 @@ class AdbuilderTranslator {
                 "adbuilder.actions.preview": "Vorschau",
                 "adbuilder.images": "Bilder:",
                 "adbuilder.noImages": "Keine Bilder ausgewählt",
+                "adbuilder.errorImgLoad": "Fehler beim Laden der Bilder",
                 "adbuilder.chooseFiles": "Bilder auswählen",
+                "adbuilder.loadImages": "Bilder geladen",
                 "adbuilder.loadThumbnail": "Vorschaubilder geladen",
                 "adbuilder.errorAdLoading": "Fehler beim Anzeigen laden",
                 "adbuilder.noPictures": "Keine Bilder ausgewählt",
@@ -466,4 +571,22 @@ if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initAdbuilder);
 } else {
     initAdbuilder();
+}
+function initShippingGroupExclusion() {
+    const checkboxes = document.querySelectorAll('#shipping_options input[type="checkbox"]');
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', function () {
+            const group = this.getAttribute('data-group');
+
+            // Wenn aktiviert → alle anderen Gruppen deaktivieren
+            if (this.checked) {
+                checkboxes.forEach(other => {
+                    if (other !== this && other.getAttribute('data-group') !== group) {
+                        other.checked = false;
+                    }
+                });
+            }
+        });
+    });
 }

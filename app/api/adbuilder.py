@@ -14,38 +14,56 @@ SHARED_PICS = Path(os.getenv("SHARED_PIC"))
 max_images_per_ad = 16
 
 
-@router.post("/adbuilder/builder")
-async def build(request: Request):
+@router.post("/adbuilder/save_ad")
+async def save_ad(
+    title: str = Form(...),
+    description: str = Form(""),
+    category: str = Form(""),
+    price: str = Form(""),
+    price_type: str = Form(""),
+    sell_directly: str = Form("0"),
+    shipping_type: str = Form(""),
+    shipping_option: list[str] = Form([]),
+    images: list[UploadFile] = File([]),
+):
     try:
-        print(f'router.post("/adbuilder/builder"')
-        data = await request.json()  
-        title = data.get("title")
-        title = re.sub(r'[^a-zA-Z0-9_\-]', '_', title)
-        #title = "".join(c if c.isalnum() or c in "-_" else "_" for c in title)
-        description = data.get("description")
-        category= data.get("category")
-        price = data.get("price")
-        price_type = data.get("price_type")
-        sell_directly = data.get("sell_directly")
-        shipping_options = data.get("shipping_options")
-        images = images = data.get("images", [])
         ad_filename = SHARED_ADS / f"ad_{title}.json"
-       
-        updated_images = []
+        img_dir = SHARED_PICS / title
+        img_dir.mkdir(parents=True, exist_ok=True)
+
+        # Save images
+        saved_images = []
         for img in images:
-            image_name = Path(img).name
-            updated_images.append(f"./{title}/{image_name}")
-        data["images"] = updated_images
-        
-        with open(ad_filename, "w", encoding="utf-8") as adFile:
-                json.dump(data, adFile, indent=2, ensure_ascii=False)
-                
-        print(f"✅ Ad-Daten gespeichert in: {ad_filename}")
-        return {"status": "ok", "saved_file": str(ad_filename), "received_data": data}
-    
+            filename = Path(img.filename).name
+            target = img_dir / filename
+            with open(target, "wb") as buffer:
+                shutil.copyfileobj(img.file, buffer)
+            saved_images.append(f"./{title}/{filename}")
+
+        # Build JSON data
+        ad_data = {
+            "title": title,
+            "description": description,
+            "category": category,
+            "price": price,
+            "price_type": price_type,
+            "sell_directly": sell_directly,
+            "shipping_type": shipping_type,
+            "shipping_options": shipping_option,
+            "images": saved_images,
+        }
+
+        with open(ad_filename, "w", encoding="utf-8") as f:
+            json.dump(ad_data, f, indent=2, ensure_ascii=False)
+
+        print("SAVED:", ad_filename)
+        return {"success": True, "file": str(ad_filename)}
+
     except Exception as ex:
-        print(f"❌ Fehler beim Speichern der Ad-Datei: {ex}")
-        return {"status": "error", "message": str(ex)}
+        print("❌ Fehler:", ex)
+        return {"success": False, "error": str(ex)}
+
+    
    
 @router.get("/adbuilder/categories")
 async def get_categories():
@@ -105,6 +123,7 @@ def list_ads_files():
     for f in SHARED_ADS.iterdir():
         print(f" Found file: {f.name}")
         if f.is_file() and f.suffix.lower() in [".json", ".yaml", ".yml"]:
+            print(f" Found file: {f.name}")
             files.append(f.name)
 
     print(f" Returning files: {files}")   
