@@ -30,8 +30,7 @@ async def save_ad(
         ad_filename = SHARED_ADS / f"ad_{title}.json"
         img_dir = SHARED_PICS / title
         img_dir.mkdir(parents=True, exist_ok=True)
-
-        # Save images
+        
         saved_images = []
         for img in images:
             filename = Path(img.filename).name
@@ -39,8 +38,7 @@ async def save_ad(
             with open(target, "wb") as buffer:
                 shutil.copyfileobj(img.file, buffer)
             saved_images.append(f"./{title}/{filename}")
-
-        # Build JSON data
+            
         ad_data = {
             "title": title,
             "description": description,
@@ -52,19 +50,12 @@ async def save_ad(
             "shipping_options": shipping_option,
             "images": saved_images,
         }
-
         with open(ad_filename, "w", encoding="utf-8") as f:
             json.dump(ad_data, f, indent=2, ensure_ascii=False)
-
-        print("SAVED:", ad_filename)
         return {"success": True, "file": str(ad_filename)}
-
     except Exception as ex:
-        print("❌ Fehler:", ex)
         return {"success": False, "error": str(ex)}
 
-    
-   
 @router.get("/adbuilder/categories")
 async def get_categories():
     try:
@@ -114,28 +105,27 @@ async def upload_images(
         return JSONResponse({"error": str(ex)}, status_code=500)
 
 @router.get("/adbuilder/list_files")
-def list_ads_files():
-    if not SHARED_ADS.exists():
-        return {"error": "ADS directory not found"}
-    else:
-       print(f" Directory {SHARED_ADS} found.")
-    files = []
-    for f in SHARED_ADS.iterdir():
-        print(f" Found file: {f.name}")
-        if f.is_file() and f.suffix.lower() in [".json", ".yaml", ".yml"]:
-            print(f" Found file: {f.name}")
-            files.append(f.name)
-
-    print(f" Returning files: {files}")   
-    
-    return {"files": files}
-
+def list_ads_files():    
+    try:
+        print("/adbuilder/list_files()")        
+        if not SHARED_ADS.exists():
+            return {"error": "ADS directory not found"}
+        else:
+            print(f" Directory {SHARED_ADS} found.")        
+        files = []
+        for f in SHARED_ADS.iterdir():            
+            if f.is_file() and f.suffix.lower() in [".json", ".yaml", ".yml"]:
+                print(f" Found file: {f.name}")
+                files.append(f.name)  
+        return {"success": True, "files": files}
+        
+    except Exception as ex:
+        return {"success": False, "error": str(ex)}
+   
 @router.post("/adbuilder/load_ad")
 async def load_ad(request: Request):
     data = await request.json()  
-    title = data.get("title")
-
-    
+    title = data.get("title")    
     for f in SHARED_ADS.iterdir():
         print(f" Found file: {f.name}")
         if f.is_file() and f.suffix.lower() in [".json", ".yaml", ".yml"]:

@@ -4,6 +4,64 @@
 //PL TBD -> muss noch angepasst werden
 // validateRequiredFields uncomment #2
 
+// ---- Gemeinsame MessageBox ----
+function showMessageBox(title, message) {
+    // Falls schon offen → erst entfernen
+    document.getElementById("mandatoryModal")?.remove();
+
+    document.body.insertAdjacentHTML("beforeend", `
+        <div id="mandatoryModal"
+             class="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+            <div class="bg-gray-800 text-white p-6 rounded-xl shadow-xl w-80">
+                <h2 class="text-lg font-bold mb-3">${title}:</h2>
+                <ul>${message}</ul>
+
+                <button onclick="document.getElementById('mandatoryModal').remove()"
+                        class="mt-5 w-full bg-blue-600 hover:bg-blue-700 p-2 rounded">
+                    OK
+                </button>
+            </div>
+        </div>
+    `);
+}
+
+// ---- mbox nutzt dieselbe MessageBox ----
+const mbox = {
+    show(type, title, message) {
+
+        const icons = {
+            error: "fa-circle-xmark text-red-500",
+            info: "fa-circle-info text-blue-500",
+            warning: "fa-triangle-exclamation text-yellow-500",
+            success: "fa-circle-check text-green-500"
+        };
+
+        const iconClass = icons[type] || icons.info;
+        const finalTitle = `
+            <i class="fa-solid ${iconClass} mr-2"></i> 
+            ${title}
+        `;
+
+        // MessageBox direkt verwenden
+        showMessageBox(finalTitle, message);
+    },
+
+    error(title, message) {
+        this.show("error", title, message);
+    },
+
+    info(title, message) {
+        this.show("info", title, message);
+    },
+
+    warning(title, message) {
+        this.show("warning", title, message);
+    },
+
+    success(title, message) {
+        this.show("success", title, message);
+    }
+};
 
 class Adbuilder extends KleinManagerCore {
     constructor() {
@@ -107,6 +165,7 @@ class Adbuilder extends KleinManagerCore {
         </div>
     `)
     };
+
     getShippingOptions() {
         const type = document.getElementById("shipping_type").value;
         if (type === "SHIPPING") {
@@ -226,6 +285,7 @@ class Adbuilder extends KleinManagerCore {
         try {
             const res = await fetch("/api/v1/adbuilder/list_files");
             const data = await res.json();
+
             const container = document.getElementById("adsFileContainer");
             if (!container) return;
             container.innerHTML = "";
@@ -364,20 +424,14 @@ class Adbuilder extends KleinManagerCore {
                 body: payload
             });
             const result = await saveAd.json();
-            if (result.success) {
-                this.showMessageBox(
-                    "Ad Saved",
-                    "Your ad has been saved successfully."
-                );
-                this.refreshAds();
-            } else {
-                this.showMessageBox(
-                    "Error Saving Ad",
-                    `There was an error saving your ad: ${result.error || "Unknown error"}`
-                );
+            if (!result.success) {
+                throw new Error(result.error);
             }
+            this.refreshAds();
+            mbox.success("Ad Saved", `Ad "${title}" saved successfully.`);
         } catch (err) {
-            console.log(`error: ${err}`)
+            mbox.error("Error Saving Ad", err.message);
+            console.log(`error: ${err}`);
         }
     }
 }
