@@ -6,9 +6,7 @@
 
 // ---- Gemeinsame MessageBox ----
 function showMessageBox(title, message) {
-    // Falls schon offen → erst entfernen
     document.getElementById("mandatoryModal")?.remove();
-
     document.body.insertAdjacentHTML("beforeend", `
         <div id="mandatoryModal"
              class="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
@@ -24,8 +22,6 @@ function showMessageBox(title, message) {
         </div>
     `);
 }
-
-// ---- mbox nutzt dieselbe MessageBox ----
 const mbox = {
     show(type, title, message) {
 
@@ -97,7 +93,7 @@ class Adbuilder extends KleinManagerCore {
             value
         };
     }
-    // Prüft alle Pflichtfelder anhand getValue(id)
+    
     validateRequiredFields() {
         const requiredFields = [
             { id: "title", label: adbuilderTranslator.t("adbuilder.title") },
@@ -109,19 +105,18 @@ class Adbuilder extends KleinManagerCore {
         for (const field of requiredFields) {
             const el = document.getElementById(field.id);
 
-            // 1️⃣ Existiert das Feld nicht → Fehler
             if (!el) {
                 missing.push(field.label);
                 continue;
             }
-            // 2️⃣ Wenn es ein SELECT ist → Default prüfen
-            // if (field.isSelect) {
-            //     if (el.selectedIndex === 0 || el.value.trim() === "") {
-            //         missing.push(field.label);
-            //         continue;
-            //     }
-            // }
-            // 3️⃣ Normale Input-Validierung
+            
+            if (field.isSelect) {
+                if (el.selectedIndex === 0 || el.value.trim() === "") {
+                    missing.push(field.label);
+                    continue;
+                }
+            }
+            
             const r = this.getValue(field.id);
             if (!r.IsSuccess) {
                 missing.push(field.label);
@@ -149,22 +144,22 @@ class Adbuilder extends KleinManagerCore {
         </div>
     `);
     }
-    showMessageBox(title, message) {
-        document.body.insertAdjacentHTML("beforeend", `
-        <div id="mandatoryModal"
-             class="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-            <div class="bg-gray-800 text-white p-6 rounded-xl shadow-xl w-80">
-                <h2 class="text-lg font-bold mb-3">${title}:</h2>
-                <ul>${message}</ul>
+    // showMessageBox(title, message) {
+    //     document.body.insertAdjacentHTML("beforeend", `
+    //     <div id="mandatoryModal"
+    //          class="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+    //         <div class="bg-gray-800 text-white p-6 rounded-xl shadow-xl w-80">
+    //             <h2 class="text-lg font-bold mb-3">${title}:</h2>
+    //             <ul>${message}</ul>
 
-                <button onclick="document.getElementById('mandatoryModal').remove()"
-                        class="mt-5 w-full bg-blue-600 hover:bg-blue-700 p-2 rounded">
-                    OK
-                </button>
-            </div>
-        </div>
-    `)
-    };
+    //             <button onclick="document.getElementById('mandatoryModal').remove()"
+    //                     class="mt-5 w-full bg-blue-600 hover:bg-blue-700 p-2 rounded">
+    //                 OK
+    //             </button>
+    //         </div>
+    //     </div>
+    // `)
+    // };
 
     getShippingOptions() {
         const type = document.getElementById("shipping_type").value;
@@ -181,7 +176,6 @@ class Adbuilder extends KleinManagerCore {
        ----------------------------------------------- */
     async loadAdbuilderSection() {
         try {
-            // CSS nur einmal laden
             const cssPath = "/app/addons/adbuilder/adbuilder.css";
             if (!document.querySelector(`link[href="${cssPath}"]`)) {
                 const link = document.createElement("link");
