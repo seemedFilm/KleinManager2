@@ -1,11 +1,10 @@
-<div id="adbuilder" class="section hidden">
-    <div class="container">
+    <div class="mb-8 mt-12 lg:mt-0">
         <h1 data-i18n="adbuilder.formTitle">Create Ad</h1>
 
         <form id="adForm">
             <!-- Titel -->
             <label for="title" data-i18n="adbuilder.title">Title:</label>
-            <div class="w-1/2">
+            <!-- <div class="w-1/2"> -->
                 <input type="text" value="Text im Eingabefeld" id="title" name="title" data-i18n-placeholder="adbuilder.placeholderTitle"
                     placeholder="Titel der Anzeige" />
             </div>
@@ -33,9 +32,9 @@
                         <div class="flex flex-col">
                             <label for="price_type" data-i18n="adbuilder.priceType">Price Type</label>
                             <select id="price_type" name="price_type">
-                                <option value="NEGOTIABLE" data-i18n="adbuilder.priceType.negotiable">Negotiable</option>
-                                <option value="" data-i18n="adbuilder.priceType.default">---select---</option>
                                 <!-- <option value="NEGOTIABLE" data-i18n="adbuilder.priceType.negotiable">Negotiable</option> -->
+                                <option value="" data-i18n="adbuilder.priceType.default">---select---</option>
+                                <option value="NEGOTIABLE" data-i18n="adbuilder.priceType.negotiable">Negotiable</option>
                                 <option value="FIXED" data-i18n="adbuilder.priceType.fixed">Fixed</option>
                                 <option value="GIVE_AWAY" data-i18n="adbuilder.priceType.giveaway">Give Away</option>
                             </select>
@@ -80,10 +79,10 @@
                         Shipping Type:
                     </label>
                     <select id="shipping_type" name="shipping_type">
-                        <option value="SHIPPING" data-i18n="adbuilder.shipping_type.shipping">Shipping</option>
+                        <!-- <option value="SHIPPING" data-i18n="adbuilder.shipping_type.shipping">Shipping</option> -->
                         <option value="" data-i18n="adbuilder.shipping_type.default">---select---</option>
                         <option value="PICKUP" data-i18n="adbuilder.shipping_type.pickup">Pickup</option>
-                        <!-- <option value="SHIPPING" data-i18n="adbuilder.shipping_type.shipping">Shipping</option> -->
+                        <option value="SHIPPING" data-i18n="adbuilder.shipping_type.shipping">Shipping</option>
                         <option value="NOT_APPLICABLE" data-i18n="adbuilder.shipping_type.not-applicable">Not Applicable
                         </option>
                     </select>
@@ -140,7 +139,7 @@
                             </div>
 
                             <!-- Thumbnails -->
-                            <div id="Image-List"
+                            <div id="Image-list"
                                 class="hidden flex flex-row gap-2 p-2 bg-gray-800 rounded-lg border border-gray-700 min-h-[8px] max-h-[200px] overflow-x-auto overflow-y-hidden whitespace-nowrap">
                                 <p class="text-gray-400 italic w-full text-center" data-i18n="adbuilder.noPreview">
                                     No Preview loaded
@@ -159,4 +158,3 @@
             </div>
         </form>
     </div>
-</div>
