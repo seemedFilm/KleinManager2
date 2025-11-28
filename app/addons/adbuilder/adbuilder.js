@@ -98,7 +98,6 @@ class Adbuilder extends KleinManagerCore {
         const missing = [];
         for (const field of requiredFields) {
             const el = document.getElementById(field.id);
-
             if (!el) {
                 missing.push(field.label);
                 continue;
@@ -154,12 +153,12 @@ class Adbuilder extends KleinManagerCore {
                 link.rel = "stylesheet";
                 link.href = cssPath;
                 document.head.appendChild(link);
-                console.log(" AdBuilder CSS geladen:", cssPath);
+                console.log(`${adbuilderTranslator.t("adbuilder.www.css.loaded")}: ${cssPath}`);
             }
-            console.log(" Lade Adbuilder HTML...");
+
 
             const res = await fetch("/app/addons/adbuilder/adbuilder.html");
-            if (!res.ok) throw new Error(`Fehler beim Laden (HTTP ${res.status})`);
+            if (!res.ok) throw new Error(`${adbuilderTranslator.t("adbuilder.www.html.error")}: (HTTP ${res.status})`);
             const html = await res.text();
             const tmp = document.createElement("div");
             tmp.innerHTML = html;
@@ -172,30 +171,27 @@ class Adbuilder extends KleinManagerCore {
                 container.id = "adbuilder";
                 container.className = "section hidden p-4";
                 document.querySelector(".lg\\:ml-64.flex-1 .p-4.lg\\:p-6").appendChild(container);
-
-                console.log("🧱 Neue Section #adbuilder erstellt");
             }
             container.innerHTML = injectedHtml;
-            console.log("ℹ️ AdBuilder: HTML injiziert (inner content).");
 
             initShippingGroupExclusion();
             document.querySelectorAll("#content-area .section").forEach(sec => {
                 if (sec !== container) sec.classList.add("hidden");
             });
             container.classList.remove("hidden");
-            try { this._wireUiEvents(); } catch (e) { console.warn("⚠️ _wireUiEvents fehlgeschlagen:", e); }
+        try { this._wireUiEvents(); } catch (e) { console.warn(` _wireUiEvents ${adbuilderTranslator.t("adbuilder.failed")}:${e}`); }
             if (window.adbuilderTranslator) adbuilderTranslator.applyTranslations();
             this.applyAdbuilderTranslations?.();
             await this.loadCategories?.();
             await this.refreshAds?.();
 
-            console.log("✅ Adbuilder-HTML geladen und sichtbar.");
+            console.log(`${adbuilderTranslator.t("adbuilder.www.html.loaded")}`);
         } catch (err) {
-            console.error("❌ Konnte Adbuilder-HTML nicht laden:", err);
+            console.error(`${adbuilderTranslator.t("adbuilder.www.html.error")}: ${err}`);
             const main = document.querySelector("#content-area") || document.body;
             const fallback = document.createElement("div");
             fallback.className = "p-4 bg-red-900 text-red-200 rounded";
-            fallback.textContent = `Fehler beim Laden des AdBuilder: ${err.message || err}`;
+            fallback.textContent = `${adbuilderTranslator.t("adbuilder.www.html.error")}: ${err.message || err}`;
             main.appendChild(fallback);
         }
     }
@@ -208,12 +204,11 @@ class Adbuilder extends KleinManagerCore {
             adbuilderTranslator.translations[adbuilderTranslator.lang] ||
             adbuilderTranslator.translations.en ||
             {};
-
         document.querySelectorAll("[data-i18n]").forEach(el => {
             const key = el.getAttribute("data-i18n");
             if (dict[key]) el.textContent = dict[key];
         });
-        console.log("🈶 Adbuilder-Übersetzungen angewendet:", adbuilderTranslator.lang);
+        console.log(`${adbuilderTranslator.t("adbuilder.translations.ok")}: ${adbuilderTranslator.lang}`);
     }
     async loadCategories() {
         try {
@@ -232,11 +227,11 @@ class Adbuilder extends KleinManagerCore {
             } else {
                 const opt = document.createElement("option");
                 opt.value = "";
-                opt.textContent = "Keine Kategorien verfügbar";
+                opt.textContent = `${adbuilderTranslator.t("adbuilder.translations.noCat")}`;
                 select.appendChild(opt);
             }
         } catch (err) {
-            console.error("❌ Kategorien konnten nicht geladen werden:", err);
+            console.error(`${adbuilderTranslator.t("adbuilder.translations.error")}: ${adbuilderTranslator.lang}: ${err}`);
         }
     }
     async refreshAds() {
@@ -247,7 +242,7 @@ class Adbuilder extends KleinManagerCore {
             if (!container) return;
             container.innerHTML = "";
             if (!data.files?.length) {
-                container.innerHTML = `<p class="text-gray-400">Keine gespeicherten Anzeigen gefunden.</p>`;
+                container.innerHTML = `<p class="text-gray-400">${adbuilderTranslator.t("adbuilder.templates.noTemplate")}</p>`;
                 return;
             }
             data.files.forEach((file, idx) => {
@@ -265,7 +260,7 @@ class Adbuilder extends KleinManagerCore {
                 container.appendChild(label);
             });
         } catch (err) {
-            console.error("❌ Fehler bei refreshAds:", err);
+            console.error(`${adbuilderTranslator.t("adbuilder.errorAdLoading")}: ${err}`);
         }
     }
     handleFileSelection(input) {
